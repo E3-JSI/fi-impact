@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact name="FI-IMPACT:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/FI_IMPACT_jar</output-path>
+    <root id="root">
+      <element id="archive" name="FI-IMPACT.jar">
+        <element id="module-output" name="FI-IMPACT" />
+      </element>
+      <element id="library" level="project" name="aiutil" />
+      <element id="library" level="project" name="catalina nd servlet-api" />
+      <element id="library" level="project" name="JSON-java" />
+      <element id="library" level="project" name="log4j 2" />
+    </root>
+  </artifact>
+</component>

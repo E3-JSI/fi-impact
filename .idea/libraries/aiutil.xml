@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="aiutil">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/ai/aiutil.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
