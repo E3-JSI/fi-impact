@@ -169,7 +169,7 @@ public class SurveyManager
         sum += r;
 
         //logger.debug("score: {}", sd.results.get(resultType));
-        double percent = ((double) beforeYou) / n;
+        double percent = Math.round((((double) beforeYou) / n) * 100);
         sd.resultDerivatives.put(id + "_R", percent);
         //sd.results.put(resultType + "_RANK", (double) beforeYou);
         Double yourResult = sd.results.get(id);
@@ -920,4 +920,23 @@ public class SurveyManager
     custom.setMinusSign('-');
     return new DecimalFormat("0.0000", custom);
   }
+
+  public static DecimalFormat getDecimalFormatter0()
+  {
+    DecimalFormatSymbols custom=new DecimalFormatSymbols();
+    custom.setDecimalSeparator('.');
+    custom.setGroupingSeparator(',');
+    custom.setMinusSign('-');
+    return new DecimalFormat("0", custom);
+  }
+
+  public static void main(String[] args) throws Exception
+  {
+    double d = 1.234;
+    DecimalFormat df = getDecimalFormatter4();
+    System.out.println(df.format(d));
+    df = getDecimalFormatter0();
+    System.out.println(df.format(d));
+  }
+
 }
