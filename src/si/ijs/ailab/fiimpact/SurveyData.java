@@ -49,8 +49,26 @@ class SurveyData
                   "J\t0.316821663\t0.217659798\t0.166666667\t1.111081921\t0.265609708\t0.384075203\t0.747959145\t0.166666667\t0.774004796\t0.542547136\t0.723117782\t0.413332816\t0.168541489\t0.771010145\t0.618535185\t0.341067579\n"+
                   "K\t0.729747903\t0.713021647\t0.218419291\t1.126336793\t0.869162263\t0.529593496\t1.200075516\t0.944791667\t1.069296523\t0.771207755\t1.549248278\t1.35771179\t0.849352077\t0.715301449\t0.925640333\t1.24679248";
 
+  private static ArrayList<String> JSON_TRUNCATE_DECIMALS = new ArrayList<>();
+
   static
   {
+    //Questions listed in this list will be truncated for JSON output
+    JSON_TRUNCATE_DECIMALS .add("Q1_13");
+    JSON_TRUNCATE_DECIMALS .add("Q1_16");
+    JSON_TRUNCATE_DECIMALS .add("Q1_7");
+    JSON_TRUNCATE_DECIMALS .add("Q1_8");
+    JSON_TRUNCATE_DECIMALS .add("Q1_9");
+    JSON_TRUNCATE_DECIMALS .add("Q3_2a");
+    JSON_TRUNCATE_DECIMALS .add("Q3_2b");
+    JSON_TRUNCATE_DECIMALS .add("Q3_2c");
+    JSON_TRUNCATE_DECIMALS .add("Q4_3a");
+    JSON_TRUNCATE_DECIMALS .add("Q4_3b");
+    JSON_TRUNCATE_DECIMALS .add("Q4_3c");
+    JSON_TRUNCATE_DECIMALS .add("Q4_3d");
+    JSON_TRUNCATE_DECIMALS .add("Q4_6");
+
+    //Wiights for calculating scores
     Map<String, Double> m = new HashMap<>();
 
     m.put("TRL1", 1.0);
@@ -253,7 +271,7 @@ class SurveyData
           Element r = doc.createElement("result");
           root.appendChild(r);
           r.setAttribute("id", re.getKey());
-          r.setAttribute("score", SurveyManager.getDecimalFormatter4().format(re.getValue()));
+          r.setAttribute("score", SurveyManager.getDecimalFormatter0().format(re.getValue()));
         }
 
       }
@@ -268,7 +286,16 @@ class SurveyData
       jsonSurvey.key("questions").array();
       for (Map.Entry<String, String> qe : questions.entrySet())
       {
-        jsonSurvey.array().value(qe.getKey()).value(qe.getValue()).endArray();
+        String id = qe.getKey();
+        String val = qe.getValue();
+        if(JSON_TRUNCATE_DECIMALS.contains(id))
+        {
+          int i = val.indexOf('.');
+          if(i != -1)
+            val = val.substring(0, i);
+        }
+
+        jsonSurvey.array().value(id).value(val).endArray();
       }
       jsonSurvey.endArray();
 
