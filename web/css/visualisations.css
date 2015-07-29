@@ -1,0 +1,40 @@
+.stars { color: #95C6E9; }
+
+// Spidergram
+
+#chart {
+  display: block;
+  top: 50px;
+  left: 100px;
+}
+
+
+// Speedometer
+
+.chartObjSm {
+  width: 48%;
+  height: 350px;
+  min-width: 200px;
+  float: left;
+  background: #efefef;
+  -webkit-box-shadow: 2px 2px 8px 0px rgba(50, 50, 50, 0.23);
+  -moz-box-shadow: 2px 2px 8px 0px rgba(50, 50, 50, 0.23);
+  box-shadow: 2px 2px 8px 0px rgba(50, 50, 50, 0.23);
+  margin: 5px 1% 10px 1%;
+  text-align: center;
+}
+.chartObjSm p {
+  font-size: 1em;
+  float: left;
+  width: 100%;
+}
+.chartObjSm p em {
+  font-size: 3em;
+  clear: both;
+  width: 100%;
+}
+
+.chart-color1 { fill: #923933; }
+.chart-color2 { fill: #F4B900; }
+.chart-color3 { fill: #00A54F; }
+.chart-density { fill: #fff; }

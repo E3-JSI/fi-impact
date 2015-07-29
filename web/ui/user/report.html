@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="fiApp"><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<meta name="description" content="">
+	<meta name="author" content="JSI">
+	<link rel="icon" href="http://getbootstrap.com/favicon.ico">
+
+    <title>FI-Impact Report</title>
+		
+    <!-- Bootstrap Core CSS -->
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="../../css/agency.css" rel="stylesheet">
+	<link href="../../css/fi-impact.css" rel="stylesheet">
+    <!-- Custom Fonts -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+	<link href="../../css/visualisations.css" rel="stylesheet">
+</head>
+
+<body id="page-top" class="index" ng-controller="fiCtrl">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" href="#page-top">FI Impact Report</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="hidden"><a href="#page-top"></a></li>
+                    <li><a class="page-scroll" href="#project">Project</a></li>
+                    <li><a class="page-scroll" href="#innovation">Innovation</a></li>
+                    <li><a class="page-scroll" href="#market">Market</a></li>
+                    <li><a class="page-scroll" href="#feasibility">Feasibility</a></li>
+                    <li><a class="page-scroll" href="#marketNeeds">Market Needs</a></li>
+					<li><a class="page-scroll" href="#socialImpact">Social Impact</a></li>
+					<li><a class="page-scroll" href="#overview">Overview</a></li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="intro-text">
+                <div class="intro-lead-in">This is your</div>
+                <div class="intro-heading">FI-Impact Report</div>
+                <a href="#project" class="page-scroll btn btn-xl">Tell Me More</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Project Section -->
+    <section id="project">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2 class="section-heading">Project: <span id="data1_4"></span></h2>
+                    <h3 id="data1_14" class="section-subheading text-muted"></h3>
+                </div>
+            </div>
+			<div class="row"><div class="col-md-6"><table class="table table-striped"><tbody>
+				<tr><td width="25%"><strong>Organisation</strong></td>
+					<td><strong id="data1_3"></strong> (operational <span id="data1_16"></span> years)<br><i id="organisationType"></i><br><span id="data1_5"></span><br>
+					<span id="data1_17"></span>, <span id="data1_2"></span><br><span id="data1_9"></span>&euro; annual turnover last year</td></tr>
+				<tr><td><strong>Employees</strong></td>
+					<td>Implementing team size: <span id="data1_7"></span><br>Full time employees: <span id="data1_8"></span></td></tr>
+				<tr><td width="25%"><strong>Accelerator</strong></td>
+					<td><strong id="data1_1"></strong> (<span id="data1_13"></span>&euro;)<br><span id="data1_14"></span></td></tr>
+				<tr><td><strong>Solution</strong></td>
+					<td><span id="data1_10"></span><br><span id="data1_11"></span></td></tr>
+			</tbody></table></div>
+			<div class="col-md-6 text-left">
+				<strong>FIWARE enablers</strong>
+				<p id="data1_12"></p>
+				<table class="table table-striped" id="tableEnablers"><tbody>
+			</tbody></table></div></div>
+		</div>
+    </section>
+
+    <!-- Innovation Section -->
+    <section id="innovation" class="bg-light-gray">
+        <div class="container onBg">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+					<h2 class="section-heading">Innovation</h2>
+					<div id="innovationGauge" class="pull-right"></div>
+					<h3 class="section-subheading text-muted" id="innovationText"></h3>
+                </div>
+            </div>
+			<div class="row"><div class="col-md-6"><table class="table table-striped"><tbody>
+					<tr><td width="25%"><strong>Concept</strong></td>
+					<td><strong>Authors:</strong> <span id="data2_4"></span><br><strong>Stage:</strong> <span id="data2_1"></span></td></tr>
+				</tbody></table></div>
+				<div class="col-md-6"><table class="table table-striped"><tbody>
+					<tr><td width="25%"><strong>Business idea</strong></td>
+					<td><strong>Innovation Type:</strong> <span id="data2_2"></span><br>
+						<strong>Existence of similar solution:</strong> <span id="data2_3"></span><br>
+						<strong>Strategy:</strong> <span id="data2_5"></span></td></tr>
+			</tbody></table></div></div>
+        </div>
+    </section>
+
+    <!-- Market Section -->
+    <section id="market">
+        <div class="container onBg">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2 class="section-heading">Market</h2>
+					<div id="marketGauge" class="pull-right"></div>
+                    <h3 class="section-subheading text-muted">The Market Focus indicator assesses to what extent you have gathered 
+					knowledge about customers in the target market, and if your initiative has a strategy and plan to reach the target
+					market. This indicator measures the level of your “customer development” activities: whether you have already approached 
+					customers to collect feedback on your product, and to what extent you have developed a strategy to acquire them.</h3>
+					<h3 class="section-subheading text-muted" id="marketText"></h3>
+                </div>
+            </div>
+            <div class="row">
+				<div class="col-md-6"><table class="table table-striped"><tbody>
+					<tr><td width="25%"><strong>Business model</strong></td>
+						<td><strong>Model:</strong> <span id="businessModel"></span><br><strong>Revenue Division:</strong> licenses <span id="data3_2a"></span>%, subscriptions: <span id="data3_2b"></span>%, project fees: <span id="data3_2c"></span>%</td></tr>
+					<tr><td><strong>Customers</strong></td>
+						<td><strong>Value Proposition Verification:</strong> <span id="data3_8"></span><br><strong>Commercial Strategy Status: </strong><span id="data3_9"></span></td></tr>
+				</tbody></table></div>
+				<div class="col-md-6"><table class="table table-striped"><tbody>
+					<tr><td width="25%"><strong>Market</strong></td>
+						<td><strong>Market Sectors:</strong> <span id="marketSectors"></span><br><strong>Channel:</strong> <span id="marketChannel"></span><br>
+							<strong>Target Market in Three Years:</strong> <span id="data3_5"></span><br><strong>Entry into the Open Market:</strong> <span id="data3_6"></span><br>
+							<strong>Level of competition:</strong> <span id="data3_7"></span><br><strong>Market Strategy Status:</strong> <span id="data3_10"></span></td></tr>
+				</tbody></table></div>
+			</div>
+        </div>
+    </section>
+
+    <!-- Feasibility Section -->
+    <section id="feasibility" class="bg-light-gray">
+        <div class="container onBg">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2 class="section-heading">Feasibility</h2>
+					<div id="feasibilityGauge" class="pull-right"></div>
+                    <h3 class="section-subheading text-muted">The Feasibility indicator assesses to what extent you have assessed the 
+					economic viability of your business, and if you have already provided for the necessary funds for the startup phase.
+					This indicator assesses whether you are aware of the funds required to start and grow your business, and whether you
+					have secured sources for these funds.</h3>
+                </div>
+            </div>
+            <div class="row">
+				<div class="col-md-6"><table class="table table-striped"><tbody>
+					<tr><td width="25%"><strong>Capital</strong></td>
+					<td><strong>Required investments until sustainable:</strong> <span id="data4_1"></span><br><strong>Secured funding:</strong> <span id="data4_6"></span>%</td></tr>
+				<tr><td><strong>Growth rate</strong></td>
+					<td><strong>Sales:</strong> <span id="data4_2"></span><br><strong>Revenue (4 years):</strong> <span id="revenueGrowth"></span></td></tr>
+				</tbody></table></div>
+				<div class="col-md-6"><table class="table table-striped"><tbody>
+					<tr><td width="25%"><strong>Customer acquisition</strong></td><td><span id="data4_4"></span></td></tr>
+				<tr><td width="25%"><strong>Sales and marketing expansion</strong></td><td><span id="data4_5"></span></td></tr>
+				</tbody></table></div>
+			</div>
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 text-center">
+                    <p class="large text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut eaque, laboriosam veritatis, quos non quis ad perspiciatis, totam corporis ea, alias ut unde.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+	
+	<!-- Market Needs Section -->
+    <section id="marketNeeds">
+        <div class="container onBg">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2 class="section-heading">Market Needs</h2>
+                </div>
+            </div>
+            <div class="row mnSector" ng-repeat="MN in aFi.marketNeeds">
+				<h3>{{MN.sector}}</h3>
+				<div class="col-md-6"><table class="table table-striped"><tbody>
+						<tr ng-repeat="score in MN.scores"><td>{{score.name}}</td><td><i class="fa fa-star" ng-repeat="st in getArray(score.stars)"></i></td></tr>
+					</tbody></table></div>
+				<div class="col-md-3">
+					<div class="mnScore">
+						<p style="font-variant: small-caps">Target Market Needs Understanding</p>
+						<h3 style="font-variant: small-caps">your score</h3>
+						<p class="theScore">
+							{{MN.score}}/10
+						</p>
+						<p>{{MN.hint}}</p>
+						<p style="font-size: 0.7em;">Personalized sentence dependent on score.</p>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<h3 class="section-subheading text-muted">{{MN.sector}} TOP 5 business needs<br><span style="font-size: 0.8em">(Source IDC)</span></h3>
+					<ol><li ng-repeat="BN in MN.top5">{{BN}}</li></ol>
+				</div>
+			</div>
+        </div>
+    </section>
+
+    <!-- Social Impact Section -->
+    <section id="socialImpact" class="bg-light-gray">
+        <div class="container onBg">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2 class="section-heading">Social Impact</h2>
+                    <h3 class="section-subheading text-muted">Lorem ipsum dolor sit amet consectetur.</h3>
+                </div>
+            </div>
+			<h3>Social Benefits</h3>
+			<div class="row">
+                <div class="col-md-6 text-center">
+					<div id="bodySocialA" class="radarBody">
+						<div class="radarLegend" class="radarLegend">
+							<p><i class="fa fa-square color0"></i> Your Score<br>
+								<i class="fa fa-square color1"></i> Average</p>
+						</div><div id="radarSocialA"></div>
+					</div>
+                </div>
+				<div class="col-md-6">
+					<h3 class="section-subheading text-muted">Axis legend</h3>
+					<p class="axisLegend" ng-repeat="SB in aFi.socialBenefits"><span>{{SB.key}}:</span> {{SB.name}}</p>
+                </div>
+            </div>
+			<h3>Quality of life improvement for certain social groups</h3>
+			<div class="row">
+                <div class="col-md-6 text-center">
+					<div id="bodySocialB" class="radarBody">
+						<div class="radarLegend" class="radarLegend">
+							<p><i class="fa fa-square color0"></i> Your Score<br>
+								<i class="fa fa-square color1"></i> Average</p>
+						</div><div id="radarSocialB"></div>
+					</div>
+                </div>
+				<div class="col-md-6">
+					
+                </div>
+            </div>
+        </div>
+    </section>
+
+	<section id="overview" class="bg-light-gray">
+		<div class="container onBg">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2 class="section-heading">Overview</h2>
+                    <h3 class="section-subheading text-muted">Lorem ipsum dolor sit amet consectetur.</h3>
+                </div>
+            </div>
+			<div id="bodyOverview" class="radarBody">
+				<div class="radarLegend">
+					<p><i class="fa fa-square color0"></i> Your Score<br>
+						<i class="fa fa-square color1"></i> Average</p>
+				</div><div id="radarOverview"></div>
+			</div>
+		</div>
+	</section>
+	
+    <!-- Partners -->
+    <aside class="clients">
+        <div class="container">
+			<hr id="partners">
+            <div class="row">
+                <div class="col-md-2 col-sm-6"><a href="http://idcitalia.com/ita/" target="_blank"><img style="margin-left: 0px; margin-right: 10px;" src="../../css/IDC_logo_4.png" alt="" width="120" height="57" /></a></div>
+                <div class="col-md-2 col-sm-6"><a href="http://www.idg.co.uk/" target="_blank"><img style="margin-left: 10px; margin-right: 10px;" src="../../css/IDG_Communications1_3.jpg" alt="" width="120" height="35" /></a></div>
+                <div class="col-md-2 col-sm-6"><a href="http://www.bluegreenstrategy.com/" target="_blank"><img style="margin-left: 10px; margin-right: 10px;" src="../../css/logotipo_bluegreen_04_v02_small_3.png" alt="" width="150" height="34" /></a></div>
+                <div class="col-md-2 col-sm-6"><a href="http://www.iimg.com" target="_blank"><img style="margin-left: 10px; margin-right: 10px;" src="../../css/iimc.gif" alt="" width="138" height="36" /></a></div>
+				<div class="col-md-2 col-sm-6"><img style="margin-left: 10px; margin-right: 10px;" src="../../css/SFC_2.jpg" alt="" width="150" height="50" /></div>
+				<div class="col-md-2 col-sm-6"><a href="http://ailab.ijs.si/" target="_blank"><img style="margin-left: 10px; margin-right: 0px;" src="../../css/jsi_logo_2.png" alt="" width="150" height="43" /></a></div>
+            </div>
+        </div>
+    </aside>
+
+    <footer><div class="container">
+		<div class="row"><div class="col-md-12">
+			<span class="copyright">Copyright &copy; FI-Impact 2015</span>
+		</div></div>
+	</div></footer>
+
+	<!-- Core JavaScript -->
+    <script src="../../js/jquery.min.js"></script>
+    <script src="../../js/bootstrap.min.js"></script>
+	<script src="../../js/angular.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../js/ie10-viewport-bug-workaround.js"></script>
+	<!-- Optional includes -->
+	
+    <!-- Plugin JavaScript -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+    <script src="../../js/classie.js"></script>
+    <script src="../../js/cbpAnimatedHeader.min.js"></script>
+    <!-- Custom Theme JavaScript -->
+    <script src="../../js/agency.js"></script>
+	<!-- D3 JavaScript -->
+	<script src="../../js/d3.min.js"></script>
+	<script src="../../js/fiRadar.js"></script>
+	<script src="../../js/Speedometer2.js"></script>
+	<script src="../../js/fiUtility.js"></script>
+	<script src="../../js/fiModel.js"></script>
+	<script src="../../js/fi.js"></script>
+	<script src="../../js/fiCtrl.js"></script>
+	<script>
+	$(document).ready( function() {
+		$.each(fi.questions, function(i, v) { if ( v && (v.text != "") ) { $('#data' + v.id).text(v.text); } });
+		console.log(parseInt(fi.results["MARKET_NEEDS_BUSINESS_G_GRAPH_SLOT"]));
+		
+		// Scoring
+		$.each(["innovation", "feasibility", "market"], function(i, v) {
+			$('#' + v + "Text").text(fi.getSpeedometerText(v));
+			$('#' + v + "Percent").text(Math.round(fi.results[v.toUpperCase() + "_R"]));
+			d3Speedometer('#' + v + 'Gauge', fi.getSpeedometerSettings(v));
+		});
+		$('#innovationText').text(fi.getSpeedometerText('innovation'));
+		
+		// Section 1
+		$("#organisationType").text(fi.getAnswersList('1_6', 'A'));
+		$.each(["a", "b", "c", "d"], function(i, v) {
+			if (fi.questions['Q1_18' + v]) { $("#tableEnablers").append('<tr><td><strong>' + model.Q1_18text[v] + '</strong></td><td>' + fi.questions['Q1_18' + v].text + '</td></tr>'); }
+		});
+		
+		// Section 3
+		$("#businessModel").text(fi.verboseFromJSON('3', '1'));
+		$("#marketSectors").text(fi.verboseFromJSON('3', '3'));
+		$("#marketChannel").text(fi.verboseFromJSON('3', '4'));
+		$("#data3_5").text(fi.getQ3_5text());
+		
+		// Section 4
+		var t4_3 = []; //  Revenue Growth
+		$.each(["3a", "3b", "3c", "3d"], function(i, v) { if (fi.questions['Q4_' + v]) { t4_3.push(fi.questions['Q4_' + v].value + '%'); } });
+		$("#revenueGrowth").text(t4_3.join( ", " ));
+		
+		// Section 6
+		
+		
+		// Radar Chart
+		window.radar = {
+			overview: new fiRadar("bodyOverview", makeRadarOverviewData(["innovation", "market", "feasibility", "business"])),
+			socialA: new fiRadar("bodySocialA", fi.makeRadarSocialData('A'), {w: 400, h: 400, levels: 5}),
+			socialB: new fiRadar("bodySocialB", fi.makeRadarSocialData('B'), {w: 400, h: 400, levels: 5})
+		};
+		radar.overview.draw("#radarOverview");
+		radar.socialA.draw("#radarSocialA");
+		radar.socialB.draw("#radarSocialB");
+	});
+	
+	</script>
+</body>
+
+</html>

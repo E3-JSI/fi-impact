@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="http://getbootstrap.com/favicon.ico">
+
+    <title>FI-Impact Report</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="/fi-impact/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/fi-impact/css/bootstrap-theme.min.css" rel="stylesheet">
+	<!-- Optional includes -->
+
+    <!-- Custom styles for this template -->
+    <link href="/fi-impact/css/theme.css" rel="stylesheet">
+	<link href="/fi-impact/css/theme.blue.css" rel="stylesheet">
+	
+	<link href="/fi-impact/css/visualisations.css" rel="stylesheet">
+
+	<script type="text/javascript" src="/fi-impact/js/jquery.min.js"></script> 
+	<script type="text/javascript" src="/fi-impact/js/jquery.tablesorter.min.js"></script> 
+	<script type="text/javascript" src="/fi-impact/js/jquery.tablesorter.pager.min.js"></script> 
+	<script>
+	$(document).ready( function() {
+	$('table').tablesorter({
+		theme: 'blue',
+		widthFixed: false,
+		onRenderHeader: function (index) {
+            $(this).find('div.tablesorter-header-inner').addClass('roundedCorners');
+		},
+		// other options: "ddmmyyyy" & "yyyymmdd"
+		dateFormat: "mmddyyyy",
+		// The key used to select more than one column for multi-column sorting.
+		sortMultiSortKey: "shiftKey",
+		// key used to remove sorting on a column
+		sortResetKey: 'ctrlKey',
+	    headers: {
+        // set "sorter : false" (no quotes) to disable the column
+        0: { sorter: "text" },
+        1: { sorter: "digit" },
+        2: { sorter: "text" },
+        3: { sorter: "url" }
+		},
+		ignoreCase: true,
+		// initial sort order of the columns, example sortList: [[0,0],[1,0]],
+		// [[columnIndex, sortDirection], ... ]
+		sortList: [[0, 0], [1, 0], [2, 0]],
+		// default sort that is added to the end of the users sort selection.
+		sortAppend: null,
+		// starting sort direction "asc" or "desc"
+		sortInitialOrder: "asc",
+		// third click on the header will reset column to default - unsorted
+		sortReset: false,
+		// restart sort to "sortInitialOrder" when clicking on previously unsorted columns
+		sortRestart: false,
+		// sort empty cell to bottom, top, none, zero
+		emptyTo: "bottom",
+		// sort strings in numerical column as max, min, top, bottom, zero
+		stringTo: "max",
+		// apply widgets on tablesorter initialization
+		initWidgets: true,
+		widgets: ['zebra', 'columns'],
+		widgetOptions: {
+			zebra: ["ui-widget-content even", "ui-state-default odd"],
+			// columns widget: change the default column class names primary is the 1st column sorted, secondary is the 2nd, etc
+        columns: ["primary", "secondary", "tertiary"],
+        filter_childRows: false,
+        filter_columnFilters: true,
+        filter_cssFilter: "tablesorter-filter",
+        filter_functions: null,
+        filter_hideFilters: false,
+        filter_ignoreCase: true,
+        filter_reset: null,
+        filter_searchDelay: 300,
+        filter_serversideFiltering: false,
+        filter_startsWith: false,
+        filter_useParsedData: false,
+        resizable: true,
+        saveSort: true,
+        stickyHeaders: "tablesorter-stickyHeader"
+    },
+
+    // *** CALLBACKS ***
+    // function called after tablesorter has completed initialization
+    initialized: function (table) {},
+
+    // *** CSS CLASS NAMES ***
+    tableClass: 'tablesorter',
+    cssAsc: "tablesorter-headerSortUp",
+    cssDesc: "tablesorter-headerSortDown",
+    cssHeader: "tablesorter-header",
+    cssHeaderRow: "tablesorter-headerRow",
+    cssIcon: "tablesorter-icon",
+    cssChildRow: "tablesorter-childRow",
+    cssInfoBlock: "tablesorter-infoOnly",
+    cssProcessing: "tablesorter-processing",
+
+    // *** SELECTORS ***
+    // jQuery selectors used to find the header cells.
+    selectorHeaders: '> thead th, > thead td',
+
+    // jQuery selector of content within selectorHeaders
+    // that is clickable to trigger a sort.
+    selectorSort: "th, td",
+
+    // rows with this class name will be removed automatically
+    // before updating the table cache - used by "update",
+    // "addRows" and "appendCache"
+    selectorRemove: "tr.remove-me",
+
+    // *** DEBUGING ***
+    // send messages to console
+    debug: false
+
+}).tablesorterPager({
+    container: $(".pager"),
+    // use this url format "http:/mydatabase.com?page={page}&size={size}" 
+    ajaxUrl: null,
+    // process ajax so that the data object is returned along with the
+    // total number of rows; example:
+    // {
+    //   "data" : [{ "ID": 1, "Name": "Foo", "Last": "Bar" }],
+    //   "total_rows" : 100 
+    // } 
+    ajaxProcessing: function(ajax) {
+        if (ajax && ajax.hasOwnProperty('data')) {
+            // return [ "data", "total_rows" ]; 
+            return [ajax.data, ajax.total_rows];
+        }
+    },
+
+    // output string - default is '{page}/{totalPages}';
+    // possible variables:
+    // {page}, {totalPages}, {startRow}, {endRow} and {totalRows}
+    output: '{startRow} to {endRow} ({totalRows})',
+
+    // apply disabled classname to the pager arrows when the rows at
+    // either extreme is visible - default is true
+    updateArrows: true,
+
+    // starting page of the pager (zero based index)
+    page: 0,
+
+    // Number of visible rows - default is 10
+    size: 3,
+
+    // if true, the table will remain the same height no matter how many
+    // records are displayed. The space is made up by an empty 
+    // table row set to a height to compensate; default is false 
+    fixedHeight: true,
+
+    // remove rows from the table to speed up the sort of large tables.
+    // setting this to false, only hides the non-visible rows; needed
+    // if you plan to add/remove rows with the pager enabled.
+    removeRows: false,
+
+    // css class names of pager arrows
+    // next page arrow
+    cssNext: '.next',
+    // previous page arrow
+    cssPrev: '.prev',
+    // go to first page arrow
+    cssFirst: '.first',
+    // go to last page arrow
+    cssLast: '.last',
+    // select dropdown to allow choosing a page
+    cssGoto: '.gotoPage',
+    // location of where the "output" is displayed
+    cssPageDisplay: '.pagedisplay',
+    // dropdown that sets the "size" option
+    cssPageSize: '.pagesize',
+    // class added to arrows when at the extremes 
+    // (i.e. prev/first arrows are "disabled" when on the first page)
+    // Note there is no period "." in front of this class name
+    cssDisabled: 'disabled'
+
+});
+});
+	</script> 
+  </head>
+  
+  <body role="document">
+<!-- pager --> 
+<div class="pager"> 
+        <img src="http://mottie.github.com/tablesorter/addons/pager/icons/first.png" class="first"/> 
+        <img src="http://mottie.github.com/tablesorter/addons/pager/icons/prev.png" class="prev"/> 
+        <span class="pagedisplay"></span> <!-- this can be any element, including an input --> 
+        <img src="http://mottie.github.com/tablesorter/addons/pager/icons/next.png" class="next"/> 
+        <img src="http://mottie.github.com/tablesorter/addons/pager/icons/last.png" class="last"/> 
+        <select class="pagesize" title="Select page size"> 
+            <option selected="selected" value="10">10</option> 
+            <option value="20">20</option> 
+            <option value="30">30</option> 
+            <option value="40">40</option> 
+        </select>
+        <select class="gotoPage" title="Select page number"></select>
+</div>
+
+<table class="tablesorter">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Major</th>
+            <th>Sex</th>
+            <th>English</th>
+            <th>Japanese</th>
+            <th>Calculus</th>
+            <th>Geometry</th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th>Name</th>
+            <th>Major</th>
+            <th>Sex</th>
+            <th>English</th>
+            <th>Japanese</th>
+            <th>Calculus</th>
+            <th>Geometry</th>
+        </tr>
+    </tfoot>
+    <tbody>
+        <tr>
+            <td>Student01</td>
+            <td>Languages</td>
+            <td>male</td>
+            <td>80</td>
+            <td>70</td>
+            <td>75</td>
+            <td>80</td>
+        </tr>
+        <tr>
+            <td>Student02</td>
+            <td>Mathematics</td>
+            <td>male</td>
+            <td>90</td>
+            <td>88</td>
+            <td>100</td>
+            <td>90</td>
+        </tr>
+        <tr>
+            <td>Student03</td>
+            <td>Languages</td>
+            <td>female</td>
+            <td>85</td>
+            <td>95</td>
+            <td>80</td>
+            <td>85</td>
+        </tr>
+        <tr>
+            <td>Student04</td>
+            <td>Languages</td>
+            <td>male</td>
+            <td>60</td>
+            <td>55</td>
+            <td>100</td>
+            <td>100</td>
+        </tr>
+        <tr>
+            <td>Student05</td>
+            <td>Languages</td>
+            <td>female</td>
+            <td>68</td>
+            <td>80</td>
+            <td>95</td>
+            <td>80</td>
+        </tr>
+        <tr>
+            <td>Student06</td>
+            <td>Mathematics</td>
+            <td>male</td>
+            <td>100</td>
+            <td>99</td>
+            <td>100</td>
+            <td>90</td>
+        </tr>
+        <tr>
+            <td>Student07</td>
+            <td>Mathematics</td>
+            <td>male</td>
+            <td>85</td>
+            <td>68</td>
+            <td>90</td>
+            <td>90</td>
+        </tr>
+        <tr>
+            <td>Student08</td>
+            <td>Languages</td>
+            <td>male</td>
+            <td>100</td>
+            <td>90</td>
+            <td>90</td>
+            <td>85</td>
+        </tr>
+        <tr>
+            <td>Student09</td>
+            <td>Mathematics</td>
+            <td>male</td>
+            <td>80</td>
+            <td>50</td>
+            <td>65</td>
+            <td>75</td>
+        </tr>
+        <tr>
+            <td>Student10</td>
+            <td>Languages</td>
+            <td>male</td>
+            <td>85</td>
+            <td>100</td>
+            <td>100</td>
+            <td>90</td>
+        </tr>
+        <tr>
+            <td>Student11</td>
+            <td>Languages</td>
+            <td>male</td>
+            <td>86</td>
+            <td>85</td>
+            <td>100</td>
+            <td>100</td>
+        </tr>
+        <tr>
+            <td>Student12</td>
+            <td>Mathematics</td>
+            <td>female</td>
+            <td>100</td>
+            <td>75</td>
+            <td>70</td>
+            <td>85</td>
+        </tr>
+        <tr>
+            <td>Student13</td>
+            <td>Languages</td>
+            <td>female</td>
+            <td>100</td>
+            <td>80</td>
+            <td>100</td>
+            <td>90</td>
+        </tr>
+        <tr>
+            <td>Student14</td>
+            <td>Languages</td>
+            <td>female</td>
+            <td>50</td>
+            <td>45</td>
+            <td>55</td>
+            <td>90</td>
+        </tr>
+        <tr>
+            <td>Student15</td>
+            <td>Languages</td>
+            <td>male</td>
+            <td>95</td>
+            <td>35</td>
+            <td>100</td>
+            <td>90</td>
+        </tr>
+        <tr>
+            <td>Student16</td>
+            <td>Languages</td>
+            <td>female</td>
+            <td>100</td>
+            <td>50</td>
+            <td>30</td>
+            <td>70</td>
+        </tr>
+        <tr>
+            <td>Student17</td>
+            <td>Languages</td>
+            <td>female</td>
+            <td>80</td>
+            <td>100</td>
+            <td>55</td>
+            <td>65</td>
+        </tr>
+        <tr>
+            <td>Student18</td>
+            <td>Mathematics</td>
+            <td>male</td>
+            <td>30</td>
+            <td>49</td>
+            <td>55</td>
+            <td>75</td>
+        </tr>
+        <tr>
+            <td>Student19</td>
+            <td>Languages</td>
+            <td>male</td>
+            <td>68</td>
+            <td>90</td>
+            <td>88</td>
+            <td>70</td>
+        </tr>
+        <tr>
+            <td>Student20</td>
+            <td>Mathematics</td>
+            <td>male</td>
+            <td>40</td>
+            <td>45</td>
+            <td>40</td>
+            <td>80</td>
+        </tr>
+        <tr>
+            <td>Student21</td>
+            <td>Languages</td>
+            <td>male</td>
+            <td>50</td>
+            <td>45</td>
+            <td>100</td>
+            <td>100</td>
+        </tr>
+        <tr>
+            <td>Student22</td>
+            <td>Mathematics</td>
+            <td>male</td>
+            <td>100</td>
+            <td>99</td>
+            <td>100</td>
+            <td>90</td>
+        </tr>
+        <tr><td>Student23</td><td>Mathematics</td><td>male</td><td>82</td><td>77</td><td>0</td><td>79</td></tr>
+        <tr><td>Student24</td><td>Languages</td><td>female</td><td>100</td><td>91</td><td>13</td><td>82</td></tr>
+        <tr><td>Student25</td><td>Mathematics</td><td>male</td><td>22</td><td>96</td><td>82</td><td>53</td></tr>
+        <tr><td>Student26</td><td>Languages</td><td>female</td><td>37</td><td>29</td><td>56</td><td>59</td></tr>
+        <tr><td>Student27</td><td>Mathematics</td><td>male</td><td>86</td><td>82</td><td>69</td><td>23</td></tr>
+        <tr><td>Student28</td><td>Languages</td><td>female</td><td>44</td><td>25</td><td>43</td><td>1</td></tr>
+        <tr><td>Student29</td><td>Mathematics</td><td>male</td><td>77</td><td>47</td><td>22</td><td>38</td></tr>
+        <tr><td>Student30</td><td>Languages</td><td>female</td><td>19</td><td>35</td><td>23</td><td>10</td></tr>
+        <tr><td>Student31</td><td>Mathematics</td><td>male</td><td>90</td><td>27</td><td>17</td><td>50</td></tr>
+        <tr><td>Student32</td><td>Languages</td><td>female</td><td>60</td><td>75</td><td>33</td><td>38</td></tr>
+        <tr><td>Student33</td><td>Mathematics</td><td>male</td><td>4</td><td>31</td><td>37</td><td>15</td></tr>
+        <tr><td>Student34</td><td>Languages</td><td>female</td><td>77</td><td>97</td><td>81</td><td>44</td></tr>
+        <tr><td>Student35</td><td>Mathematics</td><td>male</td><td>5</td><td>81</td><td>51</td><td>95</td></tr>
+        <tr><td>Student36</td><td>Languages</td><td>female</td><td>70</td><td>61</td><td>70</td><td>94</td></tr>
+        <tr><td>Student37</td><td>Mathematics</td><td>male</td><td>60</td><td>3</td><td>61</td><td>84</td></tr>
+        <tr><td>Student38</td><td>Languages</td><td>female</td><td>63</td><td>39</td><td>0</td><td>11</td></tr>
+        <tr><td>Student39</td><td>Mathematics</td><td>male</td><td>50</td><td>46</td><td>32</td><td>38</td></tr>
+        <tr><td>Student40</td><td>Languages</td><td>female</td><td>51</td><td>75</td><td>25</td><td>3</td></tr>
+        <tr><td>Student41</td><td>Mathematics</td><td>male</td><td>43</td><td>34</td><td>28</td><td>78</td></tr>
+        <tr><td>Student42</td><td>Languages</td><td>female</td><td>11</td><td>89</td><td>60</td><td>95</td></tr>
+        <tr><td>Student43</td><td>Mathematics</td><td>male</td><td>48</td><td>92</td><td>18</td><td>88</td></tr>
+        <tr><td>Student44</td><td>Languages</td><td>female</td><td>82</td><td>2</td><td>59</td><td>73</td></tr>
+        <tr><td>Student45</td><td>Mathematics</td><td>male</td><td>91</td><td>73</td><td>37</td><td>39</td></tr>
+        <tr><td>Student46</td><td>Languages</td><td>female</td><td>4</td><td>8</td><td>12</td><td>10</td></tr>
+        <tr><td>Student47</td><td>Mathematics</td><td>male</td><td>89</td><td>10</td><td>6</td><td>11</td></tr>
+        <tr><td>Student48</td><td>Languages</td><td>female</td><td>90</td><td>32</td><td>21</td><td>18</td></tr>
+        <tr><td>Student49</td><td>Mathematics</td><td>male</td><td>42</td><td>49</td><td>49</td><td>72</td></tr>
+        <tr><td>Student50</td><td>Languages</td><td>female</td><td>56</td><td>37</td><td>67</td><td>54</td></tr>
+    </tbody>
+</table>
+
+<!-- pager --> 
+<div class="pager"> 
+        <img src="http://mottie.github.com/tablesorter/addons/pager/icons/first.png" class="first"/> 
+        <img src="http://mottie.github.com/tablesorter/addons/pager/icons/prev.png" class="prev"/> 
+        <span class="pagedisplay"></span> <!-- this can be any element, including an input --> 
+        <img src="http://mottie.github.com/tablesorter/addons/pager/icons/next.png" class="next"/> 
+        <img src="http://mottie.github.com/tablesorter/addons/pager/icons/last.png" class="last"/> 
+        <select class="pagesize" title="Select page size"> 
+            <option selected="selected" value="10">10</option> 
+            <option value="20">20</option> 
+            <option value="30">30</option> 
+            <option value="40">40</option> 
+        </select>  
+        <select class="gotoPage" title="Select page number"></select>
+</div>
+</body></html>
