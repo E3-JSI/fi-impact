@@ -12,7 +12,7 @@ var fiReport = function (id) {
 	// load averages
 	this.data = getJSON(locationAverages);
 	this.averages = getKeys(this.data.results);
-	this.scores = getScores(this.averages.keys, this.results);
+	this.scores = getScores(this.averages.keys, this.results); // unit: percent
 	
 	// load list
 	this.manager =  getJSON(locationManager);
@@ -65,7 +65,7 @@ var fiReport = function (id) {
 		return result;
 	}
 	
-	function getScores(list, data) {
+	function getScores(list, data) { // unit: percent
 		var result = {};
 		$.each(list, function(i, v) {
 			s = data[i] / model.max[v];
@@ -135,7 +135,7 @@ fiReport.prototype.getQ3_5text = function(A) {
 	$.each(fi.questions.Q3_5.value.split(','), function(i, v) {
 		switch(v) {
 			case "A": result.push(model.s3.q5.A + (fi.questions.Q1_17 ? " (" + fi.questions.Q1_17.value + ")" : '')); break;
-			case "B": result.push(model.s3.q5.B + (fi.questions.Q1_12 ? " (" + fi.Q1_12.value + ")" : '')); break;
+			case "B": result.push(model.s3.q5.B + (fi.questions.Q1_12 ? " (" + fi.questions.Q1_12.value + ")" : '')); break;
 			case "C": result.push(model.s3.q5.C + (fi.questions.Q3_5c ? " (" + fi.questions.Q3_5c.value.replace(/,/g, ", ") + ")" : '')); break;
 			case "D": result.push(model.s3.q5.D); break;
 			default: result.push(model.s3.q5.E);
@@ -148,7 +148,7 @@ fiReport.prototype.makeRadarSocialData = function(A) {
 	data = [[],[]];
 	$.each(model['s6' + A].q1, function(i, v) {
 		label = ( (A == "A") ? i : v );
-		data[0].push({axis: label, value: fi.questions['Q6' + A + '_1_' + i].value});
+		data[0].push({axis: label, value: fi.results['Q6' + A + '_1_' + i + '_R']/100});
 		data[1].push({axis: label, value: fi.averages.values['social' + A + '_' + i].average});
 	});
 	return data;

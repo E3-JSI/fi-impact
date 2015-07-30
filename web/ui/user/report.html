@@ -168,6 +168,7 @@
 					economic viability of your business, and if you have already provided for the necessary funds for the startup phase.
 					This indicator assesses whether you are aware of the funds required to start and grow your business, and whether you
 					have secured sources for these funds.</h3>
+					<h3 class="section-subheading text-muted" id="feasibilityText"></h3>
                 </div>
             </div>
             <div class="row">
@@ -201,7 +202,7 @@
             <div class="row mnSector" ng-repeat="MN in aFi.marketNeeds">
 				<h3>{{MN.sector}}</h3>
 				<div class="col-md-6"><table class="table table-striped"><tbody>
-						<tr ng-repeat="score in MN.scores"><td>{{score.name}}</td><td><i class="fa fa-star" ng-repeat="st in getArray(score.stars)"></i></td></tr>
+						<tr ng-repeat="score in MN.scores"><td>{{score.name}}</td><td><i class="fa fa-star" ng-repeat="st in getArray(score.stars) track by $index"></i></td></tr>
 					</tbody></table></div>
 				<div class="col-md-3">
 					<div class="mnScore">
@@ -324,9 +325,8 @@
 	<script src="../../js/fi.js"></script>
 	<script src="../../js/fiCtrl.js"></script>
 	<script>
-	$(document).ready( function() {
+	$(document).ready( function() {	
 		$.each(fi.questions, function(i, v) { if ( v && (v.text != "") ) { $('#data' + v.id).text(v.text); } });
-		console.log(parseInt(fi.results["MARKET_NEEDS_BUSINESS_G_GRAPH_SLOT"]));
 		
 		// Scoring
 		$.each(["innovation", "feasibility", "market"], function(i, v) {
@@ -355,7 +355,7 @@
 		
 		// Section 6
 		
-		
+		console.log(fi.makeRadarSocialData('A'));
 		// Radar Chart
 		window.radar = {
 			overview: new fiRadar("bodyOverview", makeRadarOverviewData(["innovation", "market", "feasibility", "business"])),

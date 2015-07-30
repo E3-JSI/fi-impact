@@ -1,4 +1,4 @@
-window.fi = new fiReport("99fcfc42-197d-491c-93ce-3df5f2f53b13");
+window.fi = new fiReport(location.search.split('id=')[1]);
 var fiApp = angular.module('fiApp', []);
 
 fiApp.controller('fiCtrl', function ($scope) {
