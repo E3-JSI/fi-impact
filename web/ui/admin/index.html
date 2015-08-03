@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="fiApp"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<html lang="en" ng-app="fiManagerApp"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -43,10 +43,12 @@
 		</div>
 		
         <table id="listing" class="table table-striped">
-			<!-- <thead><tr><th>Project</th><th>External ID</th><th>Internal ID</th><th>Country</th><th class="sorter-false"></th></tr></thead> -->
-			<thead><tr><th>Project</th><th>Score</th><th>Feasibility</th><th>Innovation</th><th>Market</th><th>Market Needs</th><th>Accelerator</th><th>Organisation</th><th>Country</th><th class="sorter-false"></th></tr></thead> 
-            <tbody>
-			</tbody>
+			<thead><tr><th>Project</th><th>Feasibility</th><th>Innovation</th><th>Market</th><th>Market Needs</th>
+				<th>Accelerator</th><th>Organisation</th><th>Country</th></tr></thead> 
+            <tbody><tr ng-repeat="s in surveys"><td><a href="../../ui/user/report.html?id={{s.id_internal}}">{{s.Q1_4}}</a>
+				<div ng-bind-html="s.lineChart | sanitize"></div></td>
+				<td class="textRight">{{s.feasibility}}%</td><td class="textRight">{{s.innovation}}%</td><td class="textRight">{{s.market}}%</td><td class="textRight">{{s.business}}%</td>
+				<td>{{s.Q1_1}}</td><td>{{s.Q1_3}}</td><td>{{s.Q1_2}}</td></tr></tbody>
         </table>
 		
 		<!-- pager --> 
@@ -79,21 +81,11 @@
 	<script type="text/javascript" src="../../js/jquery.tablesorter.pager.min.js"></script>
 	<!-- D3 JavaScript -->
 	<script src="../../js/d3.min.js"></script>
-	<script src="../../js/RadarChart.js"></script>
-	<script src="../../js/Speedometer.js"></script>
 	<script src="../../js/fiUtility.js"></script>
 	<script src="../../js/fiModel.js"></script>
 	<script src="../../js/fi.js"></script>
-	<script src="../../js/fiCtrl.js"></script>
-	<script>
-	$(document).ready( function() {
-		console.log(fi.manager);
-		$.each(fi.manager.surveys, function( i, v ) {
-			$('#listing > tbody:last-child').append('<tr><td>' + v.Q1_4 + '</td><td>' + lineChart(v.FEASIBILITY,v.INNOVATION,v.MARKET,v.MARKET_NEEDS_B) + '</td><td>' + Math.round(fiPercent(v.FEASIBILITY,'F')) + '%</td><td>' + Math.round(fiPercent(v.INNOVATION,'I')) + '%</td><td>' + Math.round(fiPercent(v.MARKET,'M')) + '%</td><td>' + Math.round(fiPercent(v.MARKET_NEEDS_B,'MN')) + '%</td><td>' + v.Q1_1 + '</td><td>' + v.Q1_3 + '</td><td>' + v.Q1_2 + '</td><td><a class="btn btn-sm btn-info fa fa-arrow-right" href="../../ui/user/report.html?id=' + v.id_internal + '"></a></td></tr>');
-			// $('#listing > tbody:last-child').append('<tr><td>' + v.Q1_4 + '</td><td>' + v.id_external + '</td><td>' + v.id_internal + '</td><td>' + v.Q1_2 + '</td><td><a class="btn btn-sm btn-info fa fa-arrow-right" href="http://aidemo.ijs.si../../ui/user/report.html?id=' + v.id_internal + '"></a></td></tr>');
-		});
-		$("#listing").tablesorter(fiTableSorter).tablesorterPager(fiTableSorterPager);
-	});
-	</script>
+	<script>window.fi = new fiData();</script>
+	<script src="../../js/fiCtrlManager.js"></script>
+	<script>$(document).ready( function() { $("#listing").tablesorter(fiTableSorter).tablesorterPager(fiTableSorterPager); });</script>
 
 <div id="global-zeroclipboard-html-bridge" class="global-zeroclipboard-container" title="" style="position: absolute; left: 0px; top: -9999px; width: 15px; height: 15px; z-index: 999999999;" data-original-title="Copy to clipboard">      <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" id="global-zeroclipboard-flash-bridge" width="100%" height="100%">         <param name="movie" value="/assets/flash/ZeroClipboard.swf?noCache=1433148729912">         <param name="allowScriptAccess" value="sameDomain">         <param name="scale" value="exactfit">         <param name="loop" value="false">         <param name="menu" value="false">         <param name="quality" value="best">         <param name="bgcolor" value="#ffffff">         <param name="wmode" value="transparent">         <param name="flashvars" value="trustedOrigins=getbootstrap.com%2C%2F%2Fgetbootstrap.com%2Chttp%3A%2F%2Fgetbootstrap.com">         <embed src="/assets/flash/ZeroClipboard.swf?noCache=1433148729912" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="100%" height="100%" name="global-zeroclipboard-flash-bridge" allowscriptaccess="sameDomain" allowfullscreen="false" type="application/x-shockwave-flash" wmode="transparent" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="trustedOrigins=getbootstrap.com%2C%2F%2Fgetbootstrap.com%2Chttp%3A%2F%2Fgetbootstrap.com" scale="exactfit">                </object></div><svg xmlns="http://www.w3.org/2000/svg" width="1140" height="500" viewBox="0 0 1140 500" preserveAspectRatio="none" style="visibility: hidden; position: absolute; top: -100%; left: -100%;"><defs></defs><text x="0" y="53" style="font-weight:bold;font-size:53pt;font-family:Arial, Helvetica, Open Sans, sans-serif;dominant-baseline:middle">Thirdslide</text></svg></body></html>

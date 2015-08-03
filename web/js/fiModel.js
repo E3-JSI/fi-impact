@@ -10,6 +10,8 @@ var model = {
 "Q1_6": ["6a", "6b", "6c"],
 "bool": ["1_6a", "1_6b", "1_6c", "2_3", "6A_1", "6A_2"],
 "list": ["1_12", "1_18a", "1_18b", "1_18c", "1_18d", "3_4"],
+"speedometers": ["innovation", "feasibility", "market"],
+"radarOverview": ["innovation", "market", "feasibility", "business"],
 
 "marketNeedsTop5": {
 	"A": ["D", "A", "B", "C", "F"],

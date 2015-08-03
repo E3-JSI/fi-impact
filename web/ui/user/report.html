@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="fiApp"><head>
+<html lang="en" ng-app="fiReportApp"><head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,19 +15,13 @@
     <!-- Custom CSS -->
     <link href="../../css/agency.css" rel="stylesheet">
 	<link href="../../css/fi-impact.css" rel="stylesheet">
+	<link href="../../css/visualisations.css" rel="stylesheet">
     <!-- Custom Fonts -->
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
     <link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-	<link href="../../css/visualisations.css" rel="stylesheet">
 </head>
 
 <body id="page-top" class="index" ng-controller="fiCtrl">
@@ -39,9 +33,7 @@
             <div class="navbar-header page-scroll">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
                 </button>
                 <a class="navbar-brand page-scroll" href="#page-top">FI Impact Report</a>
             </div>
@@ -65,97 +57,76 @@
     </nav>
 
     <!-- Header -->
-    <header>
-        <div class="container">
-            <div class="intro-text">
-                <div class="intro-lead-in">This is your</div>
-                <div class="intro-heading">FI-Impact Report</div>
-                <a href="#project" class="page-scroll btn btn-xl">Tell Me More</a>
-            </div>
-        </div>
-    </header>
+    <header><div class="container"><div class="intro-text">
+		<div class="intro-lead-in">This is your</div><div class="intro-heading">FI-Impact Report</div>
+		<a href="#project" class="page-scroll btn btn-xl">Tell Me More</a>
+	</div></div></header>
 
     <!-- Project Section -->
-    <section id="project">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12 text-center">
-                    <h2 class="section-heading">Project: <span id="data1_4"></span></h2>
-                    <h3 id="data1_14" class="section-subheading text-muted"></h3>
-                </div>
-            </div>
-			<div class="row"><div class="col-md-6"><table class="table table-striped"><tbody>
-				<tr><td width="25%"><strong>Organisation</strong></td>
-					<td><strong id="data1_3"></strong> (operational <span id="data1_16"></span> years)<br><i id="organisationType"></i><br><span id="data1_5"></span><br>
-					<span id="data1_17"></span>, <span id="data1_2"></span><br><span id="data1_9"></span>&euro; annual turnover last year</td></tr>
-				<tr><td><strong>Employees</strong></td>
-					<td>Implementing team size: <span id="data1_7"></span><br>Full time employees: <span id="data1_8"></span></td></tr>
-				<tr><td width="25%"><strong>Accelerator</strong></td>
-					<td><strong id="data1_1"></strong> (<span id="data1_13"></span>&euro;)<br><span id="data1_14"></span></td></tr>
-				<tr><td><strong>Solution</strong></td>
-					<td><span id="data1_10"></span><br><span id="data1_11"></span></td></tr>
-			</tbody></table></div>
-			<div class="col-md-6 text-left">
-				<strong>FIWARE enablers</strong>
-				<p id="data1_12"></p>
-				<table class="table table-striped" id="tableEnablers"><tbody>
+    <section id="project"><div class="container">
+		<div class="row"><div class="col-lg-12 text-center">
+			<h2 class="section-heading">Project: {{aFi.d1_4}}</h2><h3 class="section-subheading text-muted">{{aFi.d1_14}}</h3>
+		</div></div>
+		<div class="row"><div class="col-md-6"><table class="table table-striped"><tbody>
+			<tr><td width="25%"><strong>Organisation</strong></td>
+				<td><strong>{{aFi.d1_3}}</strong> (operational {{aFi.d1_16}} years)<br><i>{{aFi.organisationType}}</i><br>{{aFi.d1_5}}<br>
+					{{aFi.d1_17}}, {{aFi.d1_2}}<br>{{aFi.d1_9}}&euro; annual turnover last year</td></tr>
+			<tr><td><strong>Employees</strong></td><td>Implementing team size: {{aFi.d1_7}}<br>Full time employees: {{aFi.d1_8}}</td></tr>
+			<tr><td width="25%"><strong>Accelerator</strong></td><td><strong>{{aFi.d1_1}}</strong> ({{aFi.d1_13}}&euro;)<br>{{aFi.d1_14}}</td></tr>
+			<tr><td><strong>Solution</strong></td><td>{{aFi.d1_10}}<br>{{aFi.d1_11}}</td></tr>
+		</tbody></table></div>
+		<div class="col-md-6 text-left"><strong>FIWARE enablers</strong><p>{{aFi.d1_12}}</p>
+			<table class="table table-striped"><tbody>
+				<tr ng-repeat="E in aFi.enablers"><td><strong>{{E.category}}</strong></td><td>{{E.list}}</td></tr>
 			</tbody></table></div></div>
-		</div>
-    </section>
+	</div></section>
 
     <!-- Innovation Section -->
-    <section id="innovation" class="bg-light-gray">
-        <div class="container onBg">
-            <div class="row">
-                <div class="col-lg-12 text-center">
-					<h2 class="section-heading">Innovation</h2>
-					<div id="innovationGauge" class="pull-right"></div>
-					<h3 class="section-subheading text-muted" id="innovationText"></h3>
-                </div>
-            </div>
-			<div class="row"><div class="col-md-6"><table class="table table-striped"><tbody>
-					<tr><td width="25%"><strong>Concept</strong></td>
-					<td><strong>Authors:</strong> <span id="data2_4"></span><br><strong>Stage:</strong> <span id="data2_1"></span></td></tr>
-				</tbody></table></div>
-				<div class="col-md-6"><table class="table table-striped"><tbody>
-					<tr><td width="25%"><strong>Business idea</strong></td>
-					<td><strong>Innovation Type:</strong> <span id="data2_2"></span><br>
-						<strong>Existence of similar solution:</strong> <span id="data2_3"></span><br>
-						<strong>Strategy:</strong> <span id="data2_5"></span></td></tr>
-			</tbody></table></div></div>
-        </div>
-    </section>
+    <section id="innovation" class="bg-light-gray"><div class="container onBg">
+		<div class="row"><div class="col-lg-12 text-center">
+			<h2 class="section-heading">Innovation</h2><div id="innovationGauge" class="pull-right"></div>
+			<h3 class="section-subheading text-muted">
+				Your score is {{aFi.innovation.score}} out of {{aFi.innovation.max}}. The average score of {{aFi.totalSurveys}} surveys is {{aFi.innovation.average}}.
+				<div ng-repeat="x in aFi.innovation.bottomHalf">You should look at improving innovation of your project. You might want to look at this documents for assistance <strong>To be provided by IDC</strong>.</div>
+			</h3>
+		</div></div>
+		<div class="row"><div class="col-md-6"><table class="table table-striped"><tbody>
+			<tr><td width="25%"><strong>Concept</strong></td>
+				<td><strong>Authors:</strong> {{aFi.d2_4}}<br><strong>Stage:</strong> {{aFi.d2_1}}</td></tr>
+		</tbody></table></div>
+		<div class="col-md-6"><table class="table table-striped"><tbody>
+			<tr><td width="25%"><strong>Business idea</strong></td><td><strong>Innovation Type:</strong> {{aFi.d2_2}}<br>
+				<strong>Existence of similar solution:</strong> {{aFi.d2_3}}<br><strong>Strategy:</strong> {{aFi.d2_5}}</td></tr>
+		</tbody></table></div></div>
+	</div></section>
 
     <!-- Market Section -->
-    <section id="market">
-        <div class="container onBg">
-            <div class="row">
-                <div class="col-lg-12 text-center">
+    <section id="market"><div class="container onBg">
+		<div class="row"><div class="col-lg-12 text-center">
                     <h2 class="section-heading">Market</h2>
 					<div id="marketGauge" class="pull-right"></div>
                     <h3 class="section-subheading text-muted">The Market Focus indicator assesses to what extent you have gathered 
 					knowledge about customers in the target market, and if your initiative has a strategy and plan to reach the target
 					market. This indicator measures the level of your “customer development” activities: whether you have already approached 
 					customers to collect feedback on your product, and to what extent you have developed a strategy to acquire them.</h3>
-					<h3 class="section-subheading text-muted" id="marketText"></h3>
-                </div>
-            </div>
-            <div class="row">
-				<div class="col-md-6"><table class="table table-striped"><tbody>
-					<tr><td width="25%"><strong>Business model</strong></td>
-						<td><strong>Model:</strong> <span id="businessModel"></span><br><strong>Revenue Division:</strong> licenses <span id="data3_2a"></span>%, subscriptions: <span id="data3_2b"></span>%, project fees: <span id="data3_2c"></span>%</td></tr>
-					<tr><td><strong>Customers</strong></td>
-						<td><strong>Value Proposition Verification:</strong> <span id="data3_8"></span><br><strong>Commercial Strategy Status: </strong><span id="data3_9"></span></td></tr>
-				</tbody></table></div>
-				<div class="col-md-6"><table class="table table-striped"><tbody>
-					<tr><td width="25%"><strong>Market</strong></td>
-						<td><strong>Market Sectors:</strong> <span id="marketSectors"></span><br><strong>Channel:</strong> <span id="marketChannel"></span><br>
-							<strong>Target Market in Three Years:</strong> <span id="data3_5"></span><br><strong>Entry into the Open Market:</strong> <span id="data3_6"></span><br>
-							<strong>Level of competition:</strong> <span id="data3_7"></span><br><strong>Market Strategy Status:</strong> <span id="data3_10"></span></td></tr>
-				</tbody></table></div>
-			</div>
-        </div>
-    </section>
+					<h3 class="section-subheading text-muted">
+						Your score is {{aFi.market.score}} out of {{aFi.market.max}}. The average score of {{aFi.totalSurveys}} surveys is {{aFi.market.average}}.
+						<div ng-repeat="x in aFi.market.bottomHalf">You should look at improving the market score of your project. You might want to look at this documents for assistance <strong>To be provided by IDC</strong>.</div>
+					</h3>
+		</div></div>
+		<div class="row"><div class="col-md-6"><table class="table table-striped"><tbody>
+			<tr><td width="25%"><strong>Business model</strong></td>
+				<td><strong>Model:</strong> {{aFi.businessModel}}<br><strong>Revenue Division:</strong> licenses {{aFi.d3_2a}}%, subscriptions: {{aFi.d3_2b}}%, project fees: {{aFi.d3_2c}}%</td></tr>
+			<tr><td><strong>Customers</strong></td>
+				<td><strong>Value Proposition Verification:</strong> {{aFi.d3_8}}<br><strong>Commercial Strategy Status: </strong>{{aFi.d3_9}}</td></tr>
+			</tbody></table></div>
+			<div class="col-md-6"><table class="table table-striped"><tbody>
+			<tr><td width="25%"><strong>Market</strong></td>
+				<td><strong>Market Sectors:</strong>  {{aFi.marketSectors}}<br><strong>Channel:</strong> {{aFi.marketChannel}}<br>
+					<strong>Target Market in Three Years:</strong> {{aFi.data3_5}}<br><strong>Entry into the Open Market:</strong> {{aFi.d3_6}}<br>
+					<strong>Level of competition:</strong> {{aFi.d3_7}}<br><strong>Market Strategy Status:</strong> {{aFi.d3_10}}</td></tr>
+		</tbody></table></div></div>
+	</div></section>
 
     <!-- Feasibility Section -->
     <section id="feasibility" class="bg-light-gray">
@@ -168,19 +139,22 @@
 					economic viability of your business, and if you have already provided for the necessary funds for the startup phase.
 					This indicator assesses whether you are aware of the funds required to start and grow your business, and whether you
 					have secured sources for these funds.</h3>
-					<h3 class="section-subheading text-muted" id="feasibilityText"></h3>
+					<h3 class="section-subheading text-muted">
+						Your score is {{aFi.feasibility.score}} out of {{aFi.feasibility.max}}. The average score of {{aFi.totalSurveys}} surveys is {{aFi.feasibility.average}}.
+						<div ng-repeat="x in aFi.feasibility.bottomHalf">You should look at improving feasibility of your project. You might want to look at this documents for assistance <strong>To be provided by IDC</strong>.</div>
+					</h3>
                 </div>
             </div>
             <div class="row">
 				<div class="col-md-6"><table class="table table-striped"><tbody>
 					<tr><td width="25%"><strong>Capital</strong></td>
-					<td><strong>Required investments until sustainable:</strong> <span id="data4_1"></span><br><strong>Secured funding:</strong> <span id="data4_6"></span>%</td></tr>
+					<td><strong>Required investments until sustainable:</strong> {{aFi.d4_1}}<br><strong>Secured funding:</strong> {{aFi.d4_6}}%</td></tr>
 				<tr><td><strong>Growth rate</strong></td>
-					<td><strong>Sales:</strong> <span id="data4_2"></span><br><strong>Revenue (4 years):</strong> <span id="revenueGrowth"></span></td></tr>
+					<td><strong>Sales:</strong> {{aFi.d4_2}}<br><strong>Revenue (4 years):</strong> {{aFi.revenueGrowth}}</td></tr>
 				</tbody></table></div>
 				<div class="col-md-6"><table class="table table-striped"><tbody>
-					<tr><td width="25%"><strong>Customer acquisition</strong></td><td><span id="data4_4"></span></td></tr>
-				<tr><td width="25%"><strong>Sales and marketing expansion</strong></td><td><span id="data4_5"></span></td></tr>
+					<tr><td width="25%"><strong>Customer acquisition</strong></td><td>{{aFi.d4_4}}</td></tr>
+				<tr><td width="25%"><strong>Sales and marketing expansion</strong></td><td>{{aFi.d4_5}}</td></tr>
 				</tbody></table></div>
 			</div>
             <div class="row">
@@ -282,25 +256,17 @@
 	</section>
 	
     <!-- Partners -->
-    <aside class="clients">
-        <div class="container">
-			<hr id="partners">
-            <div class="row">
-                <div class="col-md-2 col-sm-6"><a href="http://idcitalia.com/ita/" target="_blank"><img style="margin-left: 0px; margin-right: 10px;" src="../../css/IDC_logo_4.png" alt="" width="120" height="57" /></a></div>
-                <div class="col-md-2 col-sm-6"><a href="http://www.idg.co.uk/" target="_blank"><img style="margin-left: 10px; margin-right: 10px;" src="../../css/IDG_Communications1_3.jpg" alt="" width="120" height="35" /></a></div>
-                <div class="col-md-2 col-sm-6"><a href="http://www.bluegreenstrategy.com/" target="_blank"><img style="margin-left: 10px; margin-right: 10px;" src="../../css/logotipo_bluegreen_04_v02_small_3.png" alt="" width="150" height="34" /></a></div>
-                <div class="col-md-2 col-sm-6"><a href="http://www.iimg.com" target="_blank"><img style="margin-left: 10px; margin-right: 10px;" src="../../css/iimc.gif" alt="" width="138" height="36" /></a></div>
-				<div class="col-md-2 col-sm-6"><img style="margin-left: 10px; margin-right: 10px;" src="../../css/SFC_2.jpg" alt="" width="150" height="50" /></div>
-				<div class="col-md-2 col-sm-6"><a href="http://ailab.ijs.si/" target="_blank"><img style="margin-left: 10px; margin-right: 0px;" src="../../css/jsi_logo_2.png" alt="" width="150" height="43" /></a></div>
-            </div>
-        </div>
-    </aside>
-
-    <footer><div class="container">
-		<div class="row"><div class="col-md-12">
-			<span class="copyright">Copyright &copy; FI-Impact 2015</span>
-		</div></div>
-	</div></footer>
+	<aside class="clients"><div class="container"><hr id="partners"><div class="row">
+		<div class="col-md-2 col-sm-6"><a href="http://idcitalia.com/ita/" target="_blank"><img style="margin-left: 0px; margin-right: 10px;" src="../../css/IDC_logo_4.png" alt="" width="120" height="57" /></a></div>
+		<div class="col-md-2 col-sm-6"><a href="http://www.idg.co.uk/" target="_blank"><img style="margin-left: 10px; margin-right: 10px;" src="../../css/IDG_Communications1_3.jpg" alt="" width="120" height="35" /></a></div>
+		<div class="col-md-2 col-sm-6"><a href="http://www.bluegreenstrategy.com/" target="_blank"><img style="margin-left: 10px; margin-right: 10px;" src="../../css/logotipo_bluegreen_04_v02_small_3.png" alt="" width="150" height="34" /></a></div>
+		<div class="col-md-2 col-sm-6"><a href="http://www.iimg.com" target="_blank"><img style="margin-left: 10px; margin-right: 10px;" src="../../css/iimc.gif" alt="" width="138" height="36" /></a></div>
+		<div class="col-md-2 col-sm-6"><img style="margin-left: 10px; margin-right: 10px;" src="../../css/SFC_2.jpg" alt="" width="150" height="50" /></div>
+		<div class="col-md-2 col-sm-6"><a href="http://ailab.ijs.si/" target="_blank"><img style="margin-left: 10px; margin-right: 0px;" src="../../css/jsi_logo_2.png" alt="" width="150" height="43" /></a></div>
+	</div></div></aside>
+    <footer><div class="container"><div class="row"><div class="col-md-12">
+		<span class="copyright">Copyright &copy; FI-Impact 2015</span>
+	</div></div></div></footer>
 
 	<!-- Core JavaScript -->
     <script src="../../js/jquery.min.js"></script>
@@ -308,8 +274,6 @@
 	<script src="../../js/angular.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="../../js/ie10-viewport-bug-workaround.js"></script>
-	<!-- Optional includes -->
-	
     <!-- Plugin JavaScript -->
     <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
     <script src="../../js/classie.js"></script>
@@ -320,53 +284,22 @@
 	<script src="../../js/d3.min.js"></script>
 	<script src="../../js/fiRadar.js"></script>
 	<script src="../../js/Speedometer2.js"></script>
+	<!-- FI JavaScript -->
 	<script src="../../js/fiUtility.js"></script>
 	<script src="../../js/fiModel.js"></script>
 	<script src="../../js/fi.js"></script>
-	<script src="../../js/fiCtrl.js"></script>
+	<script>window.fi = new fiData(location.search.split('id=')[1]);</script>
+	<script src="../../js/fiCtrlReport.js"></script>
 	<script>
-	$(document).ready( function() {	
-		$.each(fi.questions, function(i, v) { if ( v && (v.text != "") ) { $('#data' + v.id).text(v.text); } });
-		
-		// Scoring
-		$.each(["innovation", "feasibility", "market"], function(i, v) {
-			$('#' + v + "Text").text(fi.getSpeedometerText(v));
-			$('#' + v + "Percent").text(Math.round(fi.results[v.toUpperCase() + "_R"]));
-			d3Speedometer('#' + v + 'Gauge', fi.getSpeedometerSettings(v));
-		});
-		$('#innovationText').text(fi.getSpeedometerText('innovation'));
-		
-		// Section 1
-		$("#organisationType").text(fi.getAnswersList('1_6', 'A'));
-		$.each(["a", "b", "c", "d"], function(i, v) {
-			if (fi.questions['Q1_18' + v]) { $("#tableEnablers").append('<tr><td><strong>' + model.Q1_18text[v] + '</strong></td><td>' + fi.questions['Q1_18' + v].text + '</td></tr>'); }
-		});
-		
-		// Section 3
-		$("#businessModel").text(fi.verboseFromJSON('3', '1'));
-		$("#marketSectors").text(fi.verboseFromJSON('3', '3'));
-		$("#marketChannel").text(fi.verboseFromJSON('3', '4'));
-		$("#data3_5").text(fi.getQ3_5text());
-		
-		// Section 4
-		var t4_3 = []; //  Revenue Growth
-		$.each(["3a", "3b", "3c", "3d"], function(i, v) { if (fi.questions['Q4_' + v]) { t4_3.push(fi.questions['Q4_' + v].value + '%'); } });
-		$("#revenueGrowth").text(t4_3.join( ", " ));
-		
-		// Section 6
-		
-		console.log(fi.makeRadarSocialData('A'));
-		// Radar Chart
+	$(document).ready( function() {
+		$.each(model.speedometers, function(i, v) { d3Speedometer('#' + v + 'Gauge', fi.getSpeedometerSettings(v)); });
 		window.radar = {
-			overview: new fiRadar("bodyOverview", makeRadarOverviewData(["innovation", "market", "feasibility", "business"])),
-			socialA: new fiRadar("bodySocialA", fi.makeRadarSocialData('A'), {w: 400, h: 400, levels: 5}),
-			socialB: new fiRadar("bodySocialB", fi.makeRadarSocialData('B'), {w: 400, h: 400, levels: 5})
+			Overview: new fiRadar("bodyOverview", fi.makeRadarOverviewData()),
+			SocialA: new fiRadar("bodySocialA", fi.makeRadarSocialData('A'), {w: 400, h: 400, levels: 5}),
+			SocialB: new fiRadar("bodySocialB", fi.makeRadarSocialData('B'), {w: 400, h: 400, levels: 5})
 		};
-		radar.overview.draw("#radarOverview");
-		radar.socialA.draw("#radarSocialA");
-		radar.socialB.draw("#radarSocialB");
+		$.each(window.radar, function(i, v) { v.draw("#radar" + i) });
 	});
-	
 	</script>
 </body>
 

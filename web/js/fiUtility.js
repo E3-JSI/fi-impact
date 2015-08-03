@@ -9,16 +9,6 @@ function fiPercent(x,t) {
 	}
 }
 
-function makeRadarOverviewData(list) {
-	data = [[],[]];
-	$.each(list, function(i, v) {
-		label = v.charAt(0).toUpperCase() + v.slice(1)
-		data[0].push({axis: label, value: fi.scores[v]});
-		data[1].push({axis: label, value: fi.averages.values[v].average});
-	});
-	return data;
-}
-
 function inArray(list, value) {
 	var result = false;
 	$.each(list, function(i, v) {
@@ -58,12 +48,13 @@ var fiTableSorter = {
 	sortResetKey: 'ctrlKey', // key used to remove sorting on a column
 	headers: {
 		0: { sorter: "text" },
-		1: { sorter: false },
+		1: { sorter: "text" },
 		2: { sorter: "text" },
 		3: { sorter: "text" },
 		4: { sorter: "text" },
 		5: { sorter: "text" },
-		6: { sorter : false }
+		6: { sorter : "text" },
+		7: { sorter : "text" }
 	},
 	ignoreCase: true,
 	sortList: [[0, 0], [1, 0], [2, 0]], // initial sort order of the columns

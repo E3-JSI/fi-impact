@@ -10,15 +10,19 @@
 	border-bottom: 1px solid #555;
 }
 #project .container, #overview .container  {
-	background-color: #E3EAFF;
 	padding-top: 1em;
 	border-radius: 5px;
 }
+#project .container  { background-color: #E3EAFF; }
 #project .table-striped { background: rgba(220, 220, 220, .3); }
 #project .table-striped > tbody > tr:nth-of-type(odd) { background: rgba(250, 250, 250, .7); }
 #innovation { background-image:url('../img/lightbulbs.jpg'); }
 #feasibility { background-image:url('../img/currency.jpg'); }
-#overview { background-color: #fff; }
+#overview { background-color: #000; margin-bottom: 50px; }
+#overview .container  { color: #fff; background-color: rgba(250, 250, 250, .3) }
+#overview .section-subheading { color: #fff; }
+#overview text { fill: #ccc; }
+#overview .axis text { fill: #fff; }
 #market, #marketNeeds { background-color: #93A8C4; }
 .onBg { background-color: rgba(250, 250, 250, .7); padding-top: 1em; border-radius: 5px; }
 

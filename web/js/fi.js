@@ -1,21 +1,23 @@
-var fiReport = function (id) {
+var fiData = function (id) { // id is optional
 	var locationAverages = '../../service?action=averages';
 	var locationData = '../../service?action=results&id=' + id;
 	var locationManager = '../../manager?action=list';
 	// var model = require(['../../js/fiModel.js']);
 	
-	// load project data
-	this.survey = getJSON(locationData);
-	this.questions = getQuestions(this.survey.questions);
-	this.results = getResults(this.survey.results);
-	
-	// load averages
-	this.data = getJSON(locationAverages);
-	this.averages = getKeys(this.data.results);
-	this.scores = getScores(this.averages.keys, this.results); // unit: percent
-	
-	// load list
-	this.manager =  getJSON(locationManager);
+	if (typeof id != 'undefined') {
+		// load project data
+		this.survey = getJSON(locationData);
+		this.questions = getQuestions(this.survey.questions);
+		this.results = getResults(this.survey.results);
+		// load averages
+		this.data = getJSON(locationAverages);
+		this.averages = getKeys(this.data.results);
+		this.scores = getScores(this.averages.keys, this.results); // unit: percent
+	}
+	else {
+		// load list
+		this.manager =  getJSON(locationManager);
+	}
 	
 	// * * * * * * * * * *
 	// internal functions
@@ -75,13 +77,13 @@ var fiReport = function (id) {
 	}
 };
 
-fiReport.prototype.getVerboseList = function(list, dictionary) {
+fiData.prototype.getVerboseList = function(list, dictionary) {
 	var result = [];
 	$.each(list, function(i, v) { if (dictionary[v]) { result.push(dictionary[v]); } });
 	return result;
 }
 
-fiReport.prototype.getSpeedometerSettings = function(key) {
+fiData.prototype.getSpeedometerSettings = function(key) {
 	var h = fi.averages.values[key].histogram;
 	var x = .65 / fi.data.total;
 	return {
@@ -92,16 +94,7 @@ fiReport.prototype.getSpeedometerSettings = function(key) {
 	};
 }
 
-fiReport.prototype.getSpeedometerText = function(key) {
-	score = fi.scores[key] * model.max[key];
-	avg = fi.averages.values[key].average * model.max[key];
-	return "Your score is " + score + " out of " + model.max[key] + ". The average score of " + fi.data.total + " surveys is " + avg + ".";
-}
-// c. Where do I fit (compared to other – namesto xx% je boljših od vas rečemo je nn% projektov imelo podoben rezultat)
-// d. Če je score pod polovico speedometra: You should look at improving “sector name” of your project
-// e. če je score pod polovico speedometra: You might want to look at this documents for assistance (potem pa bi navedli povezave do nekaterih dokumentov: imeli bi fiksen seznam za vsako področje ter en dinamični querry, ki bi pobrskal po FI-IMPACT katalogu dokumentov in ponudil link na opravljen search znotraj portal – o tem delu se še pogovorimo kako si zamišljam)
-
-fiReport.prototype.verboseFromJSON = function(s, q) {
+fiData.prototype.verboseFromJSON = function(s, q) {
 	var t = [];
 	$.each(fi.questions['Q' + s + '_' + q].value.split(','), function(i, v) {
 		if (model['s' + s]['q' + q][v]) { t.push(model['s' + s]['q' + q][v]); }
@@ -109,7 +102,7 @@ fiReport.prototype.verboseFromJSON = function(s, q) {
 	return t.join( ", " );
 }
 
-fiReport.prototype.getAnswersList = function(question, A) {
+fiData.prototype.getAnswersList = function(question, A) {
 	var result = [];
 	var q = 'Q' + question;
 	var qId = question.split('_');
@@ -121,7 +114,7 @@ fiReport.prototype.getAnswersList = function(question, A) {
 	return result.join( ", " );
 }
 
-fiReport.prototype.getMarketNeedsStarScores = function(key) {
+fiData.prototype.getMarketNeedsStarScores = function(key) {
 	var result = {};
 	$.each(model.s5A.q1, function(i, v) {
 		val = ( fi.questions["Q5A_1_" + i] ? parseInt(fi.questions["Q5A_1_" + i].value) : 0 );
@@ -130,7 +123,7 @@ fiReport.prototype.getMarketNeedsStarScores = function(key) {
 	return result;
 }
 
-fiReport.prototype.getQ3_5text = function(A) {
+fiData.prototype.getQ3_5text = function(A) {
 	var result = [];
 	$.each(fi.questions.Q3_5.value.split(','), function(i, v) {
 		switch(v) {
@@ -144,7 +137,17 @@ fiReport.prototype.getQ3_5text = function(A) {
 	return result.join(", ");
 }
 
-fiReport.prototype.makeRadarSocialData = function(A) {
+fiData.prototype.makeRadarOverviewData = function() {
+	data = [[],[]];
+	$.each(model.radarOverview, function(i, v) {
+		label = v.charAt(0).toUpperCase() + v.slice(1)
+		data[0].push({axis: label, value: fi.scores[v]});
+		data[1].push({axis: label, value: fi.averages.values[v].average});
+	});
+	return data;
+}
+
+fiData.prototype.makeRadarSocialData = function(A) {
 	data = [[],[]];
 	$.each(model['s6' + A].q1, function(i, v) {
 		label = ( (A == "A") ? i : v );

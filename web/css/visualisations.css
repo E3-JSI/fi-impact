@@ -38,3 +38,19 @@
 .chart-color2 { fill: #F4B900; }
 .chart-color3 { fill: #00A54F; }
 .chart-density { fill: #fff; }
+
+th.rotate { /* Something you can count on */
+  height: 35px;
+  white-space: nowrap;
+}
+
+th.rotate > div {
+  transform: translate(-20px, -40px) rotate(290deg);
+  width: 100px;
+  float: right;
+}
+th.rotate > div > span {
+  border-bottom: 1px solid #ccc;
+  padding: 5px 10px;
+}
+.textRight { text-align: right; }
