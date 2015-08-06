@@ -34,7 +34,7 @@ function d3Speedometer(elementId, s) {
 		arc = d3.svg.arc().outerRadius(radius - chartInset).innerRadius(radius - chartInset - barWidth).startAngle(arcStartRad + startPadRad).endAngle(arcEndRad - endPadRad);
 		chart.append('path').attr('class', "arc chart-color" + sectionIndx).attr('d', arc);
 		sec = d3.svg.arc().outerRadius(radius * s.list[_i-1] + 12).innerRadius(12).startAngle(arcStartRad + startPadRad).endAngle(arcEndRad - endPadRad);
-		chart.append('path').attr('class', "arc chart-density").attr('d', sec);
+		chart.append('path').attr('class', "arc chart-density" + sectionIndx).attr('d', sec);
 	}
 
 	Needle = (function() {

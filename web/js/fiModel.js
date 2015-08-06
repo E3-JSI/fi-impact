@@ -56,17 +56,17 @@ var model = {
 },
 
 "max": {
-	"feasibility": 5,
-	"innovation": 5,
-	"market": 5,
+	"feasibility": 5.4,
+	"innovation": 20.8,
+	"market": 37,
 	"business": 10
 },
 
 "lmh": {
-	"feasibility": [.32, .67], // 1.6/5, 3.35/5
+	"feasibility": [.32, .67],
 	"innovation": [.32, .67],
 	"market": [.32, .67],
-	"business": [.4, .75] // x/10
+	"business": [.4, .75]
 },
 
 "s1": {

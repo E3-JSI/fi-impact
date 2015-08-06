@@ -69,7 +69,7 @@
 		</div></div>
 		<div class="row"><div class="col-md-6"><table class="table table-striped"><tbody>
 			<tr><td width="25%"><strong>Organisation</strong></td>
-				<td><strong>{{aFi.d1_3}}</strong> (operational {{aFi.d1_16}} years)<br><i>{{aFi.organisationType}}</i><br>{{aFi.d1_5}}<br>
+				<td><strong>{{aFi.d1_3}}</strong> (operational {{aFi.d1_16}} year<span ng-if="aFi.d1_16 != 1">s</span>)<br><i>{{aFi.organisationType}}</i><br>{{aFi.d1_5}}<br>
 					{{aFi.d1_17}}, {{aFi.d1_2}}<br>{{aFi.d1_9}}&euro; annual turnover last year</td></tr>
 			<tr><td><strong>Employees</strong></td><td>Implementing team size: {{aFi.d1_7}}<br>Full time employees: {{aFi.d1_8}}</td></tr>
 			<tr><td width="25%"><strong>Accelerator</strong></td><td><strong>{{aFi.d1_1}}</strong> ({{aFi.d1_13}}&euro;)<br>{{aFi.d1_14}}</td></tr>
@@ -85,12 +85,23 @@
     <section id="innovation" class="bg-light-gray"><div class="container onBg">
 		<div class="row"><div class="col-lg-12 text-center">
 			<h2 class="section-heading">Innovation</h2><div id="innovationGauge" class="pull-right"></div>
-			<h3 class="section-subheading text-muted">
-				Your score is {{aFi.innovation.score}} out of {{aFi.innovation.max}}. The average score of {{aFi.totalSurveys}} surveys is {{aFi.innovation.average}}.
-				<div ng-repeat="x in aFi.innovation.bottomHalf">You should look at improving innovation of your project. You might want to look at this documents for assistance <strong>To be provided by IDC</strong>.</div>
-			</h3>
+			<p class="text-muted">The Innovation indicator expresses the level of originality, maturity and suitability of the product or service
+			as an idea or concept. The single measures are used to create an innovation indicator but are also singularly
+			used in the calculation of Market Attractiveness and Feasibility Indicators.</p>
+			<p class="text-muted">Alone the level of innovation in a product or service is neither essential nor irrelevant. When
+			contextualised in a specific market adopting a specific business model the value of innovation can be
+			significantly important. An innovative product or service can make a significant Impact in the market if you
+			are ready to implement it, but can conceal substantial engineering, business planning, development, testing
+			and marketing effort if the product or service is still in the planning phases. Additionally new product and
+			service are too far from customer’s expressed or potential needs. If the ideas being developed are shared
+			among several colleagues and perhaps potential clients the possibility of being inapplicable to real market
+			contexts is reduced. Finally Innovation is quite healthy in organisations if it is realistic and part of a
+			shared strategy but can be quite resource consuming. When planned and part of a larger strategy innovation
+			can bring long-term rejuvenation to the organisation.</p>
+			<h3 class="section-subheading">Your score is {{aFi.innovation.score}} out of {{aFi.innovation.max}}. The average score of {{aFi.totalSurveys}} surveys is {{aFi.innovation.average}}.</h3>
+			<h3 class="section-subheading" ng-repeat="x in aFi.innovation.bottomHalf">You should look at improving innovation of your project. You might want to look at this documents for assistance <strong>To be provided by IDC</strong>.</h3>
 		</div></div>
-		<div class="row"><div class="col-md-6"><table class="table table-striped"><tbody>
+		<div class="row tableMargin"><div class="col-md-6"><table class="table table-striped"><tbody>
 			<tr><td width="25%"><strong>Concept</strong></td>
 				<td><strong>Authors:</strong> {{aFi.d2_4}}<br><strong>Stage:</strong> {{aFi.d2_1}}</td></tr>
 		</tbody></table></div>
@@ -103,18 +114,16 @@
     <!-- Market Section -->
     <section id="market"><div class="container onBg">
 		<div class="row"><div class="col-lg-12 text-center">
-                    <h2 class="section-heading">Market</h2>
-					<div id="marketGauge" class="pull-right"></div>
-                    <h3 class="section-subheading text-muted">The Market Focus indicator assesses to what extent you have gathered 
-					knowledge about customers in the target market, and if your initiative has a strategy and plan to reach the target
-					market. This indicator measures the level of your “customer development” activities: whether you have already approached 
-					customers to collect feedback on your product, and to what extent you have developed a strategy to acquire them.</h3>
-					<h3 class="section-subheading text-muted">
-						Your score is {{aFi.market.score}} out of {{aFi.market.max}}. The average score of {{aFi.totalSurveys}} surveys is {{aFi.market.average}}.
-						<div ng-repeat="x in aFi.market.bottomHalf">You should look at improving the market score of your project. You might want to look at this documents for assistance <strong>To be provided by IDC</strong>.</div>
-					</h3>
+			<h2 class="section-heading">Market</h2>
+			<div id="marketGauge" class="pull-right"></div>
+			<p class="text-muted">The Market Focus indicator assesses to what extent you have gathered knowledge about customers in the
+			target market, and if your initiative has a strategy and plan to reach the target market. This indicator
+			measures the level of your “customer development” activities: whether you have already approached customers
+			to collect feedback on your product, and to what extent you have developed a strategy to acquire them.</p>
+			<h3 class="section-subheading">Your score is {{aFi.market.score}} out of {{aFi.market.max}}. The average score of {{aFi.totalSurveys}} surveys is {{aFi.market.average}}.</h3>
+			<h3 class="section-subheading" ng-repeat="x in aFi.market.bottomHalf">You should look at improving the market score of your project. You might want to look at this documents for assistance <strong>To be provided by IDC</strong>.</h3>
 		</div></div>
-		<div class="row"><div class="col-md-6"><table class="table table-striped"><tbody>
+		<div class="row tableMargin"><div class="col-md-6"><table class="table table-striped"><tbody>
 			<tr><td width="25%"><strong>Business model</strong></td>
 				<td><strong>Model:</strong> {{aFi.businessModel}}<br><strong>Revenue Division:</strong> licenses {{aFi.d3_2a}}%, subscriptions: {{aFi.d3_2b}}%, project fees: {{aFi.d3_2c}}%</td></tr>
 			<tr><td><strong>Customers</strong></td>
@@ -129,131 +138,86 @@
 	</div></section>
 
     <!-- Feasibility Section -->
-    <section id="feasibility" class="bg-light-gray">
-        <div class="container onBg">
-            <div class="row">
-                <div class="col-lg-12 text-center">
-                    <h2 class="section-heading">Feasibility</h2>
-					<div id="feasibilityGauge" class="pull-right"></div>
-                    <h3 class="section-subheading text-muted">The Feasibility indicator assesses to what extent you have assessed the 
-					economic viability of your business, and if you have already provided for the necessary funds for the startup phase.
-					This indicator assesses whether you are aware of the funds required to start and grow your business, and whether you
-					have secured sources for these funds.</h3>
-					<h3 class="section-subheading text-muted">
-						Your score is {{aFi.feasibility.score}} out of {{aFi.feasibility.max}}. The average score of {{aFi.totalSurveys}} surveys is {{aFi.feasibility.average}}.
-						<div ng-repeat="x in aFi.feasibility.bottomHalf">You should look at improving feasibility of your project. You might want to look at this documents for assistance <strong>To be provided by IDC</strong>.</div>
-					</h3>
-                </div>
-            </div>
-            <div class="row">
-				<div class="col-md-6"><table class="table table-striped"><tbody>
-					<tr><td width="25%"><strong>Capital</strong></td>
+    <section id="feasibility" class="bg-light-gray"><div class="container onBg">
+		<div class="row"><div class="col-lg-12 text-center">
+			<h2 class="section-heading">Feasibility</h2>
+			<div id="feasibilityGauge" class="pull-right"></div>
+			<p class="text-muted">The Feasibility indicator assesses to what extent you have assessed the 
+			economic viability of your business, and if you have already provided for the necessary funds for the startup phase.
+			This indicator assesses whether you are aware of the funds required to start and grow your business, and whether you
+			have secured sources for these funds.</p>
+			<h3 class="section-subheading">Your score is {{aFi.feasibility.score}} out of {{aFi.feasibility.max}}. The average score of {{aFi.totalSurveys}} surveys is {{aFi.feasibility.average}}.</h3>
+			<h3 class="section-subheading" ng-repeat="x in aFi.feasibility.bottomHalf">You should look at improving feasibility of your project. You might want to look at this documents for assistance <strong>To be provided by IDC</strong>.</h3>
+		</div></div>
+		<div class="row tableMargin">
+			<div class="col-md-6"><table class="table table-striped"><tbody>
+				<tr><td width="25%"><strong>Capital</strong></td>
 					<td><strong>Required investments until sustainable:</strong> {{aFi.d4_1}}<br><strong>Secured funding:</strong> {{aFi.d4_6}}%</td></tr>
 				<tr><td><strong>Growth rate</strong></td>
 					<td><strong>Sales:</strong> {{aFi.d4_2}}<br><strong>Revenue (4 years):</strong> {{aFi.revenueGrowth}}</td></tr>
 				</tbody></table></div>
-				<div class="col-md-6"><table class="table table-striped"><tbody>
-					<tr><td width="25%"><strong>Customer acquisition</strong></td><td>{{aFi.d4_4}}</td></tr>
+			<div class="col-md-6"><table class="table table-striped"><tbody>
+				<tr><td width="25%"><strong>Customer acquisition</strong></td><td>{{aFi.d4_4}}</td></tr>
 				<tr><td width="25%"><strong>Sales and marketing expansion</strong></td><td>{{aFi.d4_5}}</td></tr>
-				</tbody></table></div>
-			</div>
-            <div class="row">
-                <div class="col-lg-8 col-lg-offset-2 text-center">
-                    <p class="large text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut eaque, laboriosam veritatis, quos non quis ad perspiciatis, totam corporis ea, alias ut unde.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+			</tbody></table></div>
+		</div>
+    </div></section>
 	
 	<!-- Market Needs Section -->
-    <section id="marketNeeds">
-        <div class="container onBg">
-            <div class="row">
-                <div class="col-lg-12 text-center">
-                    <h2 class="section-heading">Market Needs</h2>
-                </div>
-            </div>
-            <div class="row mnSector" ng-repeat="MN in aFi.marketNeeds">
-				<h3>{{MN.sector}}</h3>
-				<div class="col-md-6"><table class="table table-striped"><tbody>
-						<tr ng-repeat="score in MN.scores"><td>{{score.name}}</td><td><i class="fa fa-star" ng-repeat="st in getArray(score.stars) track by $index"></i></td></tr>
-					</tbody></table></div>
-				<div class="col-md-3">
-					<div class="mnScore">
-						<p style="font-variant: small-caps">Target Market Needs Understanding</p>
-						<h3 style="font-variant: small-caps">your score</h3>
-						<p class="theScore">
-							{{MN.score}}/10
-						</p>
-						<p>{{MN.hint}}</p>
-						<p style="font-size: 0.7em;">Personalized sentence dependent on score.</p>
-					</div>
-				</div>
-				<div class="col-md-3">
-					<h3 class="section-subheading text-muted">{{MN.sector}} TOP 5 business needs<br><span style="font-size: 0.8em">(Source IDC)</span></h3>
-					<ol><li ng-repeat="BN in MN.top5">{{BN}}</li></ol>
-				</div>
-			</div>
-        </div>
-    </section>
+    <section id="marketNeeds"><div class="container onBg">
+		<div class="row"><div class="col-lg-12 text-center">
+			<h2 class="section-heading">Market Needs</h2>
+		</div></div>
+		<div class="row mnSector" ng-repeat="MN in aFi.marketNeeds">
+			<h3>{{MN.sector}}</h3>
+			<div class="col-md-6"><table class="table table-striped"><tbody>
+				<tr ng-repeat="score in MN.scores"><td>{{score.name}}</td><td><i class="fa fa-star" ng-repeat="st in getArray(score.stars) track by $index"></i></td></tr>
+			</tbody></table></div>
+			<div class="col-md-3"><div class="mnScore">
+				<p style="font-variant: small-caps">Target Market Needs Understanding</p>
+				<h3 style="font-variant: small-caps">your score</h3>
+				<p class="theScore">{{MN.score}}/10</p><p>{{MN.hint}}</p><p style="font-size: 0.7em;">Personalized sentence dependent on score.</p>
+			</div></div>
+			<div class="col-md-3 topNeeds">
+				<h3 class="section-subheading text-muted">TOP 5 business needs</h3>
+				<h3 class="section-subheading text-muted mnSource">(Source: IDC)</h3>
+				<ol><li ng-repeat="BN in MN.top5">{{BN}}</li></ol>
+			</div></div>
+    </div></section>
 
     <!-- Social Impact Section -->
-    <section id="socialImpact" class="bg-light-gray">
-        <div class="container onBg">
-            <div class="row">
-                <div class="col-lg-12 text-center">
-                    <h2 class="section-heading">Social Impact</h2>
-                    <h3 class="section-subheading text-muted">Lorem ipsum dolor sit amet consectetur.</h3>
-                </div>
-            </div>
-			<h3>Social Benefits</h3>
-			<div class="row">
-                <div class="col-md-6 text-center">
-					<div id="bodySocialA" class="radarBody">
-						<div class="radarLegend" class="radarLegend">
-							<p><i class="fa fa-square color0"></i> Your Score<br>
-								<i class="fa fa-square color1"></i> Average</p>
-						</div><div id="radarSocialA"></div>
-					</div>
-                </div>
-				<div class="col-md-6">
-					<h3 class="section-subheading text-muted">Axis legend</h3>
-					<p class="axisLegend" ng-repeat="SB in aFi.socialBenefits"><span>{{SB.key}}:</span> {{SB.name}}</p>
-                </div>
-            </div>
-			<h3>Quality of life improvement for certain social groups</h3>
-			<div class="row">
-                <div class="col-md-6 text-center">
-					<div id="bodySocialB" class="radarBody">
-						<div class="radarLegend" class="radarLegend">
-							<p><i class="fa fa-square color0"></i> Your Score<br>
-								<i class="fa fa-square color1"></i> Average</p>
-						</div><div id="radarSocialB"></div>
-					</div>
-                </div>
-				<div class="col-md-6">
-					
-                </div>
-            </div>
-        </div>
-    </section>
-
-	<section id="overview" class="bg-light-gray">
-		<div class="container onBg">
-            <div class="row">
-                <div class="col-lg-12 text-center">
-                    <h2 class="section-heading">Overview</h2>
-                    <h3 class="section-subheading text-muted">Lorem ipsum dolor sit amet consectetur.</h3>
-                </div>
-            </div>
-			<div id="bodyOverview" class="radarBody">
-				<div class="radarLegend">
+    <section id="socialImpact" class="bg-light-gray"><div class="container onBg">
+		<div class="row"><div class="col-lg-12 text-center">
+			<h2 class="section-heading">Social Impact</h2>
+			<h3 class="section-subheading text-muted">Lorem ipsum dolor sit amet consectetur.</h3>
+		</div></div>
+		<h3>Social Benefits</h3>
+		<div class="row"><div class="col-md-6 text-center">
+				<div id="bodySocialA" class="radarBody"><div class="radarLegend" class="radarLegend">
 					<p><i class="fa fa-square color0"></i> Your Score<br>
 						<i class="fa fa-square color1"></i> Average</p>
-				</div><div id="radarOverview"></div>
-			</div>
-		</div>
-	</section>
+				</div><div id="radarSocialA"></div></div>
+			</div><div class="col-md-6 axisLegend">
+				<h3 class="section-subheading text-muted">Axis legend</h3>
+				<p ng-repeat="SB in aFi.socialBenefits"><span>{{SB.key}}:</span> {{SB.name}}</p>
+		</div></div>
+		<h3>Quality of life improvement for certain social groups</h3>
+		<div class="row"><div class="col-md-6 text-center">
+			<div id="bodySocialB" class="radarBody"><div class="radarLegend" class="radarLegend">
+				<p><i class="fa fa-square color0"></i> Your Score<br><i class="fa fa-square color1"></i> Average</p>
+			</div><div id="radarSocialB"></div></div>
+		</div><div class="col-md-6"></div></div>
+    </div></section>
+
+	<section id="overview" class="bg-light-gray"><div class="container onBg">
+		<div class="row"><div class="col-lg-12 text-center">
+			<h2 class="section-heading">Overview</h2>
+			<h3 class="section-subheading text-muted">Lorem ipsum dolor sit amet consectetur.</h3>
+		</div></div>
+		<div id="bodyOverview" class="radarBody"><div class="radarLegend">
+			<p><i class="fa fa-square color0"></i> Your Score<br><i class="fa fa-square color1"></i> Average</p>
+		</div><div id="radarOverview"></div></div>
+	</div></section>
 	
     <!-- Partners -->
 	<aside class="clients"><div class="container"><hr id="partners"><div class="row">

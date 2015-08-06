@@ -33,10 +33,10 @@ function csvToSentenceCase(str) {
 
 function lineChart(a,b,c,d) {
 	var code = '<svg class="chart" width="100" height="23">';
-	code += '<g transform="translate(0,0)"><rect width="' + fiPercent(a,'F') + '" height="5" fill="darksteelblue"></rect></g>';
-	code += '<g transform="translate(0,6)"><rect width="' + fiPercent(b,'I') + '" height="5" fill="lightsteelblue"></rect></g>';
-	code += '<g transform="translate(0,12)"><rect width="' + fiPercent(c,'M') + '" height="5" fill="black"></rect></g>';
-	code += '<g transform="translate(0,18)"><rect width="' + fiPercent(d,'MN') + '" height="5" fill="steelblue"></rect></g>';
+	code += '<g transform="translate(0,0)"><rect width="' + fiPercent(a,'F') + '" height="5" fill="steelblue"></rect></g>';
+	code += '<g transform="translate(0,6)"><rect width="' + fiPercent(b,'I') + '" height="5" fill="lightskyblue"></rect></g>';
+	code += '<g transform="translate(0,12)"><rect width="' + fiPercent(c,'M') + '" height="5" fill="teal"></rect></g>';
+	code += '<g transform="translate(0,18)"><rect width="' + fiPercent(d,'MN') + '" height="5" fill="lightsteelblue"></rect></g>';
 	code += '</svg>';
 	return code;
 }

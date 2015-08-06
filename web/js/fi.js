@@ -141,8 +141,8 @@ fiData.prototype.makeRadarOverviewData = function() {
 	data = [[],[]];
 	$.each(model.radarOverview, function(i, v) {
 		label = v.charAt(0).toUpperCase() + v.slice(1)
-		data[0].push({axis: label, value: fi.scores[v]});
-		data[1].push({axis: label, value: fi.averages.values[v].average});
+		data[0].push({axis: label, value: fi.averages.values[v].average});
+		data[1].push({axis: label, value: fi.scores[v]});
 	});
 	return data;
 }
@@ -151,8 +151,8 @@ fiData.prototype.makeRadarSocialData = function(A) {
 	data = [[],[]];
 	$.each(model['s6' + A].q1, function(i, v) {
 		label = ( (A == "A") ? i : v );
-		data[0].push({axis: label, value: fi.results['Q6' + A + '_1_' + i + '_R']/100});
-		data[1].push({axis: label, value: fi.averages.values['social' + A + '_' + i].average});
+		data[0].push({axis: label, value: fi.averages.values['social' + A + '_' + i].average});
+		data[1].push({axis: label, value: fi.results['Q6' + A + '_1_' + i + '_R']/100});
 	});
 	return data;
 }

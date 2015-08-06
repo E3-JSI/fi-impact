@@ -24,7 +24,8 @@
 #overview text { fill: #ccc; }
 #overview .axis text { fill: #fff; }
 #market, #marketNeeds { background-color: #93A8C4; }
-.onBg { background-color: rgba(250, 250, 250, .7); padding-top: 1em; border-radius: 5px; }
+.onBg { background-color: rgba(250, 250, 250, .7); padding: 2em 3em; border-radius: 5px; }
+
 
 #marketNeeds table { font-size: 0.9em; }
 #marketNeeds td { padding-top: 2px; padding-bottom: 2px; color: #555; }
@@ -34,29 +35,28 @@
 	text-align: center;
 	padding: 10px;
 }
+.mnSector h3 { margin-top: 1em; color: #1F71AB; }
+section .onBg .mnSector  p { text-align: center; }
+.mnSector .theScore { font-size: 3em; color: #36abfe;
+	font-family: "Kaushan Script","Helvetica Neue",Helvetica,Arial,cursive; }
+.topNeeds .section-subheading { text-align: left; }
+.topNeeds .mnSource { font-size: .8em; text-align: right; }
 #socialImpact { background-image:url('../img/people.jpg'); }
 
-section h3.section-subheading { margin-bottom: 5px; text-align: left; }
+section h3.section-subheading { font-size: 1.2em; margin-bottom: 5px; }
+section .onBg p {text-align: left; line-height: 1.3em; }
 section ol { margin-top: 10px; padding-left: 10px; text-align: left; }
+.tableMargin { margin-top: 20px; }
 .table-striped { background: rgba(249, 249, 249, .5); text-align: left; }
-.mnSector h3 { text-align: center; margin-top: 1em; color: #1F71AB; }
-.mnSector .theScore {
-	font-size: 3em;
-	font-family: "Kaushan Script","Helvetica Neue",Helvetica,Arial,cursive;
-	color: #36abfe;
-}
 
 .radarBody { float: left; position: relative; }
-.radarLegend { position: absolute; right: 0; width: 130px; text-align: left; }
+.radarLegend { position: absolute; right: 0; width: 130px; text-align: left; padding: 1em; }
 .radarLegend .fa { margin-right: 10px; }
-.radarLegend .color0 { color: rgb(49, 130, 189); }
-.radarLegend .color1 { color: rgb(107, 174, 214); }
-.axisLegend { margin: 0; }
-.axisLegend span { font-weight: bold; }
-
-.chart-density {
-	color: white;
-}
+.radarLegend .color0 { color: #1f3e6f; }
+.radarLegend .color1 { color: #6baed6; }
+.axisLegend h3.section-subheading { margin-bottom: 10px; padding-left: 20px; }
+.axisLegend p { margin: 5px 0; padding-left: 20px; }
+.axisLegend span { font-weight: bold; margin-right: 5px; }
 
 hr#partners {
 	padding: 0; border: none; border-top: 1px solid #ccc; color: #ccc; text-align: center;

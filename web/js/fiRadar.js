@@ -4,14 +4,15 @@
 
 var fiRadar = function (id, data, options) {
 	var opt = {
-		r: 5, w: 600, h: 600, rad: 2 * Math.PI,
-		factor: 1, factorLegend: .85, levels: 10,
+		r: 5, w: 500, h: 500, rad: 2 * Math.PI,
+		factor: 1, factorLegend: .85, levels: 5,
 		max: Math.max(0, d3.max(data, function(i) {	return d3.max(i.map( function(o) {return o.value;} )); })),
 		opacityArea: 0.5,
 		ToRight: 5,
 		TranslateX: 80, TranslateY: 30,
 		ExtraWidthX: 150, ExtraWidthY: 100,
-		color: d3.scale.category20c().domain([0, 1])
+		// color: d3.scale.category20c().domain([0, 1])
+		color: ['#6baed6', '#1f3e6f']
 	};
 	if (options) { for (var i in options) {if (options[i]) { opt[i] = options[i]; }} }
 	opt.axesNum = data[0].length;
@@ -85,11 +86,11 @@ var fiRadar = function (id, data, options) {
 			});
 			dataValues.push(dataValues[0]);
 			g.selectAll(".area").data([dataValues]).enter().append("polygon").attr("class", "radar-chart-serie"+series)
-				.style("stroke-width", "2px").style("stroke", opt.color(series)).attr("points", function(d) {
+				.style("stroke-width", "2px").style("stroke", opt.color[series]).attr("points", function(d) {
 					var str = "";
 					for ( var pti = 0; pti < d.length; pti++ ) { str = str + d[pti][0] + "," + d[pti][1] + " "; }
 					return str;
-				}).style("fill", function(j, i){return opt.color(series)}).style("fill-opacity", opt.opacityArea)
+				}).style("fill", function(j, i){return opt.color[series]}).style("fill-opacity", opt.opacityArea)
 				.on('mouseover', function (d) {
 					z = "polygon." + d3.select(this).attr("class");
 					g.selectAll("polygon").transition(200).style("fill-opacity", 0.1); 
@@ -107,7 +108,7 @@ var fiRadar = function (id, data, options) {
 				dataValues.push([opt.w / 2 * (1 - modifier * angle('x', i)), opt.h / 2 * (1 - modifier * angle('y', i))]);
 				return opt.w/2*(1-(Math.max(j.value, 0)/opt.max)*opt.factor * angle('x', i));
 			}).attr("cy", function(j, i){ return opt.h / 2 * (1 - (Math.max(j.value, 0)/opt.max) * opt.factor * angle('y', i)); })
-			.attr("data-id", function(j){return j.axis}).style("fill", opt.color(series)).style("fill-opacity", .9)
+			.attr("data-id", function(j){return j.axis}).style("fill", opt.color[series]).style("fill-opacity", .9)
 			.on('mouseover', function (d) {
 				newX =  parseFloat(d3.select(this).attr('cx')) - 10;
 				newY =  parseFloat(d3.select(this).attr('cy')) - 5;
