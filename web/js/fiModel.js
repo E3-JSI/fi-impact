@@ -12,6 +12,26 @@ var model = {
 "list": ["1_12", "1_18a", "1_18b", "1_18c", "1_18d", "3_4"],
 "speedometers": ["innovation", "feasibility", "market"],
 "radarOverview": ["innovation", "market", "feasibility", "business"],
+"ranking": {
+	"0.0000": "Low",
+	"1.0000": "Low",
+	"2.0000": "Medium",
+	"3.0000": "High",
+	"4.0000": "High"
+},
+"revenueDivision": {
+	"a": "licenses",
+	"b": "subscriptions",
+	"c": "project fees"
+},
+"radarLevelsSocial": {
+	"1": "No Impact",
+	"2": "Limited Impact",
+	"3": "Impact",
+	"4": "Significant Impact",
+	"5": "High Impact",
+	"num": 5
+},
 
 "marketNeedsTop5": {
 	"A": ["D", "A", "B", "C", "F"],
@@ -59,7 +79,8 @@ var model = {
 	"feasibility": 5.4,
 	"innovation": 20.8,
 	"market": 37,
-	"business": 10
+	"business": 10,
+	"social": 5
 },
 
 "lmh": {
@@ -115,8 +136,8 @@ var model = {
 		"TRL9": "Product/service sold in marketplace."
 	},
 	"q2": {
-		"A": "Our business idea involves changes and improvements to existing products and services (Incremental Innovation).",
-		"B": "Our business idea radically changes existing products and services and creates new markets by discovering new categories of customers (Disruptive innovation)."
+		"A": "Incremental Innovation. Our business idea involves changes and improvements to existing products and services.",
+		"B": "Disruptive innovation. Our business idea radically changes existing products and services and creates new markets by discovering new categories of customers."
 	},
 	"q4": {
 		"A": "Single person.",

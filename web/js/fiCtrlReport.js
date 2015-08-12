@@ -7,6 +7,8 @@ fiReportApp.controller('fiCtrl', function ($scope) {
 		socialBenefits: [],
 		enablers: [],
 		totalSurveys: fi.data.total,
+		trl: fi.questions.trl,
+		revenueDivision: "",
 		
 		organisationType: fi.getAnswersList('1_6', 'A'),
 		businessModel: fi.verboseFromJSON('3', '1'),
@@ -14,18 +16,26 @@ fiReportApp.controller('fiCtrl', function ($scope) {
 		marketChannel: fi.verboseFromJSON('3', '4'),
 		data3_5: fi.getQ3_5text()
 	};
-
+	
 	$.each(fi.questions, function(i, v) { if ( v && (v.text != "") ) { $scope.aFi['d' + v.id] = v.text; } });
 	$.each(["a", "b", "c", "d"], function(i, v) {
 		if (fi.questions['Q1_18' + v]) { $scope.aFi.enablers.push({category: model.Q1_18text[v], list: fi.questions['Q1_18' + v].text}); }
 	});
+	var t3_2 = [];
+	$.each(["a", "b", "c"], function(i, v) {
+		input = fi.questions['Q3_2' + v];
+		if (input && parseInt(input.value) > 0) { t3_2.push(model.revenueDivision[v] + ": " + input.value + "%"); }
+	});
+	$scope.aFi.revenueDivision = t3_2.join(", ");
+
 	$.each(model.speedometers, function(i, v) {
 		m = model.max[v];
 		$scope.aFi[v] = { max: m,
-			score: m*fi.scores[v],
-			average: m*fi.averages.values[v].average,
-			percent: Math.round(fi.results[v.toUpperCase() + "_R"]),
-			bottomHalf: ( (m*fi.scores[v] <= m/2) ? [1] : [])
+			score: fi.scores[v],
+			average: fi.averages.values[v].average,
+			ranking: model.ranking[fi.results[v.toUpperCase() + '_GRAPH_SLOT']],
+			percentOfBetter: Math.round(fi.results[v.toUpperCase() + "_R"]),
+			bottomHalf: ( (fi.scores[v] <= m/2) ? [1] : [])
 		};
 	});
 	

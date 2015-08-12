@@ -17,12 +17,6 @@ function inArray(list, value) {
 	return result;
 }
 
-function fiBool(v) {
-	if (v == "A") { return "Yes"; }
-	if (v == "B") { return "No"; }
-	return;
-}
-
 function csvToSentenceCase(str) {
 	$.map( str.split(','), function( val, i ) {
 		return val.toLowerCase; //.charAt(0).toUpperCase() + val.slice(1)

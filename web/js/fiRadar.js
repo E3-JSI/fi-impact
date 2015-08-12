@@ -2,7 +2,7 @@
 //For a bit of extra information check the blog about it:
 //http://nbremer.blogspot.nl/2013/09/making-d3-radar-chart-look-bit-better.html
 
-var fiRadar = function (id, data, options) {
+var fiRadar = function (id, data, options, fixedLevels) {
 	var opt = {
 		r: 5, w: 500, h: 500, rad: 2 * Math.PI,
 		factor: 1, factorLegend: .85, levels: 5,
@@ -18,14 +18,10 @@ var fiRadar = function (id, data, options) {
 	opt.axesNum = data[0].length;
 	opt.axesNames = data[0].map(function(i, j){return i.axis});
 	opt.radius = opt.factor * Math.min(opt.w, opt.h) / 2;
+	if (fixedLevels) { opt.leves = fixedLevels.num; }
 	
-	function levelFactor(i) {
-		return (i+1) * opt.factor * opt.radius / opt.levels;
-	}
-	function baseTranslate(axis, i) {
-		var val = ( (axis == "x") ? opt.w : opt.h );
-		return val / 2 - levelFactor(i, opt);
-	}
+	function levelFactor(i) { return (i+1) * opt.factor * opt.radius / opt.levels; }
+	function baseTranslate(axis, i) { return ( (axis == "x") ? opt.w : opt.h ) / 2 - levelFactor(i, opt); }
 	function angle(axis, i) {
 		var val = i * opt.rad / opt.axesNum;
 		if (axis == "x") { return Math.sin(val); }
@@ -33,7 +29,7 @@ var fiRadar = function (id, data, options) {
 	}
 	
 	this.draw = function(id) {
-		var Format = d3.format('%');
+		// var Format = d3.format('%');
 		d3.select(id).select("svg").remove();
 		var g = d3.select(id).append("svg")
 			.attr("width", opt.w + opt.ExtraWidthX).attr("height", opt.h + opt.ExtraWidthY)
@@ -41,7 +37,7 @@ var fiRadar = function (id, data, options) {
 		var tooltip;
 		series = 0;
 		
-		//Circular segments
+		// Circular segments
 		for ( var j = 0; j < (opt.levels - 1); j++ ) {
 			fac = levelFactor(j, opt);
 			g.selectAll(".levels").data(opt.axesNames).enter().append("svg:line")
@@ -54,16 +50,18 @@ var fiRadar = function (id, data, options) {
 				.attr("transform", "translate(" + (opt.w/2-fac) + ", " + (opt.h/2-fac) + ")");
 		}
 		
-		//Text indicating at what % each level is
+		// Text indicating at what score each level is
 		for ( var j = 0; j < opt.levels; j++ ) {
+			levelText = (j+1) * opt.max/opt.levels;
+			if (fixedLevels) { levelText = fixedLevels[j+1] }
 			g.selectAll(".levels").data([1]) //dummy data
 				.enter().append("svg:text")
 				.attr("x", function(d) { return levelFactor(j)*(1-opt.factor*Math.sin(0)); })
 				.attr("y", function(d) { return levelFactor(j)*(1-opt.factor*Math.cos(0)); })
-				.attr("class", "legend")
-				.style("font-family", "sans-serif").style("font-size", "10px")
+				.attr("class", "legend").style("font-family", "sans-serif").style("font-size", "10px")
 				.attr("transform", "translate(" + (baseTranslate('x', j) + opt.ToRight) + ", " + baseTranslate('y', j) + ")")
-				.attr("fill", "#737373").text(Format((j+1) * opt.max/opt.levels));
+				.attr("fill", "#737373").text(levelText);
+				// .text(Format((j+1) * opt.max/opt.levels)); // percent
 		}
 		
 		var axis = g.selectAll(".axis").data(opt.axesNames).enter().append("g").attr("class", "axis");
@@ -112,7 +110,7 @@ var fiRadar = function (id, data, options) {
 			.on('mouseover', function (d) {
 				newX =  parseFloat(d3.select(this).attr('cx')) - 10;
 				newY =  parseFloat(d3.select(this).attr('cy')) - 5;
-				tooltip.attr('x', newX).attr('y', newY).text(Format(d.value)).transition(200).style('opacity', 1);
+				tooltip.attr('x', newX).attr('y', newY).text(d.value).transition(200).style('opacity', 1);
 				z = "polygon."+d3.select(this).attr("class");
 				g.selectAll("polygon").transition(200).style("fill-opacity", 0.1);
 				g.selectAll(z).transition(200).style("fill-opacity", .7);

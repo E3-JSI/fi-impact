@@ -3,6 +3,7 @@ var fiData = function (id) { // id is optional
 	var locationData = '../../service?action=results&id=' + id;
 	var locationManager = '../../manager?action=list';
 	// var model = require(['../../js/fiModel.js']);
+	loadMaxValues();
 	
 	if (typeof id != 'undefined') {
 		// load project data
@@ -23,20 +24,33 @@ var fiData = function (id) { // id is optional
 	// internal functions
 	// * * * * * * * * * *
 	
+	function loadMaxValues() {
+		$.each(['A', 'B'], function(i, v) { $.each(model['s6' + v].q1, function(j, w) {
+				model.max['social' + v + '_' + j] = model.max.social;
+		}); });
+	}
+	
 	function getJSON(jsonUrl) {
 		var result = null;
 		$.ajax({ url: jsonUrl, type: 'get', dataType: 'json', async: false, success: function(data) { result = data; } });
 		return result;
 	}
 	
+	function fiBool(v) {
+		if (v == "A") { return "Yes"; }
+		if (v == "B") { return "No"; }
+		return;
+	}
+	
 	function getQuestions(list) {
 		var result = {};
 		$.each(list, function(i, v) {
+			if (v[0] == "Q2_1") { result.trl = v[1]; }
 			var qId = v[0].slice(1);
 			var aId = qId.split('_');
 			var t = (( model['s' + aId[0]] || {} )['q' + aId[1]] || {} )[v[1]];
+			if (inArray(model.bool, qId)) { t = fiBool(v[1]); }
 			if (!t) {
-				if (inArray(model.bool, qId)) { t = fiBool(v[1]); }
 				if (inArray(model.list, qId)) { t = v[1].replace(/,/g, ", ").replace(" ,", ","); }
 				else { t = v[1]; }
 			}
@@ -56,23 +70,23 @@ var fiData = function (id) { // id is optional
 		return s;
 	}
 	
+	function cutOff(score, key) {
+		m = model.max[key];
+		return ( (score > m) ? m : score );
+	}
+	
 	function getKeys(list) {
 		var result = { keys: {}, values: {} };
 		$.each(list, function( i, v ) {
 			key = result.keys[v.id] = scoreKeysReplace(v.id);
-			if (!model.max[key]) { model.max[key] = 5; }
-			s = v.average / model.max[key];
-			result.values[key] = { average: ( (s > 1) ? 1 : s ), histogram: v.histogram };
+			result.values[key] = { average: cutOff(v.average, key), histogram: v.histogram };
 		});
 		return result;
 	}
 	
-	function getScores(list, data) { // unit: percent
+	function getScores(list, data) {
 		var result = {};
-		$.each(list, function(i, v) {
-			s = data[i] / model.max[v];
-			result[v] = ( (s > 1) ? 1 : s );
-		});
+		$.each(list, function(i, v) { result[v] = cutOff(data[i], i) });
 		return result;
 	}
 };
@@ -88,9 +102,9 @@ fiData.prototype.getSpeedometerSettings = function(key) {
 	var x = .65 / fi.data.total;
 	return {
 		levels: [0, model.lmh[key][0], model.lmh[key][1], 1],
-		percent: fi.scores[key],
+		percent: fi.scores[key] / model.max[key],
 		list: [(h[0]+h[1])*x, h[2]*x, (h[3]+h[4])*x],
-		average: fi.averages.values[key].average
+		average: fi.averages.values[key].average / model.max[key]
 	};
 }
 
@@ -128,7 +142,7 @@ fiData.prototype.getQ3_5text = function(A) {
 	$.each(fi.questions.Q3_5.value.split(','), function(i, v) {
 		switch(v) {
 			case "A": result.push(model.s3.q5.A + (fi.questions.Q1_17 ? " (" + fi.questions.Q1_17.value + ")" : '')); break;
-			case "B": result.push(model.s3.q5.B + (fi.questions.Q1_12 ? " (" + fi.questions.Q1_12.value + ")" : '')); break;
+			case "B": result.push(model.s3.q5.B + (fi.questions.Q1_12 ? " (" + fi.questions.Q1_2.value + ")" : '')); break;
 			case "C": result.push(model.s3.q5.C + (fi.questions.Q3_5c ? " (" + fi.questions.Q3_5c.value.replace(/,/g, ", ") + ")" : '')); break;
 			case "D": result.push(model.s3.q5.D); break;
 			default: result.push(model.s3.q5.E);
@@ -152,7 +166,7 @@ fiData.prototype.makeRadarSocialData = function(A) {
 	$.each(model['s6' + A].q1, function(i, v) {
 		label = ( (A == "A") ? i : v );
 		data[0].push({axis: label, value: fi.averages.values['social' + A + '_' + i].average});
-		data[1].push({axis: label, value: fi.results['Q6' + A + '_1_' + i + '_R']/100});
+		data[1].push({axis: label, value: fi.results['Q6' + A + '_1_' + i]});
 	});
 	return data;
 }

@@ -1,3 +1,10 @@
+.navbar .nav .summary { color: #00f0f0; }
+.navbar .nav .summary:hover { color: #00b0b0; }
+
+header .intro-text .intro-heading { text-transform: none; }
+.linkMore { text-align: right; }
+.intro-lead-in img { height: 2em; width: auto; vertical-align: text-bottom; background: transparent; }
+
 #project, #innovation, #feasibility, #market, #marketNeeds {
 	background-repeat: none;
 	background-attachment: scroll;

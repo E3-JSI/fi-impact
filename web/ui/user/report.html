@@ -35,14 +35,14 @@
                     <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand page-scroll" href="#page-top">FI Impact Report</a>
+                <a class="navbar-brand page-scroll" href="#page-top">FI-IMPACT Report</a>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
                     <li class="hidden"><a href="#page-top"></a></li>
-                    <li><a class="page-scroll" href="#project">Project</a></li>
+                    <li><a class="page-scroll summary" href="#project">Summary</a></li>
                     <li><a class="page-scroll" href="#innovation">Innovation</a></li>
                     <li><a class="page-scroll" href="#market">Market</a></li>
                     <li><a class="page-scroll" href="#feasibility">Feasibility</a></li>
@@ -58,52 +58,52 @@
 
     <!-- Header -->
     <header><div class="container"><div class="intro-text">
-		<div class="intro-lead-in">This is your</div><div class="intro-heading">FI-Impact Report</div>
-		<a href="#project" class="page-scroll btn btn-xl">Tell Me More</a>
+		<div class="intro-lead-in">This is your <img src="../../img/logo.png"> Report for project</div><div class="intro-heading">{{aFi.d1_4}}</div>
+		<!-- <a href="#project" class="page-scroll btn btn-xl">Tell Me More</a> -->
 	</div></div></header>
 
     <!-- Project Section -->
     <section id="project"><div class="container">
 		<div class="row"><div class="col-lg-12 text-center">
-			<h2 class="section-heading">Project: {{aFi.d1_4}}</h2><h3 class="section-subheading text-muted">{{aFi.d1_14}}</h3>
+			<h2 class="section-heading">Project summary</h2><h3 class="section-subheading text-muted">{{aFi.d1_14}}</h3>
 		</div></div>
 		<div class="row"><div class="col-md-6"><table class="table table-striped"><tbody>
 			<tr><td width="25%"><strong>Organisation</strong></td>
 				<td><strong>{{aFi.d1_3}}</strong> (operational {{aFi.d1_16}} year<span ng-if="aFi.d1_16 != 1">s</span>)<br><i>{{aFi.organisationType}}</i><br>{{aFi.d1_5}}<br>
-					{{aFi.d1_17}}, {{aFi.d1_2}}<br>{{aFi.d1_9}}&euro; annual turnover last year</td></tr>
+					{{aFi.d1_17}}, {{aFi.d1_2}}</td></tr>
 			<tr><td><strong>Employees</strong></td><td>Implementing team size: {{aFi.d1_7}}<br>Full time employees: {{aFi.d1_8}}</td></tr>
 			<tr><td width="25%"><strong>Accelerator</strong></td><td><strong>{{aFi.d1_1}}</strong> ({{aFi.d1_13}}&euro;)<br>{{aFi.d1_14}}</td></tr>
-			<tr><td><strong>Solution</strong></td><td>{{aFi.d1_10}}<br>{{aFi.d1_11}}</td></tr>
+			<tr><td><strong>Solution Type</strong></td><td>{{aFi.d1_10}}<br>{{aFi.d1_11}}</td></tr>
 		</tbody></table></div>
 		<div class="col-md-6 text-left"><strong>FIWARE enablers</strong><p>{{aFi.d1_12}}</p>
 			<table class="table table-striped"><tbody>
 				<tr ng-repeat="E in aFi.enablers"><td><strong>{{E.category}}</strong></td><td>{{E.list}}</td></tr>
-			</tbody></table></div></div>
+			</tbody></table>
+			<p class="linkMore"><a target="_blank" href="http://catalogue.fiware.org/enablers">learn more about FIWARE Enablers <i class="fa fa-arrow-right"></i></a></p>
+		</div></div>
 	</div></section>
 
     <!-- Innovation Section -->
     <section id="innovation" class="bg-light-gray"><div class="container onBg">
 		<div class="row"><div class="col-lg-12 text-center">
 			<h2 class="section-heading">Innovation</h2><div id="innovationGauge" class="pull-right"></div>
-			<p class="text-muted">The Innovation indicator expresses the level of originality, maturity and suitability of the product or service
-			as an idea or concept. The single measures are used to create an innovation indicator but are also singularly
-			used in the calculation of Market Attractiveness and Feasibility Indicators.</p>
-			<p class="text-muted">Alone the level of innovation in a product or service is neither essential nor irrelevant. When
-			contextualised in a specific market adopting a specific business model the value of innovation can be
-			significantly important. An innovative product or service can make a significant Impact in the market if you
-			are ready to implement it, but can conceal substantial engineering, business planning, development, testing
-			and marketing effort if the product or service is still in the planning phases. Additionally new product and
-			service are too far from customer’s expressed or potential needs. If the ideas being developed are shared
-			among several colleagues and perhaps potential clients the possibility of being inapplicable to real market
-			contexts is reduced. Finally Innovation is quite healthy in organisations if it is realistic and part of a
-			shared strategy but can be quite resource consuming. When planned and part of a larger strategy innovation
-			can bring long-term rejuvenation to the organisation.</p>
-			<h3 class="section-subheading">Your score is {{aFi.innovation.score}} out of {{aFi.innovation.max}}. The average score of {{aFi.totalSurveys}} surveys is {{aFi.innovation.average}}.</h3>
-			<h3 class="section-subheading" ng-repeat="x in aFi.innovation.bottomHalf">You should look at improving innovation of your project. You might want to look at this documents for assistance <strong>To be provided by IDC</strong>.</h3>
+			<p class="text-muted">The Innovation indicator expresses the level of originality, maturity and sustainability of innovation to a 
+			product or service in an organization’s go to market strategy. The single measures are used to create the innovation indicator 
+			but are also used in the calculation of Market Attractiveness and Feasibility Indicators. Several conditions affect the innovation 
+			Indicator. An innovative product or service can make a significant Impact in the market if you are ready to implement it, but can 
+			conceal substantial engineering, business planning, development, testing and marketing effort if the product or service is still 
+			in the planning phases. If the innovation is being developed and validated among colleagues and potential clients the innovation’s 
+			real market potential is increased. Innovation is quite healthy in organizations if it is part of a strategy but can be quite resource 
+			consuming where stand-alone.</p>
+			<h3 class="section-subheading">Your score is {{aFi.innovation.score}} out of {{aFi.innovation.max}}. The average score of 
+			{{aFi.totalSurveys}} surveys is {{aFi.innovation.average}}. Your ranking for innovation based on the data submitted is currently 
+			{{aFi.innovation.ranking}}.</h3>
+			<h3 class="section-subheading" ng-repeat="x in aFi.innovation.bottomHalf">
+			Please visit the FI-IMPACT Library to access reading material that may be useful.</h3>
 		</div></div>
 		<div class="row tableMargin"><div class="col-md-6"><table class="table table-striped"><tbody>
 			<tr><td width="25%"><strong>Concept</strong></td>
-				<td><strong>Authors:</strong> {{aFi.d2_4}}<br><strong>Stage:</strong> {{aFi.d2_1}}</td></tr>
+				<td><strong>Concept developed by:</strong> {{aFi.d2_4}}<br><strong>TRL Level:</strong> {{aFi.d2_1}} ({{aFi.trl}})</td></tr>
 		</tbody></table></div>
 		<div class="col-md-6"><table class="table table-striped"><tbody>
 			<tr><td width="25%"><strong>Business idea</strong></td><td><strong>Innovation Type:</strong> {{aFi.d2_2}}<br>
@@ -116,16 +116,23 @@
 		<div class="row"><div class="col-lg-12 text-center">
 			<h2 class="section-heading">Market</h2>
 			<div id="marketGauge" class="pull-right"></div>
-			<p class="text-muted">The Market Focus indicator assesses to what extent you have gathered knowledge about customers in the
+			<!-- <p class="text-muted">The Market Focus indicator assesses to what extent you have gathered knowledge about customers in the
 			target market, and if your initiative has a strategy and plan to reach the target market. This indicator
 			measures the level of your “customer development” activities: whether you have already approached customers
-			to collect feedback on your product, and to what extent you have developed a strategy to acquire them.</p>
-			<h3 class="section-subheading">Your score is {{aFi.market.score}} out of {{aFi.market.max}}. The average score of {{aFi.totalSurveys}} surveys is {{aFi.market.average}}.</h3>
-			<h3 class="section-subheading" ng-repeat="x in aFi.market.bottomHalf">You should look at improving the market score of your project. You might want to look at this documents for assistance <strong>To be provided by IDC</strong>.</h3>
+			to collect feedback on your product, and to what extent you have developed a strategy to acquire them.</p> -->
+			<p class="text-muted">The Market Focus indicator reflects the quality and relevance of your knowledge of customer needs 
+			in your target market(s), the extent to which you have gathered knowledge about customers in the target market, and if your 
+			initiative has a strategy and plan to reach the target market. This indicator measures the level of your “customer development” 
+			activities: whether you have already approached customers to collect feedback on your product, and to what extent you have 
+			developed a strategy to acquire them.</p>
+			<h3 class="section-subheading">Your score is {{aFi.market.score}} out of {{aFi.market.max}}. The average score of {{aFi.totalSurveys}} 
+			surveys is {{aFi.market.average}}. Your ranking for market focus based on the data submitted is currently {{aFi.market.ranking}}.</h3>
+			<h3 class="section-subheading" ng-repeat="x in aFi.market.bottomHalf">
+			Please visit the FI-IMPACT Library to access reading material that may be useful.</h3>
 		</div></div>
 		<div class="row tableMargin"><div class="col-md-6"><table class="table table-striped"><tbody>
 			<tr><td width="25%"><strong>Business model</strong></td>
-				<td><strong>Model:</strong> {{aFi.businessModel}}<br><strong>Revenue Division:</strong> licenses {{aFi.d3_2a}}%, subscriptions: {{aFi.d3_2b}}%, project fees: {{aFi.d3_2c}}%</td></tr>
+				<td><strong>Model:</strong> {{aFi.businessModel}}<br><strong>Revenue Division:</strong> {{aFi.revenueDivision}}</td></tr>
 			<tr><td><strong>Customers</strong></td>
 				<td><strong>Value Proposition Verification:</strong> {{aFi.d3_8}}<br><strong>Commercial Strategy Status: </strong>{{aFi.d3_9}}</td></tr>
 			</tbody></table></div>
@@ -146,8 +153,11 @@
 			economic viability of your business, and if you have already provided for the necessary funds for the startup phase.
 			This indicator assesses whether you are aware of the funds required to start and grow your business, and whether you
 			have secured sources for these funds.</p>
-			<h3 class="section-subheading">Your score is {{aFi.feasibility.score}} out of {{aFi.feasibility.max}}. The average score of {{aFi.totalSurveys}} surveys is {{aFi.feasibility.average}}.</h3>
-			<h3 class="section-subheading" ng-repeat="x in aFi.feasibility.bottomHalf">You should look at improving feasibility of your project. You might want to look at this documents for assistance <strong>To be provided by IDC</strong>.</h3>
+			<h3 class="section-subheading">Your score is {{aFi.feasibility.score}} out of {{aFi.feasibility.max}}. The average score 
+			of {{aFi.totalSurveys}} surveys is {{aFi.feasibility.average}}.  Your ranking for feasibility based on the data submitted 
+			is currently {{aFi.feasibility.ranking}}.</h3>
+			<h3 class="section-subheading" ng-repeat="x in aFi.feasibility.bottomHalf">
+			Please visit the FI-IMPACT Library to access reading material that may be useful.</h3>
 		</div></div>
 		<div class="row tableMargin">
 			<div class="col-md-6"><table class="table table-striped"><tbody>
@@ -167,6 +177,10 @@
     <section id="marketNeeds"><div class="container onBg">
 		<div class="row"><div class="col-lg-12 text-center">
 			<h2 class="section-heading">Market Needs</h2>
+			<p class="text-muted">The Market Needs Indicator reflects the extent to which perceived user benefits associated with a product 
+			or service are aligned with real-market needs, based on an analysis of IDC Vertical Market Survey results. One set of indicators 
+			are outlined for business and government sectors (B2B and B2G) and a second set of indicators are outlined for consumer markets (B2C), 
+			based on different market needs.
 		</div></div>
 		<div class="row mnSector" ng-repeat="MN in aFi.marketNeeds">
 			<h3>{{MN.sector}}</h3>
@@ -176,11 +190,11 @@
 			<div class="col-md-3"><div class="mnScore">
 				<p style="font-variant: small-caps">Target Market Needs Understanding</p>
 				<h3 style="font-variant: small-caps">your score</h3>
-				<p class="theScore">{{MN.score}}/10</p><p>{{MN.hint}}</p><p style="font-size: 0.7em;">Personalized sentence dependent on score.</p>
+				<p class="theScore">{{MN.score}}/10</p>
 			</div></div>
 			<div class="col-md-3 topNeeds">
 				<h3 class="section-subheading text-muted">TOP 5 business needs</h3>
-				<h3 class="section-subheading text-muted mnSource">(Source: IDC)</h3>
+				<h3 class="section-subheading text-muted mnSource">(Source: IDC Vertical Market Survey)</h3>
 				<ol><li ng-repeat="BN in MN.top5">{{BN}}</li></ol>
 			</div></div>
     </div></section>
@@ -259,8 +273,8 @@
 		$.each(model.speedometers, function(i, v) { d3Speedometer('#' + v + 'Gauge', fi.getSpeedometerSettings(v)); });
 		window.radar = {
 			Overview: new fiRadar("bodyOverview", fi.makeRadarOverviewData()),
-			SocialA: new fiRadar("bodySocialA", fi.makeRadarSocialData('A'), {w: 400, h: 400, levels: 5}),
-			SocialB: new fiRadar("bodySocialB", fi.makeRadarSocialData('B'), {w: 400, h: 400, levels: 5})
+			SocialA: new fiRadar("bodySocialA", fi.makeRadarSocialData('A'), {w: 400, h: 400, levels: 5}, model.radarLevelsSocial),
+			SocialB: new fiRadar("bodySocialB", fi.makeRadarSocialData('B'), {w: 400, h: 400, levels: 5}, model.radarLevelsSocial)
 		};
 		$.each(window.radar, function(i, v) { v.draw("#radar" + i) });
 	});
