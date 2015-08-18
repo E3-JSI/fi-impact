@@ -46,11 +46,18 @@ public class SurveyManager
   /*
 
    */
-  private static String SPEEDOMETER =
+/*  private static String SPEEDOMETER =
           "\tmin\tlow\tmed\thigh\n" +
                   "INNOVATION\t0\t1.6\t3.35\t5\n" +
                   "MARKET\t0\t1.6\t3.35\t5\n" +
                   "FEASIBILITY\t0\t1.6\t3.35\t5\n" +
+                  "MARKET_NEEDS_BUSINESS\t0\t4\t7.5\t10\n";
+*/
+  private static String SPEEDOMETER =
+          "\tmin\tlow\tmed\thigh\n" +
+                  "INNOVATION\t1.0\t7.6\t14.2\t20.8\n" +
+                  "MARKET\t4\t15\t26\t37\n" +
+                  "FEASIBILITY\t0\t1.8\t3.6\t5.4\n" +
                   "MARKET_NEEDS_BUSINESS\t0\t4\t7.5\t10\n";
 
   private static String SOCIAL_IMPACT = "Q6A_1_A\tQ6A_1_B\tQ6A_1_C\tQ6A_1_D\tQ6A_1_E\tQ6A_1_F\tQ6A_1_G\tQ6A_1_H\tQ6A_1_I\tQ6A_1_J\tQ6A_1_K\tQ6B_1_A\tQ6B_1_B\tQ6B_1_C\tQ6B_1_D\tQ6B_1_E\tQ6B_1_F";
@@ -198,6 +205,7 @@ public class SurveyManager
       jsonAverages.object();
       jsonAverages.key("id").value(id);
       jsonAverages.key("average").value(getDecimalFormatter4().format(average));
+      jsonAverages.key("average_slot").value(graph.getSlot(average));
       jsonAverages.key("histogram").array();
       for(AIStructures.AIInteger cnt: graph.graphValues)
         jsonAverages.value(cnt.val);
@@ -232,10 +240,9 @@ public class SurveyManager
         add(sd);
     }
 
-    //returns slot ID.
     public void add(SurveyData surveyData)
     {
-      int slot = -1;
+      int slot;
       Double score = surveyData.results.get(id);
       if (score == null)
         score = -1.0;
