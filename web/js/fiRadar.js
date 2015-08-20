@@ -51,7 +51,7 @@ var fiRadar = function (id, data, options, fixedLevels) {
 		}
 		
 		// Text indicating at what score each level is
-		for ( var j = 0; j < opt.levels; j++ ) {
+		/* for ( var j = 0; j < opt.levels; j++ ) {
 			levelText = (j+1) * opt.max/opt.levels;
 			if (fixedLevels) { levelText = fixedLevels[j+1] }
 			g.selectAll(".levels").data([1]) //dummy data
@@ -62,7 +62,7 @@ var fiRadar = function (id, data, options, fixedLevels) {
 				.attr("transform", "translate(" + (baseTranslate('x', j) + opt.ToRight) + ", " + baseTranslate('y', j) + ")")
 				.attr("fill", "#737373").text(levelText);
 				// .text(Format((j+1) * opt.max/opt.levels)); // percent
-		}
+		}*/
 		
 		var axis = g.selectAll(".axis").data(opt.axesNames).enter().append("g").attr("class", "axis");
 		axis.append("line").attr("x1", opt.w/2).attr("y1", opt.h/2)
@@ -110,7 +110,7 @@ var fiRadar = function (id, data, options, fixedLevels) {
 			.on('mouseover', function (d) {
 				newX =  parseFloat(d3.select(this).attr('cx')) - 10;
 				newY =  parseFloat(d3.select(this).attr('cy')) - 5;
-				tooltip.attr('x', newX).attr('y', newY).text(d.value).transition(200).style('opacity', 1);
+				// tooltip.attr('x', newX).attr('y', newY).text(d.value).transition(200).style('opacity', 1);
 				z = "polygon."+d3.select(this).attr("class");
 				g.selectAll("polygon").transition(200).style("fill-opacity", 0.1);
 				g.selectAll(z).transition(200).style("fill-opacity", .7);
@@ -118,9 +118,9 @@ var fiRadar = function (id, data, options, fixedLevels) {
 				tooltip.transition(200).style('opacity', 0);
 				g.selectAll("polygon").transition(200).style("fill-opacity", opt.opacityArea);
 			}).on('click', function() {
-				window.location.href = "http://www.google.com";
+				// window.location.href = "http://www.google.com";
 				//window.open(url,'_blank');
-			}).append("svg:title").text(function(j){return Math.max(j.value, 0)});
+			}); //.append("svg:title").text(function(j){return Math.max(j.value, 0)});
 			series++;
 		});
 

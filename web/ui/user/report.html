@@ -6,7 +6,8 @@
 	
 	<meta name="description" content="">
 	<meta name="author" content="JSI">
-	<link rel="icon" href="http://getbootstrap.com/favicon.ico">
+	<link rel="shortcut icon" href="../../img/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
 
     <title>FI-Impact Report</title>
 		
@@ -75,7 +76,7 @@
 			<tr><td width="25%"><strong>Accelerator</strong></td><td><strong>{{aFi.d1_1}}</strong> ({{aFi.d1_13}}&euro;)<br>{{aFi.d1_14}}</td></tr>
 			<tr><td><strong>Solution Type</strong></td><td>{{aFi.d1_10}}<br>{{aFi.d1_11}}</td></tr>
 		</tbody></table></div>
-		<div class="col-md-6 text-left"><strong>FIWARE enablers</strong><p>{{aFi.d1_12}}</p>
+		<div class="col-md-6 text-left"><strong>FIWARE enablers</strong><p ng-bind-html="aFi.d1_12 | sanitize"></p>
 			<table class="table table-striped"><tbody>
 				<tr ng-repeat="E in aFi.enablers"><td><strong>{{E.category}}</strong></td><td>{{E.list}}</td></tr>
 			</tbody></table>
@@ -95,9 +96,9 @@
 			in the planning phases. If the innovation is being developed and validated among colleagues and potential clients the innovation’s 
 			real market potential is increased. Innovation is quite healthy in organizations if it is part of a strategy but can be quite resource 
 			consuming where stand-alone.</p>
-			<h3 class="section-subheading">Your score is {{aFi.innovation.score}} out of {{aFi.innovation.max}}. The average score of 
-			{{aFi.totalSurveys}} surveys is {{aFi.innovation.average}}. Your ranking for innovation based on the data submitted is currently 
-			{{aFi.innovation.ranking}}.</h3>
+			<h3 class="section-subheading">Your ranking for innovation based on the data submitted is currently {{aFi.innovation.ranking}}.
+			In this section you scored better than {{aFi.innovation.percentOfWorse}}% of the {{aFi.totalSurveys}} (total) projects and proposals 
+			that have answered this survey. {{aFi.innovation.interpretation}}</h3>
 			<h3 class="section-subheading" ng-repeat="x in aFi.innovation.bottomHalf">
 			Please visit the FI-IMPACT Library to access reading material that may be useful.</h3>
 		</div></div>
@@ -125,8 +126,9 @@
 			initiative has a strategy and plan to reach the target market. This indicator measures the level of your “customer development” 
 			activities: whether you have already approached customers to collect feedback on your product, and to what extent you have 
 			developed a strategy to acquire them.</p>
-			<h3 class="section-subheading">Your score is {{aFi.market.score}} out of {{aFi.market.max}}. The average score of {{aFi.totalSurveys}} 
-			surveys is {{aFi.market.average}}. Your ranking for market focus based on the data submitted is currently {{aFi.market.ranking}}.</h3>
+			<h3 class="section-subheading">Your ranking for market focus based on the data submitted is currently {{aFi.market.ranking}}.
+			In this section you scored better than {{aFi.market.percentOfWorse}}% of the {{aFi.totalSurveys}} (total) projects and proposals that
+			have answered this survey. {{aFi.market.interpretation}}</h3>
 			<h3 class="section-subheading" ng-repeat="x in aFi.market.bottomHalf">
 			Please visit the FI-IMPACT Library to access reading material that may be useful.</h3>
 		</div></div>
@@ -153,9 +155,9 @@
 			economic viability of your business, and if you have already provided for the necessary funds for the startup phase.
 			This indicator assesses whether you are aware of the funds required to start and grow your business, and whether you
 			have secured sources for these funds.</p>
-			<h3 class="section-subheading">Your score is {{aFi.feasibility.score}} out of {{aFi.feasibility.max}}. The average score 
-			of {{aFi.totalSurveys}} surveys is {{aFi.feasibility.average}}.  Your ranking for feasibility based on the data submitted 
-			is currently {{aFi.feasibility.ranking}}.</h3>
+			<h3 class="section-subheading">Your ranking for feasibility based on the data submitted is currently {{aFi.feasibility.ranking}}.
+			In this section you scored better than {{aFi.feasibility.percentOfWorse}}% of the {{aFi.totalSurveys}} (total) projects and proposals
+			that have answered this survey. {{aFi.feasibility.interpretation}}</h3>
 			<h3 class="section-subheading" ng-repeat="x in aFi.feasibility.bottomHalf">
 			Please visit the FI-IMPACT Library to access reading material that may be useful.</h3>
 		</div></div>
@@ -174,7 +176,7 @@
     </div></section>
 	
 	<!-- Market Needs Section -->
-    <section id="marketNeeds"><div class="container onBg">
+    <section id="business"><div class="container onBg">
 		<div class="row"><div class="col-lg-12 text-center">
 			<h2 class="section-heading">Market Needs</h2>
 			<p class="text-muted">The Market Needs Indicator reflects the extent to which perceived user benefits associated with a product 
@@ -203,7 +205,10 @@
     <section id="socialImpact" class="bg-light-gray"><div class="container onBg">
 		<div class="row"><div class="col-lg-12 text-center">
 			<h2 class="section-heading">Social Impact</h2>
-			<h3 class="section-subheading text-muted">Lorem ipsum dolor sit amet consectetur.</h3>
+			<p class="text-muted">The Social Impact Indicator reflects the extent to which the project has social impact in 11 key areas. 
+			It focuses on identifying specific social benefits that your project will support and the contribution to quality of life for 
+			specific social groups. It also contextualises the impact of your project against the average social impact of all surveyed 
+			projects in these areas.</p>
 		</div></div>
 		<h3>Social Benefits</h3>
 		<div class="row"><div class="col-md-6 text-center">
@@ -226,7 +231,10 @@
 	<section id="overview" class="bg-light-gray"><div class="container onBg">
 		<div class="row"><div class="col-lg-12 text-center">
 			<h2 class="section-heading">Overview</h2>
-			<h3 class="section-subheading text-muted">Lorem ipsum dolor sit amet consectetur.</h3>
+			<p class="text-muted">In this section you can evaluate your Impact Assessment scores against the average score calculated from all 
+			completed surveys to date. Scores are represented in a spider diagram so that you can easily identify your strengths or weaknessess 
+			compared to the average score. Details about a specific section of the report can be accessed by clicking on the node on the axis 
+			representing the respective section.</p>
 		</div></div>
 		<div id="bodyOverview" class="radarBody"><div class="radarLegend">
 			<p><i class="fa fa-square color0"></i> Your Score<br><i class="fa fa-square color1"></i> Average</p>

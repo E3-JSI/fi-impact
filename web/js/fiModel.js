@@ -19,6 +19,14 @@ var model = {
 	"3.0000": "High",
 	"4.0000": "High"
 },
+"slots": {
+	0: "l",
+	1: "l",
+	2: "m",
+	3: "h",
+	4: "h"
+},
+"tooltips": ["Low", "Medium", "High"],
 "revenueDivision": {
 	"a": "licenses",
 	"b": "subscriptions",
@@ -294,6 +302,183 @@ var model = {
 		"E": "Socially excluded groups",
 		"F": "Unemployed"
 	}
+},
+"enablers": [
+  {
+    "enabler":"Big Data Analysis",
+    "link":"http://catalogue.fi-ware.eu/enablers/bigdata-analysis-cosmos"
+  },
+  {
+    "enabler":"Complex Event Processing (CEP)",
+    "link":"http://catalogue.fiware.org/enablers/complex-event-processing-cep-proactive-technology-online"
+  },
+  {
+    "enabler":"Publish/Subscribe Context Broker",
+    "link":"http://catalogue.fi-ware.eu/enablers/publishsubscribe-context-broker-orion-context-broker"
+  },
+  {
+    "enabler":"Stream-oriented",
+    "link":"http://catalogue.fiware.org/enablers/stream-oriented-kurento"
+  },
+  {
+    "enabler":"Backend Device Management",
+    "link":"http://catalogue.fiware.org/enablers/backend-device-management-idas"
+  },
+  {
+    "enabler":"Configuration Manager-IoT Discovery",
+    "link":"http://catalogue.fiware.org/enablers/iot-discovery"
+  },
+  {
+    "enabler":"Configuration Manager-Orion Context Broker",
+    "link":""
+  },
+  {
+    "enabler":"Gateway Data Handling GE",
+    "link":"http://catalogue.fiware.org/enablers/gateway-data-handling-ge-espr4fastdata"
+  },
+  {
+    "enabler":"IoT Broker",
+    "link":"http://catalogue.fiware.org/enablers/iot-broker"
+  },
+  {
+    "enabler":"Protocol Adapter",
+    "link":"http://catalogue.fiware.org/enablers/protocol-adapter-mr-coap"
+  },
+  {
+    "enabler":"2D/3D Capture",
+    "link":"http://catalogue.fiware.org/enablers/2d3d-capture"
+  },
+  {
+    "enabler":"2D-UI",
+    "link":"http://catalogue.fiware.org/enablers/2d-ui"
+  },
+  {
+    "enabler":"3D-UI-WebTundra",
+    "link":"http://catalogue.fiware.org/enablers/3dui-webtundra"
+  },
+  {
+    "enabler":"3D-UI-XML3D",
+    "link":"http://catalogue.fiware.org/enablers/3d-ui-xml3d"
+  },
+  {
+    "enabler":"Augmented Reality",
+    "link":"http://catalogue.fiware.org/enablers/augmented-reality"
+  },
+  {
+    "enabler":"Cloud Rendering",
+    "link":"http://catalogue.fiware.org/enablers/cloud-rendering"
+  },
+  {
+    "enabler":"GIS Data Provider",
+    "link":"http://catalogue.fiware.org/enablers/gis-data-provider-geoserver3d"
+  },
+  {
+    "enabler":"Interface Designer",
+    "link":"http://catalogue.fiware.org/enablers/interface-designer"
+  },
+  {
+    "enabler":"POI Data Provider",
+    "link":"http://catalogue.fiware.org/enablers/poi-data-provider"
+  },
+  {
+    "enabler":"Real Virtual Interaction",
+    "link":"http://catalogue.fiware.org/enablers/real-virtual-interaction"
+  },
+  {
+    "enabler":"Synchronization",
+    "link":"http://catalogue.fiware.org/enablers/synchronization"
+  },
+  {
+    "enabler":"Virtual Characters",
+    "link":"http://catalogue.fiware.org/enablers/virtual-characters"
+  },
+  {
+    "enabler":"Authorization PDP",
+    "link":"http://catalogue.fiware.org/enablers/authorization-pdp-authzforce"
+  },
+  {
+    "enabler":"Identity Management",
+    "link":"http://catalogue.fiware.org/enablers/identity-management-keyrock"
+  },
+  {
+    "enabler":"PEP Proxy",
+    "link":"http://catalogue.fiware.org/enablers/pep-proxy-wilma"
+  },
+  {
+    "enabler":"Security Monitoring",
+    "link":"http://catalogue.fiware.org/enablers/security-monitoring"
+  },
+  {
+    "enabler":"Network Information and Control",
+    "link":"http://catalogue.fiware.org/enablers/network-information-and-control-ofnic"
+  },
+  {
+    "enabler":"Repository",
+    "link":"http://catalogue.fiware.org/enablers/repository-repository-ri"
+  },
+  {
+    "enabler":"Marketplace",
+    "link":"http://catalogue.fiware.org/enablers/marketplace-wmarket"
+  },
+  {
+    "enabler":"Store",
+    "link":"http://catalogue.fi-ware.eu/enablers/store-wstore"
+  },
+  {
+    "enabler":"Revenue Settlement and Sharing System",
+    "link":"http://catalogue.fiware.org/enablers/revenue-settlement-and-sharing-system-rss-ri"
+  },
+  {
+    "enabler":"Application Mashup",
+    "link":"http://catalogue.fi-ware.eu/enablers/application-mashup-wirecloud"
+  },
+  {
+    "enabler":"IaaS Resource Management GE",
+    "link":"http://catalogue.fiware.org/enablers/iaas-resource-management-ge-fiware-implementation"
+  },
+  {
+    "enabler":"Monitoring GE",
+    "link":"http://catalogue.fiware.org/enablers/monitoring-ge-fiware-implementation"
+  },
+  {
+    "enabler":"Object Storage GE",
+    "link":"http://catalogue.fiware.org/enablers/object-storage-ge-fiware-implementation"
+  },
+  {
+    "enabler":"PaaS Manager",
+    "link":"http://catalogue.fi-ware.eu/enablers/paas-manager-pegasus"
+  },
+  {
+    "enabler":"Policy Manager",
+    "link":"http://catalogue.fiware.org/enablers/policy-manager-bosun"
+  },
+  {
+    "enabler":"Self-Service Interfaces",
+    "link":"http://catalogue.fiware.org/enablers/self-service-interfaces-cloud-portal"
+  },
+  {
+    "enabler":"Software Deployment and Configuration",
+    "link":"http://catalogue.fiware.org/enablers/software-deployment-configuration-sagitta"
+  },
+  {
+    "enabler":"Content Based Security - CBS",
+    "link":""
+  },
+  {
+    "enabler":"Data Viz - SpagoBI",
+    "link":"http://catalogue.fiware.org/enablers/data-visualization-spagobi"
+  }
+],
+"interpretation": {
+	"ll": "The level of *** of your project matches that of your peers. Still, you should consider ways of further strengthening the *** element of your project.",
+	"lm": "Compared to the average of current completed surveys, you should consider ways of further strengthening the *** element of your project.",
+	"lh": "Compared to the average of current completed surveys, you should consider ways of further strengthening the *** element of your project.",
+	"ml": "Your project is outperforming your peers in terms of *** – congratulations. Still, you should consider ways of further strengthening the *** element of your project.",
+	"mm": "The level of *** of your project matches that of your peers. Still, you should consider ways of further strengthening the *** element of your project.",
+	"mh": "Compared to the average of current completed surveys, you should consider ways of further strengthening the *** element of your project.",
+	"hl": "low	Your project is outperforming your peers in terms of *** – congratulations.",
+	"hm": "Your project is outperforming your peers in terms of *** – congratulations.",
+	"hh": "The level of *** of your project matches that of your peers and is high – congratulations."
 }
 
 }

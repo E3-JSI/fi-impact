@@ -1,7 +1,8 @@
 function d3Speedometer(elementId, s) {
-	var Needle, arc, arcEndRad, arcStartRad, barWidth, chart, chartInset, degToRad, el, endPadRad, height, margin, needle, numSections, padRad, percToDeg, percToRad, percent, radius, sectionIndx, sectionPerc, startPadRad, svg, totalPercent, width, _i;
+	var Needle, arc, arcEndRad, arcStartRad, barWidth, chart, chartInset, degToRad, el, endPadRad, height, margin, needle, numSections, 
+	padRad, percToDeg, percToRad, percent, radius, sectionIndx, sectionPerc, startPadRad, svg, totalPercent, width, _i, tooltip;
 	
-	//s = settings: levels, percent, list, average
+	//s = settings: levels, percent, list, average, tooltips
 	
 	pi = Math.PI;
 	barWidth = 20;
@@ -10,6 +11,10 @@ function d3Speedometer(elementId, s) {
 	padRad = 0;
 	chartInset = 0;
 	totalPercent = .75;
+	histogram = [];
+	total = s.list.reduce( function(a, b) { return a+b; } );
+	
+	for (x = 0; x < s.list.length; x++ ) histogram.push(s.list[x] * .65 / total);
 	
 	el = d3.select(elementId);
 
@@ -24,6 +29,7 @@ function d3Speedometer(elementId, s) {
 
 	svg = el.append('svg').attr('width', width + margin.left + margin.right).attr('height', height);
 	chart = svg.append('g').attr('transform', "translate(" + ((width / 2) + margin.left) + ", " + margin.top + ")");
+	tooltip = svg.append('text').attr('x', (width/2) + margin.left).attr('y', 13).style('opacity', 0).style('font-family', 'sans-serif').style('font-size', '13px').style('text-anchor', 'middle');
 
 	for (sectionIndx = _i = 1; 1 <= numSections ? _i <= numSections : _i >= numSections; sectionIndx = 1 <= numSections ? ++_i : --_i) {
 		arcStartRad = percToRad(s.levels[_i-1]/2) - pi / 2;
@@ -32,17 +38,37 @@ function d3Speedometer(elementId, s) {
 		startPadRad = sectionIndx === 0 ? 0 : padRad / 2;
 		endPadRad = sectionIndx === numSections ? 0 : padRad / 2;
 		arc = d3.svg.arc().outerRadius(radius - chartInset).innerRadius(radius - chartInset - barWidth).startAngle(arcStartRad + startPadRad).endAngle(arcEndRad - endPadRad);
-		chart.append('path').attr('class', "arc chart-color" + sectionIndx).attr('d', arc);
-		sec = d3.svg.arc().outerRadius(radius * s.list[_i-1] + 12).innerRadius(12).startAngle(arcStartRad + startPadRad).endAngle(arcEndRad - endPadRad);
-		chart.append('path').attr('class', "arc chart-density" + sectionIndx).attr('d', sec);
+		svg.append('text').attr('x', (width/2) + margin.left).attr('y', 13).style('opacity', 0).style('font-family', 'sans-serif').style('font-size', '13px').style('text-anchor', 'middle');
+		chart.append('path').attr('class', "arc chart-color" + sectionIndx).attr('id', elementId + "Arc" + sectionIndx).attr('d', arc)
+			.on('mouseover', function (d) { var theId = d3.select(this).attr("id")
+				tooltip.text(s.tooltips[theId.substr(theId.length-1, 1) - 1]).transition(200).style('opacity', 1);
+				d3.select(this).transition(50).style('opacity', .3).transition(400).style('opacity', .7);
+			}).on('mouseout', function(){ tooltip.transition(400).style('opacity', 0);
+				d3.select(this).transition(400).style('opacity', 1);
+			});
+		sec = d3.svg.arc().outerRadius(radius * histogram[_i-1] + 12).innerRadius(12).startAngle(arcStartRad + startPadRad).endAngle(arcEndRad - endPadRad);
+		chart.append('path').attr('class', "arc chart-color" + sectionIndx).attr('id', elementId + "Histogram" + sectionIndx).attr('d', sec).style('opacity', .3)
+			.on('mouseover', function (d) { var theId = d3.select(this).attr("id");
+				var num = theId.substr(theId.length-1, 1) - 1;
+			tooltip.text(s.list[num] + " projects scored " + s.tooltips[num]).transition(200).style('opacity', 1);
+				d3.select(this).transition(50).style('opacity', 1).transition(400).style('opacity', .7);
+			}).on('mouseout', function(){ tooltip.transition(400).style('opacity', 0);
+				d3.select(this).transition(400).style('opacity', .3);
+			});
 	}
 
 	Needle = (function() {
 		function Needle(len, radius) { this.len = len; this.radius = radius; }
 		Needle.prototype.drawOn = function(el, perc, x, y) {
-			el.append('circle').attr('class', 'needle-center').attr('cx', x).attr('cy', y).attr('r', this.radius);
 			el.append('path').attr('d', "M 50 50 L 40 40");
-			return el.append('path').attr('class', 'needle').attr('d', this.mkCmd(perc));
+			el.append('circle').attr('class', 'needle-center').attr('cx', x).attr('cy', y).attr('r', this.radius);
+			return el.append('path').attr('class', 'needle').attr('d', this.mkCmd(perc))
+			.on('mouseover', function (d) { tooltip.transition(200).text("Your score").style('opacity', 11);
+				d3.select(this).transition(50).style("fill", "#fff").transition(400).style("fill", "#000").attr('opacity', 0.7);
+				d3.selectAll(".needle-center").transition(50).style("fill", "#fff").transition(400).style("fill", "#000");
+			}).on('mouseout', function(){ tooltip.transition(400).style('opacity', 0);
+				d3.select(this).transition(400).attr('opacity', 1);
+			});
 		};
 		Needle.prototype.animateOn = function(el, perc) {
 			var self;
@@ -82,9 +108,15 @@ function d3Speedometer(elementId, s) {
 			this.y = -this.external * Math.sin(this.thetaRad);
 		}
 		Average.prototype.drawOn = function(el) {
-			el.append('circle').attr('class', 'needle-center').attr('cx', this.x).attr('cy', this.y).attr('r', this.radius);
+			el.append('circle').attr('class', 'average-center').attr('cx', this.x).attr('cy', this.y).attr('r', this.radius);
 			el.append('path').attr('d', "M 50 50 L 40 40");
-			return el.append('path').attr('class', 'needle').attr('d', this.mkCmd(this.perc));
+			return el.append('path').attr('class', 'average').attr('d', this.mkCmd(this.perc))
+			.on('mouseover', function (d) { tooltip.transition(200).text("Average score").style('opacity', 11);
+				d3.select(this).transition(50).style("fill", "#fff").transition(400).style("fill", "#000").attr('opacity', 0.5);
+				d3.selectAll(".average-center").transition(50).style("fill", "#fff").transition(400).style("fill", "#000");
+			}).on('mouseout', function(){ tooltip.transition(400).style('opacity', 0);
+				d3.select(this).transition(400).attr('opacity', 1);
+			});
 		};
 		Average.prototype.mkCmd = function() {
 			var centerX, centerY, leftX, leftY, rightX, rightY, topX, topY;

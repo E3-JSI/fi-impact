@@ -5,7 +5,7 @@ header .intro-text .intro-heading { text-transform: none; }
 .linkMore { text-align: right; }
 .intro-lead-in img { height: 2em; width: auto; vertical-align: text-bottom; background: transparent; }
 
-#project, #innovation, #feasibility, #market, #marketNeeds {
+#project, #innovation, #feasibility, #market, #business {
 	background-repeat: none;
 	background-attachment: scroll;
 	background-position: center center;
@@ -27,15 +27,16 @@ header .intro-text .intro-heading { text-transform: none; }
 #feasibility { background-image:url('../img/currency.jpg'); }
 #overview { background-color: #000; margin-bottom: 50px; }
 #overview .container  { color: #fff; background-color: rgba(250, 250, 250, .3) }
+#overview .text-muted  { color: #bbb; }
 #overview .section-subheading { color: #fff; }
 #overview text { fill: #ccc; }
 #overview .axis text { fill: #fff; }
-#market, #marketNeeds { background-color: #93A8C4; }
+#market, #business { background-color: #93A8C4; }
 .onBg { background-color: rgba(250, 250, 250, .7); padding: 2em 3em; border-radius: 5px; }
 
 
-#marketNeeds table { font-size: 0.9em; }
-#marketNeeds td { padding-top: 2px; padding-bottom: 2px; color: #555; }
+#business table { font-size: 0.9em; }
+#business td { padding-top: 2px; padding-bottom: 2px; color: #555; }
 .mnScore {
 	background-color: rgba(249, 249, 249, .5); 
 	border-radius: 5px;

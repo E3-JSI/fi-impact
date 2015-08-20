@@ -1,4 +1,7 @@
 var fiReportApp = angular.module('fiReportApp', []);
+fiReportApp.filter("sanitize", ['$sce', function($sce) {
+  return function(htmlCode) { return $sce.trustAsHtml(htmlCode); }
+}]);
 fiReportApp.controller('fiCtrl', function ($scope) {
 	var colors = d3.scale.category20c();
 	$scope.getArray = function(n) { return new Array(n); };
@@ -16,10 +19,17 @@ fiReportApp.controller('fiCtrl', function ($scope) {
 		marketChannel: fi.verboseFromJSON('3', '4'),
 		data3_5: fi.getQ3_5text()
 	};
+
+	function linkEnablers(str) {
+		var result = str;
+		$.each(model.enablers, function(i, v) { if (v.link != "") result = result.replace(v.enabler, '<a target="_blank" href="' + v.link + '">' + v.enabler + '</a>'); });
+		return result
+	}
 	
 	$.each(fi.questions, function(i, v) { if ( v && (v.text != "") ) { $scope.aFi['d' + v.id] = v.text; } });
+	$scope.aFi['d1_12'] = linkEnablers($scope.aFi['d1_12']);
 	$.each(["a", "b", "c", "d"], function(i, v) {
-		if (fi.questions['Q1_18' + v]) { $scope.aFi.enablers.push({category: model.Q1_18text[v], list: fi.questions['Q1_18' + v].text}); }
+		if (fi.questions['Q1_18' + v]) { $scope.aFi.enablers.push({category: model.Q1_18text[v], list: linkEnablers(fi.questions['Q1_18' + v].text)}); }
 	});
 	var t3_2 = [];
 	$.each(["a", "b", "c"], function(i, v) {
@@ -27,15 +37,16 @@ fiReportApp.controller('fiCtrl', function ($scope) {
 		if (input && parseInt(input.value) > 0) { t3_2.push(model.revenueDivision[v] + ": " + input.value + "%"); }
 	});
 	$scope.aFi.revenueDivision = t3_2.join(", ");
-
 	$.each(model.speedometers, function(i, v) {
 		m = model.max[v];
 		$scope.aFi[v] = { max: m,
 			score: fi.scores[v],
 			average: fi.averages.values[v].average,
 			ranking: model.ranking[fi.results[v.toUpperCase() + '_GRAPH_SLOT']],
-			percentOfBetter: Math.round(fi.results[v.toUpperCase() + "_R"]),
+			percentOfWorse: 100 - Math.round(fi.results[v.toUpperCase() + "_R"]),
+			interpretation: model.interpretation[model.slots[Math.round(fi.results[v.toUpperCase() + '_GRAPH_SLOT'])] + model.slots[fi.averages.values['innovation'].slot]].replace(new RegExp('\\*\\*\\*', 'g'), v),
 			bottomHalf: ( (fi.scores[v] <= m/2) ? [1] : [])
+			// model.slots[fi.averages.values[v].slot] + 
 		};
 	});
 	

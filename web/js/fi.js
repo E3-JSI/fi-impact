@@ -79,7 +79,7 @@ var fiData = function (id) { // id is optional
 		var result = { keys: {}, values: {} };
 		$.each(list, function( i, v ) {
 			key = result.keys[v.id] = scoreKeysReplace(v.id);
-			result.values[key] = { average: cutOff(v.average, key), histogram: v.histogram };
+			result.values[key] = { average: cutOff(v.average, key), histogram: v.histogram, slot: v.average_slot };
 		});
 		return result;
 	}
@@ -99,12 +99,12 @@ fiData.prototype.getVerboseList = function(list, dictionary) {
 
 fiData.prototype.getSpeedometerSettings = function(key) {
 	var h = fi.averages.values[key].histogram;
-	var x = .65 / fi.data.total;
 	return {
 		levels: [0, model.lmh[key][0], model.lmh[key][1], 1],
-		percent: fi.scores[key] / model.max[key],
-		list: [(h[0]+h[1])*x, h[2]*x, (h[3]+h[4])*x],
-		average: fi.averages.values[key].average / model.max[key]
+		percent: ( (fi.scores[key] < model.max[key]) ? fi.scores[key] / model.max[key] : 1 ),
+		list: [h[0]+h[1], h[2], h[3]+h[4]],
+		average: fi.averages.values[key].average / model.max[key],
+		tooltips: model.tooltips
 	};
 }
 
@@ -155,8 +155,8 @@ fiData.prototype.makeRadarOverviewData = function() {
 	data = [[],[]];
 	$.each(model.radarOverview, function(i, v) {
 		label = v.charAt(0).toUpperCase() + v.slice(1)
-		data[0].push({axis: label, value: fi.averages.values[v].average});
-		data[1].push({axis: label, value: fi.scores[v]});
+		data[0].push({axis: label, value: fi.averages.values[v].average / model.max[key]});
+		data[1].push({axis: label, value: fi.scores[v] / model.max[key]});
 	});
 	return data;
 }

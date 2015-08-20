@@ -37,10 +37,6 @@
 .chart-color1 { fill: #923933; }
 .chart-color2 { fill: #F4B900; }
 .chart-color3 { fill: #00A54F; }
-.chart-density { fill: #fff; }
-.chart-density1 { fill: #923933; opacity: .3 }
-.chart-density2 { fill: #F4B900; opacity: .3 }
-.chart-density3 { fill: #00A54F; opacity: .3 }
 
 th.rotate { /* Something you can count on */
   height: 35px;
