@@ -1,0 +1,30 @@
+<html ng-app="fiApp">
+<head>
+  ...
+  <script src="../../js/angular.min.js"></script>
+</head>
+<body ng-controller="fiCtrl">
+
+  <ul>
+    <li ng-repeat="phone in phones">
+      <span>{{phone.name}}</span>
+      <p>{{phone.snippet}}</p>
+    </li>
+  </ul>
+
+<script>
+var fiApp = angular.module('fiApp', []);
+
+fiApp.controller('fiCtrl', function ($scope) {
+  $scope.phones = [
+    {'name': 'Nexus S',
+     'snippet': 'Fast just got faster with Nexus S.'},
+    {'name': 'Motorola XOOM™ with Wi-Fi',
+     'snippet': 'The Next, Next Generation tablet.'},
+    {'name': 'MOTOROLA XOOM™',
+     'snippet': 'The Next, Next Generation tablet.'}
+  ];
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="fiManagerApp"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../../img/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
+
+    <title>FI-Impact Report</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="../../css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/bootstrap-theme.min.css" rel="stylesheet">
+	<!-- Optional includes -->
+	<link rel="stylesheet" href="../../css/jquery.tablesorter.pager.min.css">
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" href="../../css/theme.css" rel="stylesheet">
+	<link rel="stylesheet" href="../../css/theme.blue.css" rel="stylesheet">
+	<link rel="stylesheet" href="../../css/visualisations.css" rel="stylesheet">
+	<!-- External CSS -->
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets../../js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="../../js/ie-emulation-modes-warning.js"></script>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  
+  <body role="document" ng-controller="fiCtrl">
+  
+    <div class="container theme-showcase" role="main">
+		
+		<div  style="height: 160px;"><img src="../../css/fi-impact.png"></div>
+		 <!-- background: top left url('css/fi-impact.png') no-repeat; -->
+    	<div class="jumbotron">
+			<h1>Projects Overview</h1>
+		</div>
+		
+        <table id="listing" class="table table-striped">
+			<thead><tr><th>Project</th><th>Feasibility</th><th>Innovation</th><th>Market</th><th>Market Needs</th>
+				<th>Accelerator</th><th>Organisation</th><th>Country</th></tr></thead> 
+            <tbody><tr ng-repeat="s in surveys"><td><a href="../../ui/user/report.html?id={{s.id_internal}}">{{s.Q1_4}}</a>
+				<div ng-bind-html="s.lineChart | sanitize"></div></td>
+				<td class="textRight">{{s.feasibility}}%</td><td class="textRight">{{s.innovation}}%</td><td class="textRight">{{s.market}}%</td><td class="textRight">{{s.business}}%</td>
+				<td>{{s.Q1_1}}</td><td>{{s.Q1_3}}</td><td>{{s.Q1_2}}</td></tr></tbody>
+        </table>
+		
+		<!-- pager --> 
+		<div class="pager">
+			<i class="first fa fa-angle-double-left"></i>	<i class="prev fa fa-angle-left"></i>
+			<span class="pagedisplay"></span> <!-- this can be any element, including an input -->
+			<i class="next fa fa-angle-right"></i>	<i class="last fa fa-angle-double-right"></i>
+			<select class="gotoPage" title="Select page number"></select>
+		</div>
+
+		<p style="text-align: center;">	<a href="http://idcitalia.com/ita/" target="_blank"><img style="margin-left: 0px; margin-right: 10px;" src="../../css/IDC_logo_4.png" alt="" width="120" height="57" /></a>
+			<a href="http://www.idg.co.uk/" target="_blank"><img style="margin-left: 10px; margin-right: 10px;" src="../../css/IDG_Communications1_3.jpg" alt="" width="120" height="35" /></a>
+			<a href="http://www.bluegreenstrategy.com/" target="_blank"><img style="margin-left: 10px; margin-right: 10px;" src="../../css/logotipo_bluegreen_04_v02_small_3.png" alt="" width="150" height="34" /></a>
+			<a href="http://www.iimg.com" target="_blank"><img style="margin-left: 10px; margin-right: 10px;" src="../../css/iimc.gif" alt="" width="138" height="36" /></a>
+			<img style="margin-left: 10px; margin-right: 10px;" src="../../css/SFC_2.jpg" alt="" width="150" height="50" />
+			<a href="http://ailab.ijs.si/" target="_blank"><img style="margin-left: 10px; margin-right: 0px;" src="../../css/jsi_logo_2.png" alt="" width="150" height="43" /></a></p>
+	  
+    </div>
+
+
+    <!-- Core JavaScript -->
+    <script src="../../js/jquery.min.js"></script>
+    <script src="../../js/bootstrap.min.js"></script>
+    <script src="../../js/angular.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../js/ie10-viewport-bug-workaround.js"></script>
+	<!-- Optional includes -->
+	<script type="text/javascript" src="../../js/jquery.min.js"></script> 
+	<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script> 
+	<script type="text/javascript" src="../../js/jquery.tablesorter.pager.min.js"></script>
+	<!-- D3 JavaScript -->
+	<script src="../../js/d3.min.js"></script>
+	<script src="../../js/fiUtility.js"></script>
+	<script src="../../js/fiModel.js"></script>
+	<script src="../../js/fi.js"></script>
+	<script>window.fi = new fiData();</script>
+	<script src="../../js/fiCtrlManager.js"></script>
+	<script>$(document).ready( function() { $("#listing").tablesorter(fiTableSorter).tablesorterPager(fiTableSorterPager); });</script>
+
+<div id="global-zeroclipboard-html-bridge" class="global-zeroclipboard-container" title="" style="position: absolute; left: 0px; top: -9999px; width: 15px; height: 15px; z-index: 999999999;" data-original-title="Copy to clipboard">      <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" id="global-zeroclipboard-flash-bridge" width="100%" height="100%">         <param name="movie" value="/assets/flash/ZeroClipboard.swf?noCache=1433148729912">         <param name="allowScriptAccess" value="sameDomain">         <param name="scale" value="exactfit">         <param name="loop" value="false">         <param name="menu" value="false">         <param name="quality" value="best">         <param name="bgcolor" value="#ffffff">         <param name="wmode" value="transparent">         <param name="flashvars" value="trustedOrigins=getbootstrap.com%2C%2F%2Fgetbootstrap.com%2Chttp%3A%2F%2Fgetbootstrap.com">         <embed src="/assets/flash/ZeroClipboard.swf?noCache=1433148729912" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="100%" height="100%" name="global-zeroclipboard-flash-bridge" allowscriptaccess="sameDomain" allowfullscreen="false" type="application/x-shockwave-flash" wmode="transparent" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="trustedOrigins=getbootstrap.com%2C%2F%2Fgetbootstrap.com%2Chttp%3A%2F%2Fgetbootstrap.com" scale="exactfit">                </object></div><svg xmlns="http://www.w3.org/2000/svg" width="1140" height="500" viewBox="0 0 1140 500" preserveAspectRatio="none" style="visibility: hidden; position: absolute; top: -100%; left: -100%;"><defs></defs><text x="0" y="53" style="font-weight:bold;font-size:53pt;font-family:Arial, Helvetica, Open Sans, sans-serif;dominant-baseline:middle">Thirdslide</text></svg></body></html>
