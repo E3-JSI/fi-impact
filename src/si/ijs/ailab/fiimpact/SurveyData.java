@@ -460,8 +460,6 @@ class SurveyData
         A3_5 += 0.75;
 
       if (listQ3_5.contains("C"))
-        A3_5 += 5.0;
-      if (listQ3_5.contains("D"))
       {
         if (Q3_5_LIST != null)
         {
@@ -469,6 +467,9 @@ class SurveyData
           A3_5 += 0.75 * arr.length;
         }
       }
+
+      if (listQ3_5.contains("D"))
+        A3_5 += 5.0;
 
       //Market weights from Q2_2 and Q3_7
       //"Q2_2_A_3_7_W1"
