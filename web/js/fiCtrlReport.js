@@ -44,7 +44,7 @@ fiReportApp.controller('fiCtrl', function ($scope) {
 			average: fi.averages.values[v].average,
 			ranking: model.ranking[fi.results[v.toUpperCase() + '_GRAPH_SLOT']],
 			percentOfWorse: 100 - Math.round(fi.results[v.toUpperCase() + "_R"]),
-			interpretation: model.interpretation[model.slots[Math.round(fi.results[v.toUpperCase() + '_GRAPH_SLOT'])] + model.slots[fi.averages.values['innovation'].slot]].replace(new RegExp('\\*\\*\\*', 'g'), v),
+			interpretation: model.interpretation[model.slots[Math.round(fi.results[v.toUpperCase() + '_GRAPH_SLOT'])] + model.slots[fi.averages.values[v].slot]].replace(new RegExp('\\*\\*\\*', 'g'), v),
 			bottomHalf: ( (fi.scores[v] <= m/2) ? [1] : [])
 			// model.slots[fi.averages.values[v].slot] + 
 		};
