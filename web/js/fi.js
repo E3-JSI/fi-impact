@@ -1,33 +1,76 @@
 var fiData = function (id) { // id is optional
-	var locationAverages = '../../service?action=averages';
-	var locationData = '../../service?action=results&id=' + id;
-	var locationManager = '../../manager?action=list';
-	// var model = require(['../../js/fiModel.js']);
-	loadMaxValues();
 	
+	this.model = {
+		"speedometers": {"S_2": "innovation", "S_4": "feasibility", "S_3": "market"},
+		"tooltips": ["Low", "Medium", "High"],
+		"radarLevelsSocial": {
+			"1": "No Impact",
+			"2": "Limited Impact",
+			"3": "Impact",
+			"4": "Significant Impact",
+			"5": "High Impact",
+			"num": 5
+		}
+	};
 	if (typeof id != 'undefined') {
-		// load project data
-		this.survey = getJSON(locationData);
-		this.questions = getQuestions(this.survey.questions);
-		this.results = getResults(this.survey.results);
-		// load averages
-		this.data = getJSON(locationAverages);
-		this.averages = getKeys(this.data.results);
-		this.scores = getScores(this.averages.keys, this.results); // unit: percent
+		this.json = loadJSON('../../service?action=resultsnew&id=' + id, this.model);
+		this.id = id;
 	}
-	else {
-		// load list
-		this.manager =  getJSON(locationManager);
-	}
+	else { this.manager =  getJSON('../../manager?action=list'); }
 	
 	// * * * * * * * * * *
 	// internal functions
 	// * * * * * * * * * *
 	
-	function loadMaxValues() {
-		$.each(['A', 'B'], function(i, v) { $.each(model['s6' + v].q1, function(j, w) {
-				model.max['social' + v + '_' + j] = model.max.social;
-		}); });
+	function loadJSON(url, constants) {
+		var json = getJSON(url);
+		var result = {
+			impact: (json.sections.S_0.answers.Q0_1.value == "Impact Assessment"),
+			self: (json.sections.S_0.answers.Q0_1.value == "Self Assessment"),
+			enablers: json.sections.S_1.answers.Q1_12,
+			enablersSpecific: {},
+			revenue: json.sections.S_3.answers.Q3_2[0].answers,
+			primaryMarketSector: ( json.sections.S_3.answers.Q3_3a ? true : false ),
+			marketNeeds: {},
+			socialBenefits: {},
+			speedometers: [],
+			radarOverview: makeRadarData(json.overview.points, false),
+			radarSocialA: makeRadarData(json.sections.S_6A.answers.Q6A_1.answers, true),
+			radarSocialB: makeRadarData(json.sections.S_6B.answers.Q6B_1.answers, false)
+		};
+		if  (json.sections.S_1.answers.Q1_18) { $.each(json.sections.S_1.answers.Q1_18[0].answers, function(i, v) { result.enablersSpecific[v.id] = { label: v.label, value: v.value }; }); }
+		$.each(constants.speedometers, function(i, v) {
+			result.speedometers.push(v)
+			result[v] = {
+				score: json.sections[i].result.result_percent,
+				average: json.sections[i].result.average_percent,
+				histogram: json.sections[i].result.speedometer_histogram,
+				interpretation: json.sections[i].result.interpretation,
+				bottomHalf: ( (json.sections[i].result.result_percent <= .5) ? [1] : []),
+			};
+			result[v].speedometer = {
+				levels: [0, json.sections[i].result.speedometer_lm, json.sections[i].result.speedometer_mh, 1],
+				percent: ( (result[v].score < 1) ? result[v].score : 1 ),
+				list: [result[v].histogram[0]+result[v].histogram[1], result[v].histogram[2], result[v].histogram[3]+result[v].histogram[4]],
+				average: result[v].average,
+				tooltips: constants.tooltips
+			}
+		});
+		$.each(json.sections, function(i, v) {
+			$.each(v.answers, function(j, w) { if (w.value) { result[j] = w.value; } });
+		});
+		$.each(json.sections.S_5A.answers.Q5A_1, function(i, v) {
+			result.marketNeeds[v.label] = { label: v.label, score: v.result, stars: [], answers: {}, top: {} };
+			$.each(v.answers, function(j, w) { 
+				result.marketNeeds[v.label].answers[w.id] = { value: w.value, label: w.label, stars: [] };
+				for (i = 0; i < w.value; i++) { result.marketNeeds[v.label].answers[w.id].stars.push(i); }
+			});
+			$.each(v.top_list, function(j, w) { result.marketNeeds[v.label].top[j] = { id: w.id, label: w.label }; });
+		});
+		$.each(json.sections.S_6A.answers.Q6A_1.answers, function(i, v) {
+			result.socialBenefits[v.id] = { id: v.id, value: v.result_percent, average: v.average_percent, label: v.label };
+		});
+		return result;
 	}
 	
 	function getJSON(jsonUrl) {
@@ -36,138 +79,17 @@ var fiData = function (id) { // id is optional
 		return result;
 	}
 	
-	function fiBool(v) {
-		if (v == "A") { return "Yes"; }
-		if (v == "B") { return "No"; }
-		return;
-	}
-	
-	function getQuestions(list) {
-		var result = {};
-		$.each(list, function(i, v) {
-			if (v[0] == "Q2_1") { result.trl = v[1]; }
-			var qId = v[0].slice(1);
-			var aId = qId.split('_');
-			var t = (( model['s' + aId[0]] || {} )['q' + aId[1]] || {} )[v[1]];
-			if (inArray(model.bool, qId)) { t = fiBool(v[1]); }
-			if (!t) {
-				if (inArray(model.list, qId)) { t = v[1].replace(/,/g, ", ").replace(" ,", ","); }
-				else { t = v[1]; }
-			}
-			result[v[0]] = { id: qId, idJSON: v[0], value: v[1], text: t };
+	function makeRadarData(object, useId) {
+		data = [[],[]];
+		$.each(object, function(i, v) {
+			var label = (useId ? v.id : v.label);
+			data[0].push({axis: label, value: v.average_percent});
+			data[1].push({axis: label, value: v.result_percent});
 		});
-		return result;
-	}
-	
-	function getResults(list) {
-		var result = {};
-		$.each(list, function( i, v ) { result[v[0]] = v[1]; });
-		return result;
-	}
-	
-	function scoreKeysReplace(s) {
-		$.each(model.scoreKeys, function(i, v) { s = s.replace(i, v); });
-		return s;
-	}
-	
-	function cutOff(score, key) {
-		m = model.max[key];
-		return ( (score > m) ? m : score );
-	}
-	
-	function getKeys(list) {
-		var result = { keys: {}, values: {} };
-		$.each(list, function( i, v ) {
-			key = result.keys[v.id] = scoreKeysReplace(v.id);
-			result.values[key] = { average: cutOff(v.average, key), histogram: v.histogram, slot: v.average_slot };
-		});
-		return result;
-	}
-	
-	function getScores(list, data) {
-		var result = {};
-		$.each(list, function(i, v) { result[v] = cutOff(data[i], i) });
-		return result;
+		return data;
 	}
 };
 
-fiData.prototype.getVerboseList = function(list, dictionary) {
-	var result = [];
-	$.each(list, function(i, v) { if (dictionary[v]) { result.push(dictionary[v]); } });
-	return result;
-}
-
-fiData.prototype.getSpeedometerSettings = function(key) {
-	var h = fi.averages.values[key].histogram;
-	return {
-		levels: [0, model.lmh[key][0], model.lmh[key][1], 1],
-		percent: ( (fi.scores[key] < model.max[key]) ? fi.scores[key] / model.max[key] : 1 ),
-		list: [h[0]+h[1], h[2], h[3]+h[4]],
-		average: fi.averages.values[key].average / model.max[key],
-		tooltips: model.tooltips
-	};
-}
-
-fiData.prototype.verboseFromJSON = function(s, q) {
-	var t = [];
-	$.each(fi.questions['Q' + s + '_' + q].value.split(','), function(i, v) {
-		if (model['s' + s]['q' + q][v]) { t.push(model['s' + s]['q' + q][v]); }
-	});
-	return t.join( ", " );
-}
-
-fiData.prototype.getAnswersList = function(question, A) {
-	var result = [];
-	var q = 'Q' + question;
-	var qId = question.split('_');
-	var s = 's' + qId[0];
-	var a = 'a' + qId[1];
-	$.each(model[q], function(i, v) {
-		if ( fi.questions[q] && (fi.questions[q].value == A) ) { result.push(model[s][a][v.slice(1)]); }
-	});
-	return result.join( ", " );
-}
-
-fiData.prototype.getMarketNeedsStarScores = function(key) {
-	var result = {};
-	$.each(model.s5A.q1, function(i, v) {
-		val = ( fi.questions["Q5A_1_" + i] ? parseInt(fi.questions["Q5A_1_" + i].value) : 0 );
-		result[i] = { name: v, stars: val, x: val };
-	});
-	return result;
-}
-
-fiData.prototype.getQ3_5text = function(A) {
-	var result = [];
-	$.each(fi.questions.Q3_5.value.split(','), function(i, v) {
-		switch(v) {
-			case "A": result.push(model.s3.q5.A + (fi.questions.Q1_17 ? " (" + fi.questions.Q1_17.value + ")" : '')); break;
-			case "B": result.push(model.s3.q5.B + (fi.questions.Q1_12 ? " (" + fi.questions.Q1_2.value + ")" : '')); break;
-			case "C": result.push(model.s3.q5.C + (fi.questions.Q3_5c ? " (" + fi.questions.Q3_5c.value.replace(/,/g, ", ") + ")" : '')); break;
-			case "D": result.push(model.s3.q5.D); break;
-			default: result.push(model.s3.q5.E);
-		}
-	});
-	return result.join(", ");
-}
-
-fiData.prototype.makeRadarOverviewData = function() {
-	data = [[],[]];
-	$.each(model.radarOverview, function(i, v) {
-		label = v.charAt(0).toUpperCase() + v.slice(1)
-		data[0].push({axis: label, value: fi.averages.values[v].average / model.max[key]});
-		data[1].push({axis: label, value: fi.scores[v] / model.max[key]});
-	});
-	return data;
-}
-
-fiData.prototype.makeRadarSocialData = function(A) {
-	data = [[],[]];
-	$.each(model['s6' + A].q1, function(i, v) {
-		label = ( (A == "A") ? i : v );
-		data[0].push({axis: label, value: fi.averages.values['social' + A + '_' + i].average});
-		data[1].push({axis: label, value: fi.results['Q6' + A + '_1_' + i]});
-	});
-	return data;
-}
-
+window.fi = new fiData(location.search.split('id=')[1]);
+var fiReportApp = angular.module('fiReportApp', []);
+fiReportApp.controller('fiCtrl', function ($scope) { $scope.d = fi.json; });

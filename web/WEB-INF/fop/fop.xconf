@@ -16,7 +16,7 @@ the location of this file.
 <fop version="1.0">
 
   <!-- Base URL for resolving relative URLs -->
-  <base>file:///E:/ijs/fi-impact/web/WEB-INF/fop/</base>
+  <base>file:///C:/Tomcat7/webapps/fi-impact/WEB-INF/fop/</base>
   
   <!-- Source resolution in dpi (dots/pixels per inch) for determining the size of pixels in SVG and bitmap images, default: 72dpi -->
   <source-resolution>72</source-resolution>

@@ -47,40 +47,45 @@
                     <li><a class="page-scroll" href="#innovation">Innovation</a></li>
                     <li><a class="page-scroll" href="#market">Market</a></li>
                     <li><a class="page-scroll" href="#feasibility">Feasibility</a></li>
-                    <li><a class="page-scroll" href="#marketNeeds">Market Needs</a></li>
+                    <li><a class="page-scroll" href="#business">Market Needs</a></li>
 					<li><a class="page-scroll" href="#socialImpact">Social Impact</a></li>
 					<li><a class="page-scroll" href="#overview">Overview</a></li>
+					<li><a id="pdfDownload" href="#"><i class="fa fa-download"></i> PDF</a></li>
                 </ul>
-            </div>
-            <!-- /.navbar-collapse -->
-        </div>
-        <!-- /.container-fluid -->
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
     </nav>
 
     <!-- Header -->
     <header><div class="container"><div class="intro-text">
-		<div class="intro-lead-in">This is your <img src="../../img/logo.png"> Report for project</div><div class="intro-heading">{{aFi.d1_4}}</div>
-		<!-- <a href="#project" class="page-scroll btn btn-xl">Tell Me More</a> -->
+		<div class="intro-lead-in">This is your <img src="../../img/logo.png"> <span ng-if="d.impact">Impact</span><span ng-if="d.self">Self</span> Assessment Report for project</div><div class="intro-heading">{{d.Q1_4}}</div>
 	</div></div></header>
 
     <!-- Project Section -->
     <section id="project"><div class="container">
 		<div class="row"><div class="col-lg-12 text-center">
-			<h2 class="section-heading">Project summary</h2><h3 class="section-subheading text-muted">{{aFi.d1_14}}</h3>
+			<h2 class="section-heading">Project summary</h2>
 		</div></div>
 		<div class="row"><div class="col-md-6"><table class="table table-striped"><tbody>
-			<tr><td width="25%"><strong>Organisation</strong></td>
-				<td><strong>{{aFi.d1_3}}</strong> (operational {{aFi.d1_16}} year<span ng-if="aFi.d1_16 != 1">s</span>)<br><i>{{aFi.organisationType}}</i><br>{{aFi.d1_5}}<br>
-					{{aFi.d1_17}}, {{aFi.d1_2}}</td></tr>
-			<tr><td><strong>Employees</strong></td><td>Implementing team size: {{aFi.d1_7}}<br>Full time employees: {{aFi.d1_8}}</td></tr>
-			<tr><td width="25%"><strong>Accelerator</strong></td><td><strong>{{aFi.d1_1}}</strong> ({{aFi.d1_13}}&euro;)<br>{{aFi.d1_14}}</td></tr>
-			<tr><td><strong>Solution Type</strong></td><td>{{aFi.d1_10}}<br>{{aFi.d1_11}}</td></tr>
+			<tr ng-if="d.impact"><td width="25%"><strong>Organisation</strong></td>
+				<td><strong>{{d.Q1_3}}</strong> <span ng-if='d.Q1_16 != ""'>(operational {{d.Q1_16}} year<span ng-if="d.Q1_16 != 1">s</span>)</span><br><i>{{d.Q1_6}}</i><br>{{d.Q1_5}}<br>{{d.Q1_2}}</td></tr>
+			<tr><td><strong>Employees</strong></td><td>Implementing team size: {{d.Q1_7}}<br>Full time employees: {{d.Q1_8}}</td></tr>
+			<tr ng-if="d.impact"><td width="25%"><strong>Accelerator</strong></td><td><strong>{{d.Q1_1}}</strong> ({{d.Q1_13}}&euro;)<span ng-if='d.Q1_14 != ""'><br>{{d.Q1_14}}</span></td></tr>
+			<tr><td><strong>Solution Type</strong></td><td>{{d.Q1_10}}<br>{{d.Q1_11}}</td></tr>
+			<tr ng-if="d.self"><td><strong>Project</strong></td><td>{{d.Q1_19}}</td></tr>
+			<tr ng-if="d.self"><td><strong>FIWARE enablers use</strong></td><td>{{d.Q1_20}}</td></tr>
 		</tbody></table></div>
-		<div class="col-md-6 text-left"><strong>FIWARE enablers</strong><p ng-bind-html="aFi.d1_12 | sanitize"></p>
+		<div class="col-md-6 text-left"><strong>FIWARE enablers</strong><p><span ng-repeat="E in d.enablers"><a target="_blank" href="{{E.link}}">{{E.label}}</a>{{$last ? '' : ', '}}</span></p>
 			<table class="table table-striped"><tbody>
-				<tr ng-repeat="E in aFi.enablers"><td><strong>{{E.category}}</strong></td><td>{{E.list}}</td></tr>
+				<tr ng-repeat="E in d.enablersSpecific"><td><strong>{{E.label}}</strong></td><td>{{E.value}}</td></tr>
 			</tbody></table>
 			<p class="linkMore"><a target="_blank" href="http://catalogue.fiware.org/enablers">learn more about FIWARE Enablers <i class="fa fa-arrow-right"></i></a></p>
+		</div></div>
+		<div class="row" ng-if="d.self"><div class="col-md-12" style="text-align: left">
+			<table class="table table-striped"><tbody><tr><td>
+				<p><strong>Focus and benefits of your project</strong></p>
+				{{d.Q1_21}}
+			</td></tr></tbody></table>
 		</div></div>
 	</div></section>
 
@@ -96,19 +101,17 @@
 			in the planning phases. If the innovation is being developed and validated among colleagues and potential clients the innovation’s 
 			real market potential is increased. Innovation is quite healthy in organizations if it is part of a strategy but can be quite resource 
 			consuming where stand-alone.</p>
-			<h3 class="section-subheading">Your ranking for innovation based on the data submitted is currently {{aFi.innovation.ranking}}.
-			In this section you scored better than {{aFi.innovation.percentOfWorse}}% of the {{aFi.totalSurveys}} (total) projects and proposals 
-			that have answered this survey. {{aFi.innovation.interpretation}}</h3>
-			<h3 class="section-subheading" ng-repeat="x in aFi.innovation.bottomHalf">
+			<h3 class="section-subheading">{{d.innovation.interpretation}}</h3>
+			<h3 class="section-subheading" ng-repeat="x in d.innovation.bottomHalf">
 			Please visit the FI-IMPACT Library to access reading material that may be useful.</h3>
 		</div></div>
 		<div class="row tableMargin"><div class="col-md-6"><table class="table table-striped"><tbody>
 			<tr><td width="25%"><strong>Concept</strong></td>
-				<td><strong>Concept developed by:</strong> {{aFi.d2_4}}<br><strong>TRL Level:</strong> {{aFi.d2_1}} ({{aFi.trl}})</td></tr>
+				<td><strong>Concept developed by:</strong> {{d.Q2_4}}<br><strong>TRL Level:</strong> {{d.Q2_1}}</td></tr>
 		</tbody></table></div>
 		<div class="col-md-6"><table class="table table-striped"><tbody>
-			<tr><td width="25%"><strong>Business idea</strong></td><td><strong>Innovation Type:</strong> {{aFi.d2_2}}<br>
-				<strong>Existence of similar solution:</strong> {{aFi.d2_3}}<br><strong>Strategy:</strong> {{aFi.d2_5}}</td></tr>
+			<tr><td width="25%"><strong>Business idea</strong></td>
+				<td><strong>Innovation Type:</strong> {{d.Q2_2}}<br><strong>Existence of similar solution:</strong> {{d.Q2_3}}<br><strong>Strategy:</strong> {{d.Q2_5}}</td></tr>
 		</tbody></table></div></div>
 	</div></section>
 
@@ -126,23 +129,25 @@
 			initiative has a strategy and plan to reach the target market. This indicator measures the level of your “customer development” 
 			activities: whether you have already approached customers to collect feedback on your product, and to what extent you have 
 			developed a strategy to acquire them.</p>
-			<h3 class="section-subheading">Your ranking for market focus based on the data submitted is currently {{aFi.market.ranking}}.
-			In this section you scored better than {{aFi.market.percentOfWorse}}% of the {{aFi.totalSurveys}} (total) projects and proposals that
-			have answered this survey. {{aFi.market.interpretation}}</h3>
-			<h3 class="section-subheading" ng-repeat="x in aFi.market.bottomHalf">
+			<h3 class="section-subheading">{{d.market.interpretation}}</h3>
+			<h3 class="section-subheading" ng-repeat="x in d.market.bottomHalf">
 			Please visit the FI-IMPACT Library to access reading material that may be useful.</h3>
 		</div></div>
 		<div class="row tableMargin"><div class="col-md-6"><table class="table table-striped"><tbody>
 			<tr><td width="25%"><strong>Business model</strong></td>
-				<td><strong>Model:</strong> {{aFi.businessModel}}<br><strong>Revenue Division:</strong> {{aFi.revenueDivision}}</td></tr>
+				<td><strong>Model:</strong> {{d.Q3_1}}<br><strong>Revenue Division:</strong> <span ng-repeat="R in d.revenue">{{R.value}}% {{R.label}}{{$last ? '' : ', '}}</span></td></tr>
 			<tr><td><strong>Customers</strong></td>
-				<td><strong>Value Proposition Verification:</strong> {{aFi.d3_8}}<br><strong>Commercial Strategy Status: </strong>{{aFi.d3_9}}</td></tr>
+				<td><strong>Value Proposition Verification:</strong> {{d.Q3_8}}<br><strong>Commercial Strategy Status: </strong>{{d.Q3_9}}</td></tr>
 			</tbody></table></div>
 			<div class="col-md-6"><table class="table table-striped"><tbody>
+			<tr ng-if="d.primaryMarketSector"><td width="25%"><strong>Primary Market Sector</strong></td>
+				<td>{{d.Q3_3a}}<br><strong>Reasons for targeting:</strong>  {{d.Q3_3b}}</td></tr>
+			<tr><td width="25%"><strong>Secondary Market Sectors</strong></td>
+				<td>{{d.Q3_3}}<span ng-if="d.Q3_3c"><br><strong>Reasons for targeting:</strong>  {{d.Q3_3c}}<span></td></tr>
 			<tr><td width="25%"><strong>Market</strong></td>
-				<td><strong>Market Sectors:</strong>  {{aFi.marketSectors}}<br><strong>Channel:</strong> {{aFi.marketChannel}}<br>
-					<strong>Target Market in Three Years:</strong> {{aFi.data3_5}}<br><strong>Entry into the Open Market:</strong> {{aFi.d3_6}}<br>
-					<strong>Level of competition:</strong> {{aFi.d3_7}}<br><strong>Market Strategy Status:</strong> {{aFi.d3_10}}</td></tr>
+				<td><strong>Channel:</strong> {{d.Q3_4}}<br>
+					<strong>Target Market in Three Years:</strong> {{d.Q3_5}}<br><strong>Entry into the Open Market:</strong> {{d.Q3_6}}<br>
+					<strong>Level of competition:</strong> {{d.Q3_7}}<br><strong>Market Strategy Status:</strong> {{d.Q3_10}}, {{d.Q3_11}}</td></tr>
 		</tbody></table></div></div>
 	</div></section>
 
@@ -155,22 +160,20 @@
 			economic viability of your business, and if you have already provided for the necessary funds for the startup phase.
 			This indicator assesses whether you are aware of the funds required to start and grow your business, and whether you
 			have secured sources for these funds.</p>
-			<h3 class="section-subheading">Your ranking for feasibility based on the data submitted is currently {{aFi.feasibility.ranking}}.
-			In this section you scored better than {{aFi.feasibility.percentOfWorse}}% of the {{aFi.totalSurveys}} (total) projects and proposals
-			that have answered this survey. {{aFi.feasibility.interpretation}}</h3>
-			<h3 class="section-subheading" ng-repeat="x in aFi.feasibility.bottomHalf">
+			<h3 class="section-subheading">{{d.feasibility.interpretation}}</h3>
+			<h3 class="section-subheading" ng-repeat="x in d.feasibility.bottomHalf">
 			Please visit the FI-IMPACT Library to access reading material that may be useful.</h3>
 		</div></div>
 		<div class="row tableMargin">
 			<div class="col-md-6"><table class="table table-striped"><tbody>
 				<tr><td width="25%"><strong>Capital</strong></td>
-					<td><strong>Required investments until sustainable:</strong> {{aFi.d4_1}}<br><strong>Secured funding:</strong> {{aFi.d4_6}}%</td></tr>
+					<td><strong>Required investments until sustainable:</strong> {{d.Q4_1}}<br><strong>Secured funding:</strong> {{d.Q4_6}}%</td></tr>
 				<tr><td><strong>Growth rate</strong></td>
-					<td><strong>Sales:</strong> {{aFi.d4_2}}<br><strong>Revenue (4 years):</strong> {{aFi.revenueGrowth}}</td></tr>
+					<td><strong>Sales:</strong> {{d.Q4_2}}<br><strong>Revenue (4 years):</strong> {{d.Q4_3}}</td></tr>
 				</tbody></table></div>
 			<div class="col-md-6"><table class="table table-striped"><tbody>
-				<tr><td width="25%"><strong>Customer acquisition</strong></td><td>{{aFi.d4_4}}</td></tr>
-				<tr><td width="25%"><strong>Sales and marketing expansion</strong></td><td>{{aFi.d4_5}}</td></tr>
+				<tr><td width="25%"><strong>Customer acquisition</strong></td><td>{{d.Q4_4}}</td></tr>
+				<tr><td width="25%"><strong>Sales and marketing expansion</strong></td><td>{{d.Q4_5}}</td></tr>
 			</tbody></table></div>
 		</div>
     </div></section>
@@ -184,10 +187,10 @@
 			are outlined for business and government sectors (B2B and B2G) and a second set of indicators are outlined for consumer markets (B2C), 
 			based on different market needs.
 		</div></div>
-		<div class="row mnSector" ng-repeat="MN in aFi.marketNeeds">
-			<h3>{{MN.sector}}</h3>
+		<div class="row mnSector" ng-repeat="MN in d.marketNeeds">
+			<h3>{{MN.label}}</h3>
 			<div class="col-md-6"><table class="table table-striped"><tbody>
-				<tr ng-repeat="score in MN.scores"><td>{{score.name}}</td><td><i class="fa fa-star" ng-repeat="st in getArray(score.stars) track by $index"></i></td></tr>
+				<tr ng-repeat="score in MN.answers"><td>{{score.label}}</td><td><i class="fa fa-star" ng-repeat="st in score.stars"></i></td></tr>
 			</tbody></table></div>
 			<div class="col-md-3"><div class="mnScore">
 				<p style="font-variant: small-caps">Target Market Needs Understanding</p>
@@ -197,7 +200,7 @@
 			<div class="col-md-3 topNeeds">
 				<h3 class="section-subheading text-muted">TOP 5 business needs</h3>
 				<h3 class="section-subheading text-muted mnSource">(Source: IDC Vertical Market Survey)</h3>
-				<ol><li ng-repeat="BN in MN.top5">{{BN}}</li></ol>
+				<ol><li ng-repeat="BN in MN.top">{{BN.label}}</li></ol>
 			</div></div>
     </div></section>
 
@@ -218,7 +221,7 @@
 				</div><div id="radarSocialA"></div></div>
 			</div><div class="col-md-6 axisLegend">
 				<h3 class="section-subheading text-muted">Axis legend</h3>
-				<p ng-repeat="SB in aFi.socialBenefits"><span>{{SB.key}}:</span> {{SB.name}}</p>
+				<p ng-repeat="SB in d.socialBenefits"><span>{{SB.id}}:</span> {{SB.label}}</p>
 		</div></div>
 		<h3>Quality of life improvement for certain social groups</h3>
 		<div class="row"><div class="col-md-6 text-center">
@@ -271,20 +274,25 @@
 	<script src="../../js/fiRadar.js"></script>
 	<script src="../../js/Speedometer2.js"></script>
 	<!-- FI JavaScript -->
-	<script src="../../js/fiUtility.js"></script>
-	<script src="../../js/fiModel.js"></script>
 	<script src="../../js/fi.js"></script>
-	<script>window.fi = new fiData(location.search.split('id=')[1]);</script>
-	<script src="../../js/fiCtrlReport.js"></script>
 	<script>
 	$(document).ready( function() {
-		$.each(model.speedometers, function(i, v) { d3Speedometer('#' + v + 'Gauge', fi.getSpeedometerSettings(v)); });
+		$.each(fi.json.speedometers, function(i, v) { d3Speedometer('#' + v + 'Gauge', fi.json[v].speedometer); });
 		window.radar = {
-			Overview: new fiRadar("bodyOverview", fi.makeRadarOverviewData()),
-			SocialA: new fiRadar("bodySocialA", fi.makeRadarSocialData('A'), {w: 400, h: 400, levels: 5}, model.radarLevelsSocial),
-			SocialB: new fiRadar("bodySocialB", fi.makeRadarSocialData('B'), {w: 400, h: 400, levels: 5}, model.radarLevelsSocial)
+			Overview: new fiRadar("bodyOverview", fi.json.radarOverview),
+			SocialA: new fiRadar("bodySocialA", fi.json.radarSocialA, {w: 400, h: 400, levels: 5}, fi.model.radarLevelsSocial),
+			SocialB: new fiRadar("bodySocialB", fi.json.radarSocialB, {w: 400, h: 400, levels: 5}, fi.model.radarLevelsSocial)
 		};
 		$.each(window.radar, function(i, v) { v.draw("#radar" + i) });
+		
+		$("#pdfDownload").click(function() {
+			$.get( "http://aidemo.ijs.si/fi-impact/service?action=pdf&id=" + fi.id, function(data) {
+				if ($(data).find('status').attr('status') == "OK") {
+					var win = window.open('http://aidemo.ijs.si/fi-impact/pdf/survey-' + fi.id + '.pdf', '_blank');
+					if (win) { win.focus(); }
+				}
+			});
+		});
 	});
 	</script>
 </body>

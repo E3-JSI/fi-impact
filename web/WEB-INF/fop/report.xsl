@@ -336,47 +336,59 @@
 	<fo:block xsl:use-attribute-sets="fi-heading">Market Needs</fo:block>
 	<fo:block xsl:use-attribute-sets="fi-subtext">The Market Needs Indicator reflects the extent to which perceived user benefits associated with a product or service are aligned with real-market needs, based on an analysis of IDC Vertical Market Survey results. One set of indicators are outlined for business and government sectors (B2B and B2G) and a second set of indicators are outlined for consumer markets (B2C), based on different market needs.</fo:block>
 	
-	<xsl:for-each select="project/business/item">
-		<fo:block xsl:use-attribute-sets="fi-marketneeds-subtitle"><xsl:value-of select="title"/></fo:block>
+	<xsl:for-each select="survey/sections/S_5A/answers/list_Q5A_1/Q5A_1">
+		<fo:block xsl:use-attribute-sets="fi-marketneeds-subtitle"><xsl:value-of select="label"/></fo:block>
+		<fo:block>Your score in Target Market Needs Understanding is <fo:inline xsl:use-attribute-sets="fi-marketneeds-score"><xsl:value-of select="result"/></fo:inline>.</fo:block>
 		<fo:table xsl:use-attribute-sets="fi-marketneeds">
-		  <fo:table-column /><fo:table-column column-width="40mm" />
-		  <fo:table-body>
-			<fo:table-row>
-				<fo:table-cell><fo:block>
-					<fo:table xsl:use-attribute-sets="fi-marketneeds">
-						<fo:table-column /><fo:table-column column-width="30mm" />
-						<fo:table-body>
-						<xsl:for-each select="needs/item">
-							<fo:table-row>
-								<fo:table-cell><fo:block><xsl:value-of select="title"/></fo:block></fo:table-cell>
-								<fo:table-cell><fo:block>
-									<fo:instream-foreign-object>
-										<svg:svg xmlns:svg="http://www.w3.org/2000/svg" width="60" height="10">
-											<svg:defs>
-												<svg:pattern id="Pattern" x="0" y="0" width="10" height="12" patternUnits="userSpaceOnUse">
-													<svg:g transform="scale(0.05)" fill="#5D8AAE"><svg:polygon points="100,10 40,198 190,78 10,78 160,198" style="fill-rule: nonzero;" /></svg:g>
-												</svg:pattern>
-											</svg:defs>
-											<svg:g transform="translate(0, -2.5)">
-												<svg:rect fill="url(#Pattern)" x="0" y="0" height="10">
-													<xsl:attribute name="width"><xsl:value-of select="value"/></xsl:attribute>
-												</svg:rect>
-											</svg:g>
-										</svg:svg>
-									</fo:instream-foreign-object>
-								</fo:block></fo:table-cell>
-							</fo:table-row>
-						</xsl:for-each>
-						</fo:table-body>
-					</fo:table>
-				</fo:block></fo:table-cell>
-				<fo:table-cell>
-					<fo:block xsl:use-attribute-sets="fi-marketneeds-subtext">Target Market Needs Understanding</fo:block>
-					<fo:block xsl:use-attribute-sets="fi-marketneeds-text">Your score is</fo:block>
-					<fo:block xsl:use-attribute-sets="fi-marketneeds-score"><xsl:value-of select="score"/></fo:block>
-				</fo:table-cell>
-			</fo:table-row>
-		  </fo:table-body>
+			<fo:table-column /><fo:table-column column-width="60mm" />
+			<fo:table-body>
+				<fo:table-row>
+					<fo:table-cell><fo:block>
+						<fo:table xsl:use-attribute-sets="fi-marketneeds-table">
+							<fo:table-column column-width="85mm" /><fo:table-column column-width="40mm" />
+							<fo:table-body>
+								<xsl:for-each select="list_answers/answers">
+									<fo:table-row>
+										<fo:table-cell><fo:block><xsl:value-of select="label"/></fo:block></fo:table-cell>
+										<fo:table-cell><fo:block>
+											<!-- <fo:instream-foreign-object>
+												<svg:svg xmlns:svg="http://www.w3.org/2000/svg" width="60" height="10">
+													<svg:defs><svg:pattern id="Pattern" x="0" y="0" width="6" height="12" patternUnits="userSpaceOnUse">
+														<svg:g transform="scale(0.03)" fill="#5D8AAE"><svg:polygon points="100,10 40,198 190,78 10,78 160,198" style="fill-rule: nonzero;" /></svg:g>
+													</svg:pattern></svg:defs>
+													<svg:g transform="translate(0, -1)"><svg:rect fill="url(#Pattern)" x="0" y="0" height="10">
+														<xsl:attribute name="width"><xsl:value-of select="6*value"/></xsl:attribute>
+													</svg:rect></svg:g>
+												</svg:svg>
+											</fo:instream-foreign-object> -->
+											<xsl:for-each select="list_star/star">
+											<fo:instream-foreign-object>
+												<svg:svg xmlns:svg="http://www.w3.org/2000/svg" width="6" height="6">
+													<svg:g transform="scale(0.03)" fill="#5D8AAE"><svg:polygon points="100,10 40,198 190,78 10,78 160,198" style="fill-rule: nonzero;" /></svg:g>
+												</svg:svg>
+											</fo:instream-foreign-object>
+											</xsl:for-each>
+										</fo:block></fo:table-cell>
+									</fo:table-row>
+								</xsl:for-each>
+							</fo:table-body>
+						</fo:table>
+					</fo:block></fo:table-cell>
+					<fo:table-cell><fo:block>
+						<fo:block xsl:use-attribute-sets="fi-marketneeds-top-head">TOP 5 business needs</fo:block><fo:block xsl:use-attribute-sets="fi-marketneeds-top-source">(Source: IDC Vertical Market Survey)</fo:block>
+						<fo:table>
+							<fo:table-column />
+							<fo:table-body>
+								<xsl:for-each select="list_top_list/top_list">
+									<fo:table-row>
+										<fo:table-cell xsl:use-attribute-sets="fi-marketneeds-top"><fo:block><xsl:value-of select="position()"/>. <xsl:value-of select="label"/></fo:block></fo:table-cell>
+									</fo:table-row>
+								</xsl:for-each>
+							</fo:table-body>
+						</fo:table>
+					</fo:block></fo:table-cell>
+				</fo:table-row>
+			</fo:table-body>
 		</fo:table>
 	</xsl:for-each>
 	

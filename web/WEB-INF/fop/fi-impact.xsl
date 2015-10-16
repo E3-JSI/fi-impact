@@ -26,7 +26,7 @@
 	<xsl:attribute name="table-layout">fixed</xsl:attribute>
 	<xsl:attribute name="width">100%</xsl:attribute>
 	<xsl:attribute name="border-collapse">separate</xsl:attribute>
-	<xsl:attribute name="margin-top">2pt</xsl:attribute>
+	<xsl:attribute name="margin-top">10pt</xsl:attribute>
 	<xsl:attribute name="margin-bottom">2pt</xsl:attribute>
 </xsl:attribute-set>
 
@@ -109,8 +109,32 @@
 	<xsl:attribute name="padding-bottom">2pt</xsl:attribute>
 	<xsl:attribute name="margin-bottom">10pt</xsl:attribute>
 </xsl:attribute-set>
+<xsl:attribute-set name="fi-marketneeds-table">
+	<xsl:attribute name="font-size">8.5pt</xsl:attribute>
+	<xsl:attribute name="color">#666</xsl:attribute>
+</xsl:attribute-set>
+<xsl:attribute-set name="fi-marketneeds-top">
+	<xsl:attribute name="font-size">8.5pt</xsl:attribute>
+	<xsl:attribute name="color">#666</xsl:attribute>
+	<xsl:attribute name="margin-top">2pt</xsl:attribute>
+	<xsl:attribute name="margin-bottom">2pt</xsl:attribute>
+</xsl:attribute-set>
+<xsl:attribute-set name="fi-marketneeds-top-source">
+	<xsl:attribute name="font-size">8.5pt</xsl:attribute>
+	<xsl:attribute name="color">#999</xsl:attribute>
+	<xsl:attribute name="font-family">sans-serif</xsl:attribute>
+	<xsl:attribute name="font-style">italic</xsl:attribute>
+	<xsl:attribute name="line-height">8.5pt</xsl:attribute>
+	<xsl:attribute name="space-before.optimum">10pt</xsl:attribute>
+	<xsl:attribute name="text-align">right</xsl:attribute>
+	<xsl:attribute name="margin-bottom">5pt</xsl:attribute>
+</xsl:attribute-set>
+<xsl:attribute-set name="fi-marketneeds-top-head">
+	<xsl:attribute name="font-family">serif</xsl:attribute>
+	<xsl:attribute name="text-align">left</xsl:attribute>
+</xsl:attribute-set>
 <xsl:attribute-set name="fi-marketneeds-subtext">
-	<xsl:attribute name="font-size">9pt</xsl:attribute>
+	<xsl:attribute name="font-size">8.5pt</xsl:attribute>
 	<xsl:attribute name="color">#999</xsl:attribute>
 	<xsl:attribute name="font-family">sans-serif</xsl:attribute>
 	<xsl:attribute name="line-height">12pt</xsl:attribute>
@@ -126,10 +150,10 @@
 	<xsl:attribute name="margin-bottom">10pt</xsl:attribute>
 </xsl:attribute-set>
 <xsl:attribute-set name="fi-marketneeds-score">
+	<xsl:attribute name="font-size">12pt</xsl:attribute>
 	<xsl:attribute name="color">#849CB4</xsl:attribute>
 	<xsl:attribute name="font-family">serif</xsl:attribute>
 	<xsl:attribute name="font-style">italic</xsl:attribute>
-	<xsl:attribute name="font-size">32pt</xsl:attribute>
 	<xsl:attribute name="font-weight">bold</xsl:attribute>
 	<xsl:attribute name="text-align">center</xsl:attribute>
 	<xsl:attribute name="padding-top">3pt</xsl:attribute>
