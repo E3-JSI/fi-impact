@@ -9,6 +9,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import si.ijs.ailab.util.AIStructures;
 import si.ijs.ailab.util.AIUtils;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -58,6 +59,7 @@ class SurveyData
 
   private static final String[] SLOT_INTERPRETATION = {"l", "l", "m", "h", "h"};
 
+
   static
   {
     //Questions listed in this list will be truncated for UI output
@@ -69,6 +71,7 @@ class SurveyData
     JSON_TRUNCATE_DECIMALS.add("Q3_2a");
     JSON_TRUNCATE_DECIMALS.add("Q3_2b");
     JSON_TRUNCATE_DECIMALS.add("Q3_2c");
+    JSON_TRUNCATE_DECIMALS.add("Q4_3");
     JSON_TRUNCATE_DECIMALS.add("Q4_3a");
     JSON_TRUNCATE_DECIMALS.add("Q4_3b");
     JSON_TRUNCATE_DECIMALS.add("Q4_3c");
@@ -237,7 +240,117 @@ class SurveyData
   }
 
 
-  private JSONObject createResultAndSpeedometer(String sectionName, String sectionLabel)
+  private static double SPEEDOMETER_R = 100.0;
+  private static double SPEEDOMETER_r = 80.0;
+
+  private static String SPEEDOMETER_ARC_SVG = "M %s %s A %s %s 0 0 1 %s %s L %s %s A %s %s 0 0 0 %s %s";
+  private static String[] SPEEDOMETER_COLORS = {"#923933", "#F4B900", "#00A54F"};
+  private static String SPEEDOMETER_NEEDLE_SVG = "M %s %s L %s %s L %s %s";
+
+  private String getSVGArc(double dR, double dr, double boundaryLo, double boundaryHi)
+  {
+
+    double dR0x = -dR*Math.cos(Math.PI*boundaryLo);
+    double dR0y = -dR*Math.sin(Math.PI *boundaryLo);
+
+    double dR1x = -dR*Math.cos(Math.PI * boundaryHi);
+    double dR1y = -dR*Math.sin(Math.PI * boundaryHi);
+
+    double dr0x = -dr*Math.cos(Math.PI * boundaryLo);
+    double dr0y = -dr*Math.sin(Math.PI * boundaryLo);
+
+    double dr1x = -dr*Math.cos(Math.PI * boundaryHi);
+    double dr1y = -dr*Math.sin(Math.PI * boundaryHi);
+
+
+    //"M %s %s A %s %s 0 0 1 %s %s L %s %s A %s %s 0 0 0 %s %s"
+    String svg = String.format(SPEEDOMETER_ARC_SVG,
+            SurveyManager.getDecimalFormatter2().format(dR0x),SurveyManager.getDecimalFormatter2().format(dR0y),
+            SurveyManager.getDecimalFormatter2().format(dR),SurveyManager.getDecimalFormatter2().format(dR),
+            SurveyManager.getDecimalFormatter2().format(dR1x),SurveyManager.getDecimalFormatter2().format(dR1y),
+            SurveyManager.getDecimalFormatter2().format(dr1x),SurveyManager.getDecimalFormatter2().format(dr1y),
+            SurveyManager.getDecimalFormatter2().format(dr),SurveyManager.getDecimalFormatter2().format(dr),
+            SurveyManager.getDecimalFormatter2().format(dr0x),SurveyManager.getDecimalFormatter2().format(dr0y));
+
+    return svg;
+
+  }
+
+  private void getAverageSVG(double averagePercent, JSONObject jsonSpeedometerSVG)
+  {
+    double R = SPEEDOMETER_R;
+    double len = 15.0;
+    double r = 3;
+
+    double average_x = -R*Math.cos(Math.PI*averagePercent);
+    double average_y = -R*Math.sin(Math.PI * averagePercent);
+
+    double avg_rad = Math.PI * averagePercent;
+    double xl = average_x - r*Math.cos(avg_rad+Math.PI/2.0);
+    double yl = average_y - r*Math.sin(avg_rad + Math.PI / 2.0);
+
+    double xt = average_x + len*Math.cos(avg_rad);
+    double yt = average_y + len*Math.sin(avg_rad);
+
+    double xr = average_x - r*Math.cos(avg_rad-Math.PI/2.0);
+    double yr = average_y - r*Math.sin(avg_rad - Math.PI / 2.0);
+
+    //"M %s %s L %s %s L %s %s";
+    String svg = String.format(SPEEDOMETER_NEEDLE_SVG,
+            SurveyManager.getDecimalFormatter2().format(xl),SurveyManager.getDecimalFormatter2().format(yl),
+            SurveyManager.getDecimalFormatter2().format(xt),SurveyManager.getDecimalFormatter2().format(yt),
+            SurveyManager.getDecimalFormatter2().format(xr),SurveyManager.getDecimalFormatter2().format(yr));
+
+    jsonSpeedometerSVG.put("average", svg);
+    jsonSpeedometerSVG.put("average_x", SurveyManager.getDecimalFormatter2().format(average_x));
+    jsonSpeedometerSVG.put("average_y", SurveyManager.getDecimalFormatter2().format(average_y));
+
+  }
+
+  private String getResultSVG(double resultPercent)
+  {
+    double len = 85.0;
+    double r = 8.0;
+
+
+    double res_rad = Math.PI * resultPercent;
+    double xl = - r*Math.cos(res_rad-Math.PI/2.0);
+    double yl = - r*Math.sin(res_rad-Math.PI/2.0);
+
+    double xt = -len*Math.cos(res_rad);
+    double yt = -len*Math.sin(res_rad);
+
+    double xr = -r*Math.cos(res_rad+Math.PI/2.0);
+    double yr = -r*Math.sin(res_rad+Math.PI/2.0);
+
+    //"M %s %s L %s %s L %s %s";
+    String svg = String.format(SPEEDOMETER_NEEDLE_SVG,
+            SurveyManager.getDecimalFormatter2().format(xl),SurveyManager.getDecimalFormatter2().format(yl),
+            SurveyManager.getDecimalFormatter2().format(xt),SurveyManager.getDecimalFormatter2().format(yt),
+            SurveyManager.getDecimalFormatter2().format(xr),SurveyManager.getDecimalFormatter2().format(yr));
+
+    return svg;
+  }
+
+  private String getSegmentSVG(double r, int i, int total, double dPercentResult, JSONObject segment)
+  {
+    double di = i;
+    double dtotal = total;
+
+    double x = r + r*dPercentResult*Math.cos(di*2*Math.PI/dtotal+Math.PI/2.0);
+    double y = r - r*dPercentResult*Math.sin(di * 2 * Math.PI / dtotal + Math.PI / 2.0);
+
+    String sx = SurveyManager.getDecimalFormatter2().format(x);
+    String sy = SurveyManager.getDecimalFormatter2().format(y);
+    String svg = sx+","+sy;
+    segment.put("x", sx);
+    segment.put("y", sy);
+    return svg;
+
+  }
+
+
+  private JSONObject createResultAndSpeedometer(String sectionName, String sectionLabel, String sectionLabel2, JSONObject radarOverviewOut, int overviewSectionsCnt, int overviewSectionsTotal)
   {
 
     String type = getType();
@@ -245,6 +358,18 @@ class SurveyData
       type = "IS";
 
     JSONObject jsonResult = new JSONObject();
+    JSONObject jsonOverviewPoint = new JSONObject();
+    JSONArray jsonOverviewPoints = radarOverviewOut.getJSONArray("points");
+    jsonOverviewPoints.put(jsonOverviewPoint);
+    String overviewOutLineAverage = radarOverviewOut.getString("line_average");
+    String overviewOutLineResult = radarOverviewOut.getString("line_result");
+
+
+
+    jsonOverviewPoint.put("id", sectionName);
+    jsonOverviewPoint.put("label", sectionLabel2);
+
+
     logger.debug("create result for {}/{}", type, sectionName);
 
     Map<String, Map<String, OverallResult>> allResults = SurveyManager.getSurveyManager().getResults();
@@ -253,7 +378,11 @@ class SurveyData
     OverallResult or = typeResults.get(sectionName);
     String averageSlot = SLOT_INTERPRETATION[or.getAverageSlot()];
     logger.debug("Calculating interpretation for {}", sectionName);
-    int iMySlot = resultDerivatives.get(sectionName + "_GRAPH_SLOT").intValue();
+    Double dSlot = resultDerivatives.get(sectionName + "_GRAPH_SLOT");
+    if(dSlot == null)
+      dSlot = 0.0;
+
+    int iMySlot = dSlot.intValue();
     logger.debug("My slot: {}", iMySlot);
     String mySlot = SLOT_INTERPRETATION[iMySlot];
     logger.debug("My slot interpretation: {}", mySlot);
@@ -261,32 +390,105 @@ class SurveyData
     String response = SurveyManager.fiImpactModel.getJSONObject("interpretation").getString(key);
 
     Double dResult = results.get(sectionName);
+    double R = 250.0;
+    double dPercentResult = 0.0;
     if(dResult != null)
     {
-      double dPercentResult = or.getSpeedometerPercent(dResult);
+      dPercentResult = or.getSpeedometerPercent(dResult);
       jsonResult.put("result_percent", SurveyManager.getDecimalFormatter2().format(dPercentResult));
+      jsonOverviewPoint.put("result_percent", SurveyManager.getDecimalFormatter2().format(dPercentResult));
     }
+    JSONObject xy = new JSONObject();
+    jsonOverviewPoint.put("result_coord", xy);
+    String svg = getSegmentSVG(R, overviewSectionsCnt, overviewSectionsTotal, dPercentResult, xy);
+    if(overviewOutLineResult.length() > 0)
+      overviewOutLineResult+=" ";
+    overviewOutLineResult+=svg;
+    radarOverviewOut.put("line_result", overviewOutLineResult);
+
+
     jsonResult.put("speedometer_lm", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercentLM()));
     jsonResult.put("speedometer_mh", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercentMH()));
 
     jsonResult.put("average_percent", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercent(or.average)));
+    jsonOverviewPoint.put("average_percent", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercent(or.average)));
     jsonResult.put("speedometer_histogram", or.toJSONHistogram());
 
 
+    xy = new JSONObject();
+    jsonOverviewPoint.put("avg_coord", xy);
+    svg = getSegmentSVG(R, overviewSectionsCnt, overviewSectionsTotal, or.getSpeedometerPercent(or.average), xy);
+    if(overviewOutLineAverage.length() > 0)
+      overviewOutLineAverage+=" ";
+    overviewOutLineAverage+=svg;
+    radarOverviewOut.put("line_average", overviewOutLineAverage);
+
+    JSONObject jsonSpeedometerSVG = new JSONObject();
+    jsonResult.put("speedometer_svg", jsonSpeedometerSVG);
+    JSONArray jsonSpeedometerSegmentsSVG = new JSONArray();
+    jsonSpeedometerSVG.put("segments", jsonSpeedometerSegmentsSVG);
+
+    ArrayList<Double> speedometerBoundaries = new ArrayList<>();
+    speedometerBoundaries.add(0.0);
+    speedometerBoundaries.add(or.getSpeedometerPercentLM());
+    speedometerBoundaries.add(or.getSpeedometerPercentMH());
+    speedometerBoundaries.add(1.0);
+
+    for(int i = 0; i < speedometerBoundaries.size()-1; i++)
+    {
+      JSONObject jsonSpeedometerSegment = new JSONObject();
+      jsonSpeedometerSegmentsSVG.put(jsonSpeedometerSegment);
+      jsonSpeedometerSegment.put("color", SPEEDOMETER_COLORS[i]);
+
+      svg = getSVGArc(SPEEDOMETER_R, SPEEDOMETER_r, speedometerBoundaries.get(i), speedometerBoundaries.get(i + 1));
+      jsonSpeedometerSegment.put("arc", svg);
+
+
+      AIStructures.AIInteger cnt = or.graph.graphValues.get(i + 1);
+
+      double total = or.n;
+      double segmentN = 0.0;
+
+      if(cnt != null)
+        segmentN = (double)cnt.val;
+
+      double segmentPercent = 0.0;
+      if(total > 0.0)
+        segmentPercent = segmentN/total;
+
+      double dr = 12.0;
+      double dR = SPEEDOMETER_R*0.65*(segmentPercent)+dr;
+      //logger.debug("R= {}, r={}, percent={}, n={}, N={}", dR, dr, segmentPercent, segmentN, total);
+
+      svg = getSVGArc(dR, dr, speedometerBoundaries.get(i), speedometerBoundaries.get(i+1));
+
+      jsonSpeedometerSegment.put("histogram", svg);
+
+    }
+
+    double averagePercent = or.getSpeedometerPercent(or.average);
+    getAverageSVG(averagePercent, jsonSpeedometerSVG);
+    svg = getResultSVG(dPercentResult);
+    jsonSpeedometerSVG.put("result", svg);
 
     //"Your ranking for %s based on the data submitted is currently %s.
     // In this section you scored better than %s% of the %s (total) projects and proposals that have answered this survey.";
     String scoreInWords = SurveyManager.fiImpactModel.getString("score_in_words");
+    Double dPercent = resultDerivatives.get(sectionName + "_" + type + "_R");
+    if(dPercent == null)
+      dPercent = 0.0;
+    dPercent = 100.0 - dPercent;
+
     scoreInWords = String.format(scoreInWords,
-            sectionLabel, SurveyManager.fiImpactModel.getJSONObject("ranking").getString(Integer.toString(resultDerivatives.get(sectionName + "_GRAPH_SLOT").intValue())),
-            Integer.toString(resultDerivatives.get(sectionName + "_R").intValue()), Integer.toString(or.n));
+            sectionLabel, SurveyManager.fiImpactModel.getJSONObject("ranking").getString(Integer.toString(dSlot.intValue())),
+            Integer.toString(dPercent.intValue()), Integer.toString(or.n));
      response = String.format(response, sectionLabel, sectionLabel);
      jsonResult.put("interpretation", scoreInWords + " " + response);
 
-
-
     return jsonResult;
   }
+
+
 
   private void write(OutputStream os, OutputFormat outputFormat, OutputType outputType, boolean writeResults) throws IOException
   {
@@ -385,21 +587,42 @@ class SurveyData
       jsonSurvey.put("external_id", externalId);
       JSONObject jsonSectionsOut = new JSONObject();
       jsonSurvey.put("sections", jsonSectionsOut);
+      JSONObject radarOverviewOut = new JSONObject();
+      radarOverviewOut.put("line_average", "");
+      radarOverviewOut.put("line_result", "");
+      radarOverviewOut.put("points", new JSONArray());
+
+      jsonSurvey.put("overview", radarOverviewOut);
+
       JSONArray modelSections = SurveyManager.fiImpactModel.getJSONArray("sections");
+
+      int overviewSectionsTotal = 0;
+      for(int i = 0; i < modelSections.length(); i++)
+      {
+        JSONObject section = modelSections.getJSONObject(i);
+        String sectionName = section.optString("name", null);
+        if (sectionName != null)
+          overviewSectionsTotal++;
+      }
+      int overviewSectionsCnt = 0;
       for(int i = 0; i < modelSections.length(); i++)
       {
         JSONObject section = modelSections.getJSONObject(i);
         JSONObject sectionOut = new JSONObject();
-        jsonSectionsOut.put("S_"+section.getString("id"), sectionOut);
+        jsonSectionsOut.put("S_" + section.getString("id"), sectionOut);
         JSONObject answersOut = new JSONObject();
         sectionOut.put("answers", answersOut);
         JSONArray questionsDef = section.getJSONArray("questions");
         String sQuestionNameRoot = "Q"+section.getString("id")+"_";
         String sectionName = section.optString("name", null);
         String sectionLabel = section.optString("label", null);
+        String sectionLabel2 = section.optString("label_graph", null);
 
         if(sectionName != null)
-          sectionOut.put("result", createResultAndSpeedometer(sectionName, sectionLabel));
+        {
+          sectionOut.put("result", createResultAndSpeedometer(sectionName, sectionLabel, sectionLabel2, radarOverviewOut, overviewSectionsCnt, overviewSectionsTotal));
+          overviewSectionsCnt++;
+        }
 
         logger.info("section {}", sQuestionNameRoot);
         for(int j  = 0; j < questionsDef.length(); j++)
@@ -413,6 +636,8 @@ class SurveyData
           String sLabel = questionDef.optString("label", null);
           JSONArray answersListDef = questionDef.optJSONArray("answers_list");
           String customDef = questionDef.optString("custom", null);
+          String defaultAnswer = questionDef.optString("default", null);
+          String postfixChar = questionDef.optString("postfix", null);
 
           StringBuilder sbAnswer = new StringBuilder();
           if(customDef != null)
@@ -505,12 +730,17 @@ class SurveyData
                 {
                   sValue = getLookup(lookupDef, sValue);
                 }
+                else
+                  sValue = truncateDecimals(sQuestionNameRoot + mergeObjectDef.getString("id"), sValue);
+
                 if(!sValue.equals(""))
                 {
                   if (sbAnswer.length() != 0)
                     sbAnswer.append(", ").append(sValue);
                   else
                     sbAnswer.append(sValue);
+                  if(postfixChar!=null)
+                    sbAnswer.append(postfixChar);
                 }
               }
             }
@@ -555,12 +785,17 @@ class SurveyData
                           sbAnswer.append(", ").append(sSegment);
                         else
                           sbAnswer.append(sSegment);
+                        if(postfixChar!=null)
+                          sbAnswer.append(postfixChar);
+
                       }
                     }
                   }
                   else
                   {
                     sbAnswer.append(sValue);
+                    if(postfixChar!=null)
+                      sbAnswer.append(postfixChar);
                   }
                   subSegmentAnswer.put("value", sbAnswer.toString());
                   sbAnswer.setLength(0);
@@ -572,6 +807,9 @@ class SurveyData
           {
             String s = questions.get(sQuestionNameRoot + questionDef.getString("id"));
             boolean bLinks = questionDef.optBoolean("links", false);
+            if(s==null || s.equals(""))
+              if(defaultAnswer != null)
+                s = defaultAnswer;
             if(s!=null)
             {
               String[] sArr = s.split(",");
@@ -616,6 +854,10 @@ class SurveyData
           else if(sList.equals("true"))
           {
             String s = questions.get(sQuestionNameRoot + questionDef.getString("id"));
+            if(s==null || s.equals(""))
+              if(defaultAnswer != null)
+                s = defaultAnswer;
+
             if(s!=null)
             {
               String[] sArr = s.split(",");
@@ -628,6 +870,8 @@ class SurveyData
                     sbAnswer.append(", ").append(sSegment);
                   else
                     sbAnswer.append(sSegment);
+                  if(postfixChar!=null)
+                    sbAnswer.append(postfixChar);
                 }
               }
             }
@@ -636,6 +880,9 @@ class SurveyData
           else if(multipleDef != null)
           {
             JSONArray multiplyBy = questionDef.optJSONArray("multiply");
+            String ui_specific = questionDef.optString("ui_specific", "");
+            boolean doStars = ui_specific.equals("stars");
+
             if(multiplyBy != null && multiplyBy.length() > 0)
             {
               boolean topList = questionDef.optBoolean("top_list", false);
@@ -663,14 +910,17 @@ class SurveyData
                     {
                       sSegmentId = sSegmentId.trim();
                       String sSegment = getLookup(mLookupDef, sSegmentId);
-                      if(!sSegment.equals(""))
+                      if(!sSegment.equals("") && !sSegment.equals(sSegmentId))
                       {
                         JSONObject segmentAnswer = new JSONObject();
                         answer.put(segmentAnswer);
                         segmentAnswer.put("label", sSegment);
                         if(resultID != null)
                         {
-                          segmentAnswer.put("result", SurveyManager.getDecimalFormatter4().format(results.get(resultID + "_" + sSegmentId)));
+                          Double res = results.get(resultID + "_" + sSegmentId);
+                          if(res == null)
+                            res = 0.0;
+                          segmentAnswer.put("result", SurveyManager.getDecimalFormatter2().format(res));
                         }
 
 
@@ -688,6 +938,16 @@ class SurveyData
                           if (sValue != null)
                           {
                             subSegmentAnswer.put("value", sValue);
+                            if(doStars)
+                            {
+                              int score = AIUtils.parseInteger(sValue, 0);
+                              JSONArray jesusChristSuperstar = new JSONArray();
+                              subSegmentAnswer.put("star", jesusChristSuperstar);
+                              for (int iStar = 0; iStar < score; iStar++)
+                              {
+                                jesusChristSuperstar.put(new JSONObject());
+                              }
+                            }
                           }
                           else
                           {
@@ -728,18 +988,19 @@ class SurveyData
             }
             else
             {
-              JSONArray answer = new JSONArray();
-              answersOut.put(sQuestionNameRoot + questionDef.getString("id"), answer);
               JSONObject segmentAnswer = new JSONObject();
-              answer.put(segmentAnswer);
-              //segmentAnswer.put("label", sSegment);
               JSONArray subSegmentAnswers = new JSONArray();
               segmentAnswer.put("answers", subSegmentAnswers);
+              answersOut.put(sQuestionNameRoot + questionDef.getString("id"), segmentAnswer);
+
+              String lineAverage = "";
+              String lineResult = "";
+
+
               for(int l = 0; l < multipleDef.length(); l++)
               {
                 JSONObject def = multipleDef.getJSONObject(l);
                 String key = def.getString("id");
-                String sValue = questions.get(sQuestionNameRoot + questionDef.getString("id") + "_" + key);
                 JSONObject subSegmentAnswer = new JSONObject();
                 subSegmentAnswers.put(subSegmentAnswer);
                 subSegmentAnswer.put("id", key);
@@ -750,26 +1011,55 @@ class SurveyData
                 OverallResult or = SurveyManager.getSurveyManager().getResults().get(type).get(sQuestionNameRoot + questionDef.getString("id") + "_" + key);
                 if(or!=null)
                 {
-                  subSegmentAnswer.put("average", SurveyManager.getDecimalFormatter2().format(or.average));
-                }
+                  Double dResult = results.get(sQuestionNameRoot + questionDef.getString("id") + "_" + key);
+                  double dPercentResult = 0.0;
+                  if(dResult != null)
+                  {
+                    dPercentResult = or.getSpeedometerPercent(dResult);
+                  }
 
-                if (sValue != null)
-                {
-                  subSegmentAnswer.put("value", sValue);
-                }
-                else
-                {
-                  subSegmentAnswer.put("value", "0");
+                  double dPercentAverage = or.getSpeedometerPercent(or.average);
+
+                  subSegmentAnswer.put("result_percent", SurveyManager.getDecimalFormatter2().format(dPercentResult));
+                  subSegmentAnswer.put("average_percent", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercent(or.average)));
+
+                  double R = 200;
+
+                  JSONObject xy = new JSONObject();
+                  subSegmentAnswer.put("result_coord", xy);
+                  String svg = getSegmentSVG(R, l, multipleDef.length(), dPercentResult, xy);
+                  if(lineResult.length() > 0)
+                    lineResult+=" ";
+                  lineResult+=svg;
+
+
+                  xy = new JSONObject();
+                  subSegmentAnswer.put("avg_coord", xy);
+                  svg = getSegmentSVG(R, l, multipleDef.length(), dPercentAverage, xy);
+                  if(lineAverage.length() > 0)
+                    lineAverage+=" ";
+                  lineAverage+=svg;
                 }
 
               }
+              segmentAnswer.put("line_average", lineAverage);
+              segmentAnswer.put("line_result", lineResult);
+
             }
           }
           else
           {
             String sValue = questions.get(sQuestionNameRoot + questionDef.getString("id"));
+            if(sValue==null || sValue.equals(""))
+              if(defaultAnswer != null)
+                sValue = defaultAnswer;
+
             if(sValue != null)
+            {
               sbAnswer.append(sValue);
+              if(postfixChar!=null)
+                sbAnswer.append(postfixChar);
+            }
           }
 
           if(sbAnswer.length() != 0)
@@ -787,8 +1077,6 @@ class SurveyData
 
         }
       }
-
-
 
 
 
@@ -821,6 +1109,7 @@ class SurveyData
     }
     logger.info("Saved survey {}/{} with {} questions and {} results", externalId, id, questions.size(), results.size());
   }
+
 
   private String truncateDecimals(String id, String sAnswer)
   {

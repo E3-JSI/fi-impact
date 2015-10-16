@@ -1,5 +1,18 @@
 {
 	"sections" : [{
+			"id" : "0",
+			"questions" : [{
+					"id" : "1",
+					"default" : "I",
+					"lookup" : [{
+							"I" : "Impact Assessment"
+						}, {
+							"S" : "Self Assessment"
+						}
+					]
+				}
+			]
+		}, {
 			"id" : "1",
 			"questions" : [{
 					"id" : "1",
@@ -258,13 +271,33 @@
 							"list" : "true"
 						}
 					]
+				},
+				{
+					"id" : "19",
+					"lookup" : [{
+							"A" : "Project under preparation"
+						}, {
+							"B" : "Running project"
+						}
+					]
+				}, {
+					"id" : "20",
+					"lookup" : [{
+							"A" : "Yes"
+						}, {
+							"B" : "No"
+						}
+					]
+				}, {
+					"id" : "21"
 				}
 
 			]
 		}, {
 			"id" : "2",
-			"name": "INNOVATION",
-			"label": "innovation",
+			"name" : "INNOVATION",
+			"label" : "innovation",
+			"label_graph" : "Innovation",
 			"questions" : [{
 					"id" : "1",
 					"lookup" : [{
@@ -325,8 +358,9 @@
 			]
 		}, {
 			"id" : "3",
-			"name": "MARKET",
-			"label": "market focus",
+			"name" : "MARKET",
+			"label" : "market focus",
+			"label_graph" : "Market focus",
 			"questions" : [{
 					"id" : "1",
 					"lookup" : [{
@@ -402,8 +436,6 @@
 						}, {
 							"E" : "Construction"
 						}, {
-							"F" : "Consumer"
-						}, {
 							"G" : "Education"
 						}, {
 							"H" : "Financial Services"
@@ -441,8 +473,6 @@
 						}, {
 							"E" : "Construction"
 						}, {
-							"F" : "Consumer"
-						}, {
 							"G" : "Education"
 						}, {
 							"H" : "Financial Services"
@@ -468,26 +498,30 @@
 					]
 
 				}, {
+					"id" : "3b"
+				}, {
+					"id" : "3c"
+				}, {
 					"id" : "4",
 					"lookup" : [{
-							"A" : "Sales agents"
+							"A" : "App-stores"
 						}, {
-							"B" : "Shops"
+							"B" : "E-mail/Phone-call marketing"
 						}, {
-							"C" : "App-stores"
+							"C" : "Other external websites"
 						}, {
 							"D" : "Personal website"
 						}, {
-							"E" : "Other external websites"
+							"E" : "Public tenders notices"
 						}, {
-							"F" : "Public tenders notices "
+							"F" : "Sales agents"
 						}, {
-							"G" : " E-mail/Phone-call marketing"
+							"G" : " Shops"
 						}
 					]
 				}, {
 					"id" : "5",
-					"custom": "Q3_5",
+					"custom" : "Q3_5",
 					"lookup" : [{
 							"A" : "Q1_17"
 						}, {
@@ -561,8 +595,9 @@
 			]
 		}, {
 			"id" : "4",
-			"name": "FEASIBILITY",
-			"label": "feasibility",
+			"name" : "FEASIBILITY",
+			"label" : "feasibility",
+			"label_graph":"Feasibility",
 			"questions" : [{
 					"id" : "1",
 					"lookup" : [{
@@ -584,7 +619,20 @@
 						}
 					]
 				}, {
-					"id" : "3"
+					"id" : "3",
+					"postfix": "%",
+					"merge" : [{
+							"id" : "3a"
+						}, {
+							"id" : "3b"
+
+						}, {
+							"id" : "3c"
+						}, {
+							"id" : "3d"
+						}
+					]
+
 				}, {
 					"id" : "4",
 					"lookup" : [{
@@ -612,6 +660,9 @@
 			]
 		}, {
 			"id" : "5A",
+			"name" : "MARKET_NEEDS_BUSINESS",
+			"label" : "market needs",
+			"label_graph": "Market needs",
 			"questions" : [{
 					"id" : "1",
 					"multiply" : [{
@@ -622,7 +673,8 @@
 							"question" : "3"
 						}
 					],
-					"result": "MARKET_NEEDS_BUSINESS",
+					"ui_specific": "stars",
+					"result" : "MARKET_NEEDS_BUSINESS",
 					"top_list" : true,
 					"multiple_fields" : [{
 							"id" : "A",
@@ -661,8 +713,7 @@
 					]
 				}
 			]
-		},
-		{
+		}, {
 			"id" : "6A",
 			"questions" : [{
 					"id" : "1",
@@ -732,7 +783,6 @@
 		}
 	],
 
-	"radarOverview" : ["innovation", "market", "feasibility", "business"],
 	"tooltips" : ["Low", "Medium", "High"],
 	"radarLevelsSocial" : {
 		"1" : "No Impact",

@@ -19,6 +19,7 @@ public class FIImpactRequestHandler extends HttpServlet
 {
   final static Logger logger = LogManager.getLogger(FIImpactRequestHandler.class.getName());
   SurveyManager surveyManager;
+  PDFManager pdfManager;
 
   @Override
   public void init(ServletConfig config) throws ServletException
@@ -41,6 +42,7 @@ public class FIImpactRequestHandler extends HttpServlet
     surveyManager = SurveyManager.getSurveyManager(config.getServletContext().getRealPath("/"), slots);
     */
     surveyManager = SurveyManager.getSurveyManager(config.getServletContext().getRealPath("/"));
+    pdfManager = pdfManager.getPDFManager(config.getServletContext().getRealPath("/"));
   }
 
   @Override
@@ -65,7 +67,7 @@ public class FIImpactRequestHandler extends HttpServlet
     logger.info("Received request: action={} for {} with {} questions", sAction, sId, arrQuestions.length);
     if (sAction == null || sAction.equals(""))
       setBadRequest(response, "Parameter 'action' not defined.");
-    else if (!(sAction.equals("add") || sAction.equals("remove") || sAction.equals("resultsxml") ||sAction.equals("results") ||sAction.equals("resultsnew") || sAction.equals("averages")))
+    else if (!(sAction.equals("add") || sAction.equals("remove") || sAction.equals("resultsxml") ||sAction.equals("results") ||sAction.equals("resultsnew") || sAction.equals("averages") || sAction.equals("pdf") || sAction.equals("allpdf")))
       setBadRequest(response, "Parameter 'action' not valid: "+sAction);
     else if (sAction.equals("add"))
     {
@@ -77,7 +79,28 @@ public class FIImpactRequestHandler extends HttpServlet
         response.setContentType("application/xml");
         response.setCharacterEncoding("utf-8");
         surveyManager.addSurvey(response.getOutputStream(), arrQuestions, sId);
+
       }
+    }
+    else if (sAction.equals("pdf"))
+    {
+      if (sId == null || sId.equals(""))
+        setBadRequest(response, "Parameter 'id' not defined.");
+      else
+      {
+        //id is internal
+        response.setContentType("application/xml");
+        response.setCharacterEncoding("utf-8");
+        pdfManager.createPDF(response.getOutputStream(), sId);
+
+      }
+    }
+    else if (sAction.equals("allpdf"))
+    {
+        response.setContentType("application/xml");
+        response.setCharacterEncoding("utf-8");
+        pdfManager.createPDFAll(response.getOutputStream());
+
     }
     else if(sAction.equals("remove"))
     {
@@ -123,11 +146,11 @@ public class FIImpactRequestHandler extends HttpServlet
         setBadRequest(response, "Parameter 'id' not defined.");
       else
       {
-        //id is internal
-        response.setContentType("application/xml");
-        response.setCharacterEncoding("utf-8");
-        surveyManager.getXMLSurvey(response.getOutputStream(), sId);
-      }
+      //id is internal
+      response.setContentType("application/xml");
+      response.setCharacterEncoding("utf-8");
+      surveyManager.getXMLSurvey(response.getOutputStream(), sId);
+    }
 
     }
     else if(sAction.equals("averages"))

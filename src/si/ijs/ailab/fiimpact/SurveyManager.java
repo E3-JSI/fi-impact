@@ -32,8 +32,14 @@ public class SurveyManager
   private final Path mapFile;
   private final Path surveyRoot;
   private final Path webappRoot;
-  private Map<String, String> externalIDMap = new HashMap<>();
-  private Map<String, SurveyData> surveys = new HashMap<>();
+  private Map<String, String> externalIDMap = Collections.synchronizedMap(new HashMap<String, String>());
+
+  public Map<String, SurveyData> getSurveys()
+  {
+    return surveys;
+  }
+
+  private Map<String, SurveyData> surveys = Collections.synchronizedMap(new HashMap<String, SurveyData>());
 
   public Map<String, Map<String, OverallResult>> getResults()
   {
@@ -242,26 +248,29 @@ public class SurveyManager
       resultsNew.put(type, typeResults);
       for(Map.Entry<String, OverallResult.ScoreBoundaries> entry: SPEEDOMETER_SLOTS.entrySet())
       {
-        typeResults.put(entry.getKey(), new OverallResult(entry.getKey(), entry.getValue()));
+        typeResults.put(entry.getKey(), new OverallResult(type, entry.getKey(), entry.getValue()));
       }
     }
 
     logger.info("Recalc results for {} surveys.", surveys.size());
-    for(SurveyData sd: surveys.values())
+    synchronized (surveys)
     {
-      String sdType = sd.getType();
-      for(String type: QUESTIONNAIRE_TYPE)
+      for (SurveyData sd : surveys.values())
       {
-        if(type.contains(sdType))
+        String sdType = sd.getType();
+        for (String type : QUESTIONNAIRE_TYPE)
         {
-          Map<String, OverallResult> typeResults = resultsNew.get(type);
-
-          for (Map.Entry<String, Double> r : sd.results.entrySet())
+          if (type.contains(sdType))
           {
-            OverallResult or = typeResults.get(r.getKey());
-            if (or != null)
+            Map<String, OverallResult> typeResults = resultsNew.get(type);
+
+            for (Map.Entry<String, Double> r : sd.results.entrySet())
             {
-              or.add(sd);
+              OverallResult or = typeResults.get(r.getKey());
+              if (or != null)
+              {
+                or.add(sd);
+              }
             }
           }
         }
@@ -285,12 +294,15 @@ public class SurveyManager
 
     try
     {
-      OutputStreamWriter w = new OutputStreamWriter(new FileOutputStream(mapFile.toFile()), "utf-8");
-      for(Map.Entry<String, String> entry: externalIDMap.entrySet())
+      synchronized (externalIDMap)
       {
-        w.write(entry.getKey()+"\t"+entry.getValue()+"\n");
+        OutputStreamWriter w = new OutputStreamWriter(new FileOutputStream(mapFile.toFile()), "utf-8");
+        for (Map.Entry<String, String> entry : externalIDMap.entrySet())
+        {
+          w.write(entry.getKey() + "\t" + entry.getValue() + "\n");
+        }
+        w.close();
       }
-      w.close();
     }
     catch(java.io.IOException ioe)
     {
@@ -303,7 +315,7 @@ public class SurveyManager
   private SurveyData loadSurvey(String id)
   {
 
-    Path p = surveyRoot.resolve("survey-"+id+".xml");
+    Path p = surveyRoot.resolve("survey-" + id + ".xml");
     SurveyData sd = new SurveyData();
 
     try
@@ -676,19 +688,22 @@ public class SurveyManager
 
 
     saveMap();
-    for(SurveyData surveyData: surveys.values())
+    synchronized (surveys)
     {
-      surveyData.calculateResults();
-      surveyData.saveSurvey(surveyRoot);
-    }
-    recalcResults();
+      for (SurveyData surveyData : surveys.values())
+      {
+        surveyData.calculateResults();
+        surveyData.saveSurvey(surveyRoot);
+      }
+      recalcResults();
 
-    logger.info("Added {} surveys, total {}.", totalNewSurveys, surveys.size());
-    json.key("total_added").value(totalNewSurveys);
-    json.key("total_after").value(surveys.size());
-    json.endObject();
-    w.flush();
-    w.close();
+      logger.info("Added {} surveys, total {}.", totalNewSurveys, surveys.size());
+      json.key("total_added").value(totalNewSurveys);
+      json.key("total_after").value(surveys.size());
+      json.endObject();
+      w.flush();
+      w.close();
+    }
 
   }
 
@@ -747,35 +762,36 @@ public class SurveyManager
     SortedSet<String> resultsDef = new TreeSet<>();
     SortedSet<String> resultsDevDef = new TreeSet<>();
 
-    for(SurveyData sd: surveys.values())
+    synchronized (surveys)
     {
-      for (String s : sd.questions.keySet())
+      for (SurveyData sd : surveys.values())
       {
-        if(s.contains("_"))
+        for (String s : sd.questions.keySet())
         {
-          //this is a hack to sort questions in the export correctly - Q1_1 --> Q1_01, Q1_10 --> Q1_10, Q1_2a --> Q1_02a, ...
-          String[] sArr = s.split("\\_");
-          if (sArr[1].length() == 2 && !AIUtils.isInteger(sArr[1]))
+          if (s.contains("_"))
           {
-            sArr[1] = "0" + sArr[1];
-          } else if (sArr[1].length() == 1)
-          {
-            sArr[1] = "0" + sArr[1];
-          }
-          questionsDef.add(sArr[0] + "_" + sArr[1] + "#" + s);
+            //this is a hack to sort questions in the export correctly - Q1_1 --> Q1_01, Q1_10 --> Q1_10, Q1_2a --> Q1_02a, ...
+            String[] sArr = s.split("\\_");
+            if (sArr[1].length() == 2 && !AIUtils.isInteger(sArr[1]))
+            {
+              sArr[1] = "0" + sArr[1];
+            } else if (sArr[1].length() == 1)
+            {
+              sArr[1] = "0" + sArr[1];
+            }
+            questionsDef.add(sArr[0] + "_" + sArr[1] + "#" + s);
+          } else
+            questionsDef.add(s + "#" + s);
         }
-        else
-          questionsDef.add(s+"#"+s);
+
+        for (String s : sd.results.keySet())
+          resultsDef.add(s + "#" + s);
+
+        for (String s : sd.resultDerivatives.keySet())
+          resultsDevDef.add(s + "#" + s);
+
       }
-
-      for (String s : sd.results.keySet())
-        resultsDef.add(s+"#"+s);
-
-      for (String s : sd.resultDerivatives.keySet())
-        resultsDevDef.add(s+"#"+s);
-
     }
-
 
     StringBuilder sb = new StringBuilder();
     sb.append("id_external").append("\t").append("id_internal");
@@ -796,41 +812,44 @@ public class SurveyManager
 
     sb.setLength(0);
 
-    for (SurveyData surveyData: surveys.values())
+    synchronized (surveys)
     {
-      sb.append(surveyData.getExternalId()).append("\t").append(surveyData.getId());
-      for(String s: questionsDef)
+      for (SurveyData surveyData: surveys.values())
       {
-        sb.append("\t");
-        String answer = surveyData.questions.get(s.split("#")[1]);
-        if(answer!=null)
+        sb.append(surveyData.getExternalId()).append("\t").append(surveyData.getId());
+        for (String s : questionsDef)
         {
-          answer = answer.replace("\r\n", ", ");
-          answer = answer.replace("\r", ", ");
-          answer = answer.replace("\n", ", ");
-          sb.append(answer);
+          sb.append("\t");
+          String answer = surveyData.questions.get(s.split("#")[1]);
+          if (answer != null)
+          {
+            answer = answer.replace("\r\n", ", ");
+            answer = answer.replace("\r", ", ");
+            answer = answer.replace("\n", ", ");
+            sb.append(answer);
+          }
         }
-      }
-      for(String s: resultsDef)
-      {
-        sb.append("\t");
-        Double r = surveyData.results.get(s.split("#")[1]);
-        if(r!=null)
+        for (String s : resultsDef)
         {
-          sb.append(getDecimalFormatter4().format(r));
+          sb.append("\t");
+          Double r = surveyData.results.get(s.split("#")[1]);
+          if (r != null)
+          {
+            sb.append(getDecimalFormatter4().format(r));
+          }
         }
-      }
-      for(String s: resultsDevDef)
-      {
-        sb.append("\t");
-        Double r = surveyData.resultDerivatives.get(s.split("#")[1]);
-        if(r!=null)
+        for (String s : resultsDevDef)
         {
-          sb.append(getDecimalFormatter4().format(r));
+          sb.append("\t");
+          Double r = surveyData.resultDerivatives.get(s.split("#")[1]);
+          if (r != null)
+          {
+            sb.append(getDecimalFormatter4().format(r));
+          }
         }
+        writeLine(writerTXT, sb.toString());
+        sb.setLength(0);
       }
-      writeLine(writerTXT, sb.toString());
-      sb.setLength(0);
     }
     json.endObject();
     w.flush();
@@ -862,11 +881,14 @@ public class SurveyManager
     logger.info("Remove all {} surveys", surveys.size());
     JSONWriter json = new JSONWriter(w);
     json.object().key("total").value(surveys.size());
-    for(String id: surveys.keySet())
+    synchronized (surveys)
     {
-      Path p = surveyRoot.resolve("survey-" + id + ".xml");
-      p.toFile().delete();
-      logger.info("Survey removed: {}", id);
+      for (String id : surveys.keySet())
+      {
+        Path p = surveyRoot.resolve("survey-" + id + ".xml");
+        p.toFile().delete();
+        logger.info("Survey removed: {}", id);
+      }
     }
     externalIDMap.clear();
     surveys.clear();

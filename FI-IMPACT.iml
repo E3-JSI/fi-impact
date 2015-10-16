@@ -11,5 +11,15 @@
     <orderEntry type="library" name="log4j 2" level="project" />
     <orderEntry type="library" name="aiutil" level="project" />
     <orderEntry type="library" name="JSON-java" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/web/WEB-INF/lib/fop" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+        <jarDirectory url="file://$MODULE_DIR$/web/WEB-INF/lib/fop" recursive="false" />
+      </library>
+    </orderEntry>
   </component>
 </module>

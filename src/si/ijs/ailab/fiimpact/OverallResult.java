@@ -14,6 +14,7 @@ class OverallResult
 {
 
   String id;
+  String type;
   int n;
   double sum;
   double average;
@@ -25,11 +26,11 @@ class OverallResult
     double min, lo_med, med_hi, max;
   }
 
-  private class ResultGraph
+  public static class ResultGraph
   {
     String id;
     ScoreBoundaries boundaries;
-    ArrayList<AIStructures.AIInteger> graphValues;
+    public ArrayList<AIStructures.AIInteger> graphValues;
 
     ResultGraph(String _id, ScoreBoundaries _scoreBoundaries)
     {
@@ -85,14 +86,15 @@ class OverallResult
   }
 
   ArrayList<SurveyData> surveys;
-  ResultGraph graph;
+  public ResultGraph graph;
 
-  public OverallResult(String _id, ScoreBoundaries scoreBoundaries)
+  public OverallResult(String _type, String _id, ScoreBoundaries scoreBoundaries)
   {
     id = _id;
     n = 0;
     average = 0.0;
     sum = 0.0;
+    type = _type;
 
     graph = new ResultGraph(id, scoreBoundaries);
     surveys = new ArrayList<>();
@@ -143,7 +145,7 @@ class OverallResult
 
       //logger.debug("score: {}", sd.results.get(resultType));
       double percent = Math.round((((double) beforeYou) / n) * 100);
-      sd.resultDerivatives.put(id + "_R", percent);
+      sd.resultDerivatives.put(id + "_"+type+"_R", percent);
       Double yourResult = sd.results.get(id);
       if (yourResult == null)
         yourResult = 0.0;
