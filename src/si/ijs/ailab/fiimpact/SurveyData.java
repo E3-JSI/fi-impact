@@ -17,6 +17,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -585,12 +586,19 @@ class SurveyData
       JSONObject jsonSurvey = new JSONObject();
       jsonSurvey.put("id", id);
       jsonSurvey.put("external_id", externalId);
+      SimpleDateFormat format = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
+
+      Date curDate = new Date();
+      jsonSurvey.put("timestamp_report_display", format.format(curDate));
+
+
       JSONObject jsonSectionsOut = new JSONObject();
       jsonSurvey.put("sections", jsonSectionsOut);
       JSONObject radarOverviewOut = new JSONObject();
       radarOverviewOut.put("line_average", "");
       radarOverviewOut.put("line_result", "");
       radarOverviewOut.put("points", new JSONArray());
+
 
       jsonSurvey.put("overview", radarOverviewOut);
 
@@ -1257,19 +1265,14 @@ class SurveyData
     write(os, OutputFormat.XML, OutputType.STRUCTURE, true);
   }
 
-  public void writeUIXML(OutputStream os , JSONObject averages) throws IOException
+  public void writeUIXML(OutputStream os) throws IOException
   {
     write(os, OutputFormat.XML, OutputType.UI, true);
   }
 
-  public void writeUIJSON(OutputStream os, JSONObject averages) throws IOException
+  public void writeUIJSON(OutputStream os) throws IOException
   {
     write(os, OutputFormat.JSON, OutputType.UI, true);
-  }
-
-  public void writeStructureJSON(OutputStream os) throws IOException
-  {
-    write(os, OutputFormat.JSON, OutputType.STRUCTURE, true);
   }
 
   public void read(InputStream is) throws ParserConfigurationException, IOException, SAXException
@@ -1319,6 +1322,7 @@ class SurveyData
     results.clear();
     resultDerivatives.clear();
     logger.debug("Calculate results for {}", id);
+
     //------------INNOVATION--------------------
     String Q2_1 = questions.get("Q2_1");
     String Q2_2 = questions.get("Q2_2");
@@ -1358,8 +1362,9 @@ class SurveyData
     String Q3_3a = questions.get("Q3_3a");
 
     String Q3_4 = questions.get("Q3_4");
-    String Q3_5 = questions.get("Q3_5");
-    String Q3_5_LIST = questions.get("Q3_5c");
+    //as of version 2.2, Q3_5 removed
+    //String Q3_5 = questions.get("Q3_5");
+    //String Q3_5_LIST = questions.get("Q3_5c");
 
     String Q3_7 = questions.get("Q3_7");
     String Q3_8 = questions.get("Q3_8");
@@ -1368,9 +1373,11 @@ class SurveyData
     String Q3_11 = questions.get("Q3_11");
 
 
-    logger.debug("Q3_X: {}, {}, {}, {}, {}, {}, {}, {}, {}", Q3_3, Q3_3a, Q3_4, Q3_5, Q3_7, Q3_8, Q3_9, Q3_10, Q3_11);
+    //logger.debug("Q3_X: {}, {}, {}, {}, {}, {}, {}, {}, {}", Q3_3, Q3_3a, Q3_4, Q3_5, Q3_7, Q3_8, Q3_9, Q3_10, Q3_11);
+    logger.debug("Q3_X: {}, {}, {}, {}, {}, {}, {}, {}", Q3_3, Q3_3a, Q3_4, Q3_7, Q3_8, Q3_9, Q3_10, Q3_11);
 
-    if ((Q3_3 != null || Q3_3a != null) && Q3_4 != null && Q3_5 != null && Q3_7 != null && Q3_8 != null && Q3_9 != null && Q3_10 != null && Q3_11 != null && Q2_2 != null)
+    //if ((Q3_3 != null || Q3_3a != null) && Q3_4 != null && Q3_5 != null && Q3_7 != null && Q3_8 != null && Q3_9 != null && Q3_10 != null && Q3_11 != null && Q2_2 != null)
+    if ((Q3_3 != null || Q3_3a != null) && Q3_4 != null && Q3_7 != null && Q3_8 != null && Q3_9 != null && Q3_10 != null && Q3_11 != null && Q2_2 != null)
     {
       int Q3_3_length = 0;
       if(Q3_3 != null)
@@ -1388,16 +1395,16 @@ class SurveyData
       String[] arr = Q3_4.split(",");
       Double A3_4 = (1.0 * arr.length) / 4.0;
 
+      /*
       Double A3_5 = 0.0;
       List<String> listQ3_5 = Arrays.asList(Q3_5.split(","));
-        /*
-          '@Q3_5 = case 'answer3_5'
-            when 'A' then 0.50 --city/region
-            when 'B' then 0.75 --my country
-            when 'C' then 5.00 --global
-            when 'D' then count('answer3_5list')*0.75 end --multiple select country
 
-         */
+          //'@Q3_5 = case 'answer3_5'
+          //when 'A' then 0.50 --city/region
+          //when 'B' then 0.75 --my country
+          //when 'C' then 5.00 --global
+          //when 'D' then count('answer3_5list')*0.75 end --multiple select country
+
       if (listQ3_5.contains("A"))
         A3_5 += 0.5;
 
@@ -1415,6 +1422,7 @@ class SurveyData
 
       if (listQ3_5.contains("D"))
         A3_5 += 5.0;
+      */
 
       //Market weights from Q2_2 and Q3_7
       //"Q2_2_A_3_7_W1"
@@ -1441,15 +1449,21 @@ class SurveyData
       Double A3_10 = SCORES.get("Q3_10").get(Q3_10);
       Double A3_11 = SCORES.get("Q3_11").get(Q3_11);
 
-      if (A3_5 != null && A3_8 != null && A3_9 != null && A3_10 != null && A3_11 != null && W1 != null && W2 != null)
+      //if (A3_5 != null && A3_8 != null && A3_9 != null && A3_10 != null && A3_11 != null && W1 != null && W2 != null)
+      if (A3_8 != null && A3_9 != null && A3_10 != null && A3_11 != null && W1 != null && W2 != null)
       {
-        logger.debug("A3_X: 3: {}, 4: {}, 5: {}, 8: {}, 9: {}, 10: {}, 11: {}, W1: {}, W2: {}", A3_3, A3_4, A3_5, A3_8, A3_9, A3_10, A3_11, W1, W2);
+        //logger.debug("A3_X: 3: {}, 4: {}, 5: {}, 8: {}, 9: {}, 10: {}, 11: {}, W1: {}, W2: {}", A3_3, A3_4, A3_5, A3_8, A3_9, A3_10, A3_11, W1, W2);
+        logger.debug("A3_X: 3: {}, 4: {}, 8: {}, 9: {}, 10: {}, 11: {}, W1: {}, W2: {}", A3_3, A3_4, A3_8, A3_9, A3_10, A3_11, W1, W2);
 
         /*
           --calc result --
-          @R3 = @W1*(@Q3_8+@Q3_9) + @W2*(@Q3_10 +@Q3_11 +@Q3_3 +Q3_4 +@Q3_5)"
-        */
+          OLD - @R3 = @W1*(@Q3_8+@Q3_9) + @W2*(@Q3_10 +@Q3_11 +@Q3_3 +Q3_4 +@Q3_5)"
         Double r = W1 * (A3_8 + A3_9) + W2 * (A3_10 + A3_11 + A3_3 + A3_4 + A3_5);
+
+        as of version 2.2.
+        @R3 = (@W1*(@Q3_8+@Q3_9)/2 + @W2*(@Q3_10 +@Q3_11 +@Q3_3 +Q3_4)/4)/2
+        */
+        Double r = (W1 * (A3_8 + A3_9) / 2.0 + W2 * (A3_10 + A3_11 + A3_3 + A3_4) / 4.0) / 2.0;
         logger.debug("R3: {}", r);
         results.put("MARKET", r);
       }
@@ -1510,14 +1524,13 @@ class SurveyData
 
         /*
           --calc result --
-          @R3 = (@W1*(@Q4_1 * (1-'answer4_6'))   + @W2*(@Q4_2 +@Q4_4 +@Q4_5)/3 )/2
-          @R3 = (@W1*(@Q4_1 * 'answer4_6' / 100) + @W2*(@Q4_2 +@Q4_4 +@Q4_5)/3 )/2
+          @R4 = [@W3*(@Q4_1 + ( 'answer4_6' / 100)*5)/2  + @W4*(@Q4_2 +@Q4_4 +@Q4_5)/3 ]/2
         */
-        A4_6 = A4_6 / 100.0;
+        //A4_6 = A4_6 / 100.0;
         logger.debug("A4_X: 1: {}, 2: {}, 4: {}, 5: {}, 6: {}, W3: {}, W4: {}", A4_1, A4_2, A4_4, A4_5, A4_6, W3, W4);
 
-        //Double r = (W3 * (A4_1 * A4_6 / 100.0) + W4 * (A4_2 + A4_4 + A4_5) / 3) / 2;
-        Double r = (W3 * (A4_1 + A4_6 / 100.0 * 5.0) + W4 * (A4_2 + A4_4 + A4_5) / 3) / 2;
+        //Double r = (W3 * (A4_1 + A4_6 / 100.0 * 5.0) + W4 * (A4_2 + A4_4 + A4_5) / 3) / 2;
+        Double r = (W3 * (A4_1 + A4_6 / 100.0 * 5.0)/2.0 + W4 * (A4_2 + A4_4 + A4_5) / 3) / 2;
 
         logger.debug("R4: {}", r);
         results.put("FEASIBILITY", r);

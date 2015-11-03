@@ -26,7 +26,7 @@ class OverallResult
     double min, lo_med, med_hi, max;
   }
 
-  public static class ResultGraph
+  public class ResultGraph
   {
     String id;
     ScoreBoundaries boundaries;
@@ -63,7 +63,12 @@ class OverallResult
       AIStructures.AIInteger cnt = graphValues.get(slot);
       cnt.val++;
 
+      double  dPercentResult = getSpeedometerPercent(score);
+
+
       surveyData.resultDerivatives.put(id + "_GRAPH_SLOT", (double) slot);
+      surveyData.resultDerivatives.put(id + "_GRAPH_PERCENT", dPercentResult);
+
     }
 
     private int getSlot(double d)

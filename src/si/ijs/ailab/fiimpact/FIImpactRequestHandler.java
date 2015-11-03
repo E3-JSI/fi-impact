@@ -67,7 +67,7 @@ public class FIImpactRequestHandler extends HttpServlet
     logger.info("Received request: action={} for {} with {} questions", sAction, sId, arrQuestions.length);
     if (sAction == null || sAction.equals(""))
       setBadRequest(response, "Parameter 'action' not defined.");
-    else if (!(sAction.equals("add") || sAction.equals("remove") || sAction.equals("resultsxml") ||sAction.equals("results") ||sAction.equals("resultsnew") || sAction.equals("averages") || sAction.equals("pdf") || sAction.equals("allpdf")))
+    else if (!(sAction.equals("add") || sAction.equals("remove") || sAction.equals("resultsxml")  ||sAction.equals("resultsnew") || sAction.equals("averages") || sAction.equals("pdf") || sAction.equals("allpdf")))
       setBadRequest(response, "Parameter 'action' not valid: "+sAction);
     else if (sAction.equals("add"))
     {
@@ -113,19 +113,6 @@ public class FIImpactRequestHandler extends HttpServlet
         response.setCharacterEncoding("utf-8");
         surveyManager.removeSurvey(response.getOutputStream(), sId);
       }
-    }
-    else if(sAction.equals("results"))
-    {
-      if (sId == null || sId.equals(""))
-        setBadRequest(response, "Parameter 'id' not defined.");
-      else
-      {
-        //id is internal
-        response.setContentType("application/json");
-        response.setCharacterEncoding("utf-8");
-        surveyManager.getJSONSurveyOld(response.getOutputStream(), sId);
-      }
-
     }
     else if(sAction.equals("resultsnew"))
     {

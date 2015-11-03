@@ -68,7 +68,8 @@ public class SurveyManager
   private static String SPEEDOMETER =
           "\tmin\tlow\tmed\thigh\n" +
                   "INNOVATION\t1.0\t7.6\t14.2\t20.8\n" +
-                  "MARKET\t4\t15\t26\t37\n" +
+                  //"MARKET\t4\t15\t26\t37\n" +
+                  "MARKET\t0.7\t2.3\t3.9\t5.5\n" +
                   "FEASIBILITY\t0\t1.8\t3.6\t5.4\n" +
                   "MARKET_NEEDS_BUSINESS\t0\t4\t7.5\t10\n";
 
@@ -165,7 +166,7 @@ public class SurveyManager
     }
 
 
-    String jsonData = null;
+    String jsonData;
     Path m = Paths.get(_webappRoot).resolve("js").resolve("fiModelNew.js");
     try
     {
@@ -396,22 +397,6 @@ public class SurveyManager
     AIUtils.save(doc, outputStream);
   }
 
-  public void getJSONSurveyOld(OutputStream outputStream, String id) throws IOException
-  {
-    SurveyData surveyData = surveys.get(id);
-    if(surveyData == null)
-    {
-      OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
-      JSONWriter jsonSurvey = new JSONWriter(w);
-      jsonSurvey.object().key("id").value(id).key("error").value("Survey not found.").endObject();
-      w.flush();
-      w.close();
-    }
-    else
-    {
-      surveyData.writeStructureJSON(outputStream);
-    }
-  }
 
   public void getJSONSurvey(OutputStream outputStream, String id) throws IOException
   {
@@ -426,10 +411,7 @@ public class SurveyManager
     }
     else
     {
-      String type = surveyData.getType();
-      if(type.equals("S"))
-        type = "IS";
-      surveyData.writeUIJSON(outputStream, getAveragesJSON(type));
+      surveyData.writeUIJSON(outputStream);
     }
   }
   public void getXMLSurvey(OutputStream outputStream, String id) throws IOException
@@ -444,10 +426,7 @@ public class SurveyManager
     }
     else
     {
-      String type = surveyData.getType();
-      if(type.equals("S"))
-        type = "IS";
-      surveyData.writeUIXML(outputStream, getAveragesJSON(type));
+      surveyData.writeUIXML(outputStream);
     }
   }
 
@@ -729,6 +708,11 @@ public class SurveyManager
       addResultKey(json, "MARKET", surveyData.results);
       addResultKey(json, "FEASIBILITY", surveyData.results);
       addResultKey(json, "MARKET_NEEDS_BUSINESS", surveyData.results);
+
+      addResultKey(json, "INNOVATION_GRAPH_PERCENT", surveyData.resultDerivatives);
+      addResultKey(json, "MARKET_GRAPH_PERCENT", surveyData.resultDerivatives);
+      addResultKey(json, "FEASIBILITY_GRAPH_PERCENT", surveyData.resultDerivatives);
+      addResultKey(json, "MARKET_NEEDS_BUSINESS_GRAPH_PERCENT", surveyData.resultDerivatives);
 
       json.endObject();
     }
