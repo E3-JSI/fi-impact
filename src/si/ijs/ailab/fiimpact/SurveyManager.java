@@ -58,20 +58,21 @@ public class SurveyManager
 
   public static JSONObject fiImpactModel;
 
-/*  private static String SPEEDOMETER =
-          "\tmin\tlow\tmed\thigh\n" +
-                  "INNOVATION\t0\t1.6\t3.35\t5\n" +
-                  "MARKET\t0\t1.6\t3.35\t5\n" +
-                  "FEASIBILITY\t0\t1.6\t3.35\t5\n" +
-                  "MARKET_NEEDS_BUSINESS\t0\t4\t7.5\t10\n";
-*/
-  private static String SPEEDOMETER =
+  /*private static String SPEEDOMETER =
           "\tmin\tlow\tmed\thigh\n" +
                   "INNOVATION\t1.0\t7.6\t14.2\t20.8\n" +
                   //"MARKET\t4\t15\t26\t37\n" +
                   "MARKET\t0.7\t2.3\t3.9\t5.5\n" +
                   "FEASIBILITY\t0\t1.8\t3.6\t5.4\n" +
-                  "MARKET_NEEDS_BUSINESS\t0\t4\t7.5\t10\n";
+                  "MARKET_NEEDS_BUSINESS\t0\t4\t7.5\t10\n";*/
+
+  private static String SPEEDOMETER =
+          "\tmin\tlow\tmed\thigh\n" +
+                  "INNOVATION\t0.0\t1.667\t3.333\t5.000\n" +
+                  "MARKET\t0.0\t1.667\t3.333\t5.000\n" +
+                  "FEASIBILITY\t0.0\t1.667\t3.333\t5.000\n" +
+                  "MARKET_NEEDS_BUSINESS\t0.0\t1.667\t3.333\t5.000\n";
+
 
   private static String SOCIAL_IMPACT = "Q6A_1_A\tQ6A_1_B\tQ6A_1_C\tQ6A_1_D\tQ6A_1_E\tQ6A_1_F\tQ6A_1_G\tQ6A_1_H\tQ6A_1_I\tQ6A_1_J\tQ6A_1_K\tQ6B_1_A\tQ6B_1_B\tQ6B_1_C\tQ6B_1_D\tQ6B_1_E\tQ6B_1_F";
 
@@ -731,51 +732,104 @@ public class SurveyManager
     w.write(newline);
   }
 
+  private String getQuestionSortKey(String s)
+  {
+    String result = "";
+    if (s.contains("_"))
+    {
+      //this is a hack to sort questions in the export correctly - Q1_1 --> Q1_01, Q1_10 --> Q1_10, Q1_2a --> Q1_02a, ...
+      String[] sArr = s.split("\\_");
+      if (sArr[1].length() == 2 && !AIUtils.isInteger(sArr[1]))
+      {
+        sArr[1] = "0" + sArr[1];
+      } else if (sArr[1].length() == 1)
+      {
+        sArr[1] = "0" + sArr[1];
+      }
+      result = sArr[0] + "_" + sArr[1] + "#" + s;
+    }
+    else
+      result =  s + "#" + s;
 
-  public void exportTXT(ServletOutputStream outputStream, String fileName) throws IOException
+    return result;
+  }
+
+  private String getResultSortKey(String s)
+  {
+    String  result =  s + "#" + s;
+    return result;
+  }
+
+
+  public void exportTXT(ServletOutputStream outputStream, String exportDir, String type, String groupQuestion, String idList, String questionsList, String resultsList, String resultsDerList) throws IOException
   {
     OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
     logger.info("Save {} surveys", surveys.size());
     JSONWriter json = new JSONWriter(w);
     json.object().key("total").value(surveys.size());
 
-    Path fOut = new File(fileName).toPath();
-    BufferedWriter writerTXT = Files.newBufferedWriter(fOut, Charset.forName("UTF-8"), StandardOpenOption.CREATE);
-
     SortedSet<String> questionsDef = new TreeSet<>();
     SortedSet<String> resultsDef = new TreeSet<>();
-    SortedSet<String> resultsDevDef = new TreeSet<>();
+    SortedSet<String> resultsDerDef = new TreeSet<>();
+    if(questionsList != null && !questionsList.equals(""))
+    {
+      String[] arr = questionsList.split(";");
+      for(String s: arr)
+      {
+        questionsDef.add(getQuestionSortKey(s));
+      }
+    }
+
+    if(resultsList != null && !resultsList.equals(""))
+    {
+      String[] arr = resultsList.split(";");
+      for(String s: arr)
+      {
+        resultsDef.add(getResultSortKey(s));
+      }
+    }
+
+    if(resultsDerList != null &&  !resultsDerList.equals(""))
+    {
+      String[] arr = resultsDerList.split(";");
+      for(String s: arr)
+      {
+        String sk = getResultSortKey(s);
+        resultsDerDef.add(sk);
+      }
+    }
 
     synchronized (surveys)
     {
-      for (SurveyData sd : surveys.values())
+      if(questionsList == null || resultsList == null || resultsDerList == null)
       {
-        for (String s : sd.questions.keySet())
+        for (SurveyData sd : surveys.values())
         {
-          if (s.contains("_"))
-          {
-            //this is a hack to sort questions in the export correctly - Q1_1 --> Q1_01, Q1_10 --> Q1_10, Q1_2a --> Q1_02a, ...
-            String[] sArr = s.split("\\_");
-            if (sArr[1].length() == 2 && !AIUtils.isInteger(sArr[1]))
+          if(questionsList == null)
+            for (String s : sd.questions.keySet())
+              questionsDef.add(getQuestionSortKey(s));
+
+          if(resultsList == null)
+            for (String s : sd.results.keySet())
+              resultsDef.add(getResultSortKey(s));
+
+          if(resultsDerList == null)
+            for (String s : sd.resultDerivatives.keySet())
             {
-              sArr[1] = "0" + sArr[1];
-            } else if (sArr[1].length() == 1)
-            {
-              sArr[1] = "0" + sArr[1];
+              String sk = getResultSortKey(s);
+              resultsDerDef.add(sk);
             }
-            questionsDef.add(sArr[0] + "_" + sArr[1] + "#" + s);
-          } else
-            questionsDef.add(s + "#" + s);
         }
-
-        for (String s : sd.results.keySet())
-          resultsDef.add(s + "#" + s);
-
-        for (String s : sd.resultDerivatives.keySet())
-          resultsDevDef.add(s + "#" + s);
-
       }
     }
+
+    Map<String, BufferedWriter> exportFiles = new HashMap<>();
+    String filename = "export_all_"+type+".txt";
+    Path root = new File(exportDir).toPath();
+    Path fOut = root.resolve(filename);
+    BufferedWriter writerAllTXT = Files.newBufferedWriter(fOut, Charset.forName("UTF-8"), StandardOpenOption.CREATE);
+    exportFiles.put("#", writerAllTXT);
+
 
     StringBuilder sb = new StringBuilder();
     sb.append("id_external").append("\t").append("id_internal");
@@ -787,12 +841,13 @@ public class SurveyManager
     {
       sb.append("\t").append(s.split("#")[1]);
     }
-    for (String s: resultsDevDef)
+    for (String s: resultsDerDef)
     {
       sb.append("\t").append(s.split("#")[1]);
     }
 
-    writeLine(writerTXT, sb.toString());
+    String sHeader =  sb.toString();
+    writeLine(writerAllTXT, sHeader);
 
     sb.setLength(0);
 
@@ -822,7 +877,7 @@ public class SurveyManager
             sb.append(getDecimalFormatter4().format(r));
           }
         }
-        for (String s : resultsDevDef)
+        for (String s : resultsDerDef)
         {
           sb.append("\t");
           Double r = surveyData.resultDerivatives.get(s.split("#")[1]);
@@ -831,16 +886,36 @@ public class SurveyManager
             sb.append(getDecimalFormatter4().format(r));
           }
         }
-        writeLine(writerTXT, sb.toString());
+        writeLine(writerAllTXT, sb.toString());
+        if(groupQuestion != null)
+        {
+          String groupAnswer = surveyData.questions.get(groupQuestion);
+          if(groupAnswer == null || groupAnswer.equals(""))
+            groupAnswer = "EMPTY";
+          BufferedWriter writerGroupTXT = exportFiles.get(groupAnswer);
+          if(writerGroupTXT == null)
+          {
+            filename = "export_" + type + "_"+groupAnswer+ ".txt";
+            fOut = root.resolve(filename);
+            writerGroupTXT = Files.newBufferedWriter(fOut, Charset.forName("UTF-8"), StandardOpenOption.CREATE);
+            exportFiles.put(groupAnswer, writerGroupTXT);
+            writeLine(writerGroupTXT, sHeader);
+          }
+          writeLine(writerGroupTXT, sb.toString());
+
+        }
+
         sb.setLength(0);
       }
     }
     json.endObject();
     w.flush();
     w.close();
-    writerTXT.flush();
-    writerTXT.close();
-
+    for(BufferedWriter writer: exportFiles.values())
+    {
+      writer.flush();
+      writer.close();
+    }
     logger.info("Saved {} surveys", surveys.size());
 
   }

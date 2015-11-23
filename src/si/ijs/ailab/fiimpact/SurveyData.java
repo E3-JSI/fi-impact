@@ -83,34 +83,34 @@ class SurveyData
     Map<String, Double> m = new HashMap<>();
 
     m.put("TRL1", 1.0);
-    m.put("TRL2", 1.3);
-    m.put("TRL3", 1.9);
-    m.put("TRL4", 2.6);
-    m.put("TRL5", 3.5);
-    m.put("TRL6", 4.6);
-    m.put("TRL7", 5.9);
-    m.put("TRL8", 4.6);
-    m.put("TRL9", 3.5);
+    m.put("TRL2", 1.2);
+    m.put("TRL3", 1.3);
+    m.put("TRL4", 1.4);
+    m.put("TRL5", 1.5);
+    m.put("TRL6", 1.6);
+    m.put("TRL7", 1.7);
+    m.put("TRL8", 1.7);
+    m.put("TRL9", 1.7);
     SCORES.put("Q2_1", m);
 
     m = new HashMap<>();
-    m.put("A", 0.90);
-    m.put("B", 1.10);
+    m.put("A", 1.0);
+    m.put("B", 1.2);
     SCORES.put("Q2_2", m);
 
     m = new HashMap<>();
     m.put("A", 0.75);
-    m.put("B", 1.50);
+    m.put("B", 1.00);
     SCORES.put("Q2_3", m);
 
     m = new HashMap<>();
-    m.put("A", 1.00);
-    m.put("B", 2.50);
+    m.put("A", 1.0);
+    m.put("B", 1.2);
     SCORES.put("Q2_4", m);
 
     m = new HashMap<>();
-    m.put("A", 0.70);
-    m.put("B", 1.50);
+    m.put("A", 1.0);
+    m.put("B", 1.2);
     SCORES.put("Q2_5", m);
 
     //SECTION 3 - MARKET
@@ -138,6 +138,14 @@ class SurveyData
     m.put("C", 1.0);
     SCORES.put("Q2_2_B_3_7_W2", m);
 
+
+    m = new HashMap<>();
+    m.put("A", 1.0);
+    m.put("B", 1.5);
+    m.put("C", 2.0);
+    m.put("D", 2.5);
+    m.put("E", 1.0);
+    SCORES.put("Q3_5", m);
 
     m = new HashMap<>();
     m.put("A", 1.0);
@@ -283,7 +291,7 @@ class SurveyData
     double len = 15.0;
     double r = 3;
 
-    double average_x = -R*Math.cos(Math.PI*averagePercent);
+    double average_x = -R*Math.cos(Math.PI * averagePercent);
     double average_y = -R*Math.sin(Math.PI * averagePercent);
 
     double avg_rad = Math.PI * averagePercent;
@@ -410,6 +418,9 @@ class SurveyData
 
     jsonResult.put("speedometer_lm", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercentLM()));
     jsonResult.put("speedometer_mh", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercentMH()));
+
+    jsonResult.put("score_min", SurveyManager.getDecimalFormatter0().format(or.getMinScore()));
+    jsonResult.put("score_max", SurveyManager.getDecimalFormatter0().format(or.getMaxScore()));
 
     jsonResult.put("average_percent", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercent(or.average)));
     jsonOverviewPoint.put("average_percent", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercent(or.average)));
@@ -1344,7 +1355,9 @@ class SurveyData
 
       if (A2_1 != null && A2_2 != null && A2_3 != null && A2_4 != null && A2_5 != null)
       {
-        Double r = (A2_1 + A2_4) * A2_2 * A2_3 * A2_5;
+        Double r = A2_1 * A2_3 + A2_2 + A2_4 + A2_5;
+        //normalise
+        r = (r-3.75)*5.0/1.55;
         logger.debug("R2: {}", r);
         results.put("INNOVATION", r);
       }
@@ -1354,18 +1367,8 @@ class SurveyData
 
     //------------MARKET--------------------
 
-    //questionnaire v1 has all market sectors in 3_3.
-    //questionnaire v2 has main market sector in 3_3a and "other" sectors in 3_3a.
-    //in both cases we simply sum the number of choices.
 
-    String Q3_3 = questions.get("Q3_3");
-    String Q3_3a = questions.get("Q3_3a");
-
-    String Q3_4 = questions.get("Q3_4");
-    //as of version 2.2, Q3_5 removed
-    //String Q3_5 = questions.get("Q3_5");
-    //String Q3_5_LIST = questions.get("Q3_5c");
-
+    String Q3_5 = questions.get("Q3_7");
     String Q3_7 = questions.get("Q3_7");
     String Q3_8 = questions.get("Q3_8");
     String Q3_9 = questions.get("Q3_9");
@@ -1373,56 +1376,11 @@ class SurveyData
     String Q3_11 = questions.get("Q3_11");
 
 
-    //logger.debug("Q3_X: {}, {}, {}, {}, {}, {}, {}, {}, {}", Q3_3, Q3_3a, Q3_4, Q3_5, Q3_7, Q3_8, Q3_9, Q3_10, Q3_11);
-    logger.debug("Q3_X: {}, {}, {}, {}, {}, {}, {}, {}", Q3_3, Q3_3a, Q3_4, Q3_7, Q3_8, Q3_9, Q3_10, Q3_11);
+    logger.debug("Q3_X: {}, {}, {}, {}, {}, {}", Q3_5, Q3_7, Q3_8, Q3_9, Q3_10, Q3_11);
 
-    //if ((Q3_3 != null || Q3_3a != null) && Q3_4 != null && Q3_5 != null && Q3_7 != null && Q3_8 != null && Q3_9 != null && Q3_10 != null && Q3_11 != null && Q2_2 != null)
-    if ((Q3_3 != null || Q3_3a != null) && Q3_4 != null && Q3_7 != null && Q3_8 != null && Q3_9 != null && Q3_10 != null && Q3_11 != null && Q2_2 != null)
+    if (Q3_5 != null && Q3_7 != null && Q3_8 != null && Q3_9 != null && Q3_10 != null && Q3_11 != null && Q2_2 != null)
     {
-      int Q3_3_length = 0;
-      if(Q3_3 != null)
-      {
-        String[] arr = Q3_3.split(",");
-        Q3_3_length = arr.length;
-      }
-      if(Q3_3a != null)
-      {
-        Q3_3_length+=Q3_3a.length();
-      }
 
-      Double A3_3 = (1.0 * Q3_3_length) / 4.0;
-
-      String[] arr = Q3_4.split(",");
-      Double A3_4 = (1.0 * arr.length) / 4.0;
-
-      /*
-      Double A3_5 = 0.0;
-      List<String> listQ3_5 = Arrays.asList(Q3_5.split(","));
-
-          //'@Q3_5 = case 'answer3_5'
-          //when 'A' then 0.50 --city/region
-          //when 'B' then 0.75 --my country
-          //when 'C' then 5.00 --global
-          //when 'D' then count('answer3_5list')*0.75 end --multiple select country
-
-      if (listQ3_5.contains("A"))
-        A3_5 += 0.5;
-
-      if (listQ3_5.contains("B"))
-        A3_5 += 0.75;
-
-      if (listQ3_5.contains("C"))
-      {
-        if (Q3_5_LIST != null)
-        {
-          arr = Q3_5_LIST.split(",");
-          A3_5 += 0.75 * arr.length;
-        }
-      }
-
-      if (listQ3_5.contains("D"))
-        A3_5 += 5.0;
-      */
 
       //Market weights from Q2_2 and Q3_7
       //"Q2_2_A_3_7_W1"
@@ -1444,26 +1402,32 @@ class SurveyData
         W2 = m.get(Q3_7);
       }
 
+      String[] arr = Q3_5.split(",");
+      Double A3_5 = SCORES.get("Q3_5").get("E");
+      for(String s: arr)
+      {
+        Double dTmp = SCORES.get("Q3_5").get(s);
+        if(dTmp != null && dTmp > A3_5)
+          A3_5 = dTmp;
+      }
+
       Double A3_8 = SCORES.get("Q3_8").get(Q3_8);
       Double A3_9 = SCORES.get("Q3_9").get(Q3_9);
       Double A3_10 = SCORES.get("Q3_10").get(Q3_10);
       Double A3_11 = SCORES.get("Q3_11").get(Q3_11);
 
-      //if (A3_5 != null && A3_8 != null && A3_9 != null && A3_10 != null && A3_11 != null && W1 != null && W2 != null)
-      if (A3_8 != null && A3_9 != null && A3_10 != null && A3_11 != null && W1 != null && W2 != null)
+      if (A3_5 != null && A3_8 != null && A3_9 != null && A3_10 != null && A3_11 != null && W1 != null && W2 != null)
       {
-        //logger.debug("A3_X: 3: {}, 4: {}, 5: {}, 8: {}, 9: {}, 10: {}, 11: {}, W1: {}, W2: {}", A3_3, A3_4, A3_5, A3_8, A3_9, A3_10, A3_11, W1, W2);
-        logger.debug("A3_X: 3: {}, 4: {}, 8: {}, 9: {}, 10: {}, 11: {}, W1: {}, W2: {}", A3_3, A3_4, A3_8, A3_9, A3_10, A3_11, W1, W2);
+        logger.debug("A3_X: 5: {}, 8: {}, 9: {}, 10: {}, 11: {}, W1: {}, W2: {}", A3_5, A3_8, A3_9, A3_10, A3_11, W1, W2);
 
         /*
           --calc result --
-          OLD - @R3 = @W1*(@Q3_8+@Q3_9) + @W2*(@Q3_10 +@Q3_11 +@Q3_3 +Q3_4 +@Q3_5)"
-        Double r = W1 * (A3_8 + A3_9) + W2 * (A3_10 + A3_11 + A3_3 + A3_4 + A3_5);
-
-        as of version 2.2.
-        @R3 = (@W1*(@Q3_8+@Q3_9)/2 + @W2*(@Q3_10 +@Q3_11 +@Q3_3 +Q3_4)/4)/2
+        @R3 = @W1*(@Q3_8+@Q3_9)/2 + @W2*(@Q3_10 +@Q3_11+Q3_5)/2.5
+        Range: 2 - 10
+        Normalisation to range 0 - 5: @R3N=(@R3-2)*5/8
         */
-        Double r = (W1 * (A3_8 + A3_9) / 2.0 + W2 * (A3_10 + A3_11 + A3_3 + A3_4) / 4.0) / 2.0;
+        Double r = W1 * (A3_8 + A3_9) / 2.0 + W2 * (A3_10 + A3_11 + A3_5) / 2.5;
+        r = (r - 2.0)*5.0/8.0;
         logger.debug("R3: {}", r);
         results.put("MARKET", r);
       }
@@ -1524,13 +1488,14 @@ class SurveyData
 
         /*
           --calc result --
-          @R4 = [@W3*(@Q4_1 + ( 'answer4_6' / 100)*5)/2  + @W4*(@Q4_2 +@Q4_4 +@Q4_5)/3 ]/2
+        @R4 = W3*(@Q4_1 + ( 'answer4_6' / 100)*5)/2  + @W4*(@Q4_2 +@Q4_4 +@Q4_5)/3
+        Range: 1 - 10
+        Normalisation to range 0 - 5: @R4N=(@R4-1)*5/9
         */
-        //A4_6 = A4_6 / 100.0;
         logger.debug("A4_X: 1: {}, 2: {}, 4: {}, 5: {}, 6: {}, W3: {}, W4: {}", A4_1, A4_2, A4_4, A4_5, A4_6, W3, W4);
 
-        //Double r = (W3 * (A4_1 + A4_6 / 100.0 * 5.0) + W4 * (A4_2 + A4_4 + A4_5) / 3) / 2;
-        Double r = (W3 * (A4_1 + A4_6 / 100.0 * 5.0)/2.0 + W4 * (A4_2 + A4_4 + A4_5) / 3) / 2;
+        Double r = W3 * (A4_1 + A4_6 / 100.0 * 5.0)/2.0 + W4 * (A4_2 + A4_4 + A4_5) / 3;
+        r = (r - 1.0)*5.0/9.0;
 
         logger.debug("R4: {}", r);
         results.put("FEASIBILITY", r);
@@ -1548,6 +1513,13 @@ class SurveyData
     Map<String, Double> m5A1_Verticals = SCORES.get("Q5A_1_VERTICALS");
 
     Map<String, Double> m5A1_weights = SCORES.get("Q5A_1");
+
+    //questionnaire v1 has all market sectors in 3_3.
+    //questionnaire v2 has main market sector in 3_3a and "other" sectors in 3_3a.
+    //in both cases we simply sum the number of choices.
+    String Q3_3 = questions.get("Q3_3");
+    String Q3_3a = questions.get("Q3_3a");
+
 
     for (String s : m5A1_Benefits.keySet())
     {
@@ -1587,6 +1559,8 @@ class SurveyData
               if (weight != null)
                 verticalScore += weight * rowScore.getValue();
             }
+            //Normalisation
+            verticalScore = verticalScore / 2.0;
 
             logger.debug("Market needs - Business {}: {}", vertical, verticalScore);
             results.put("MARKET_NEEDS_BUSINESS_"+vertical, verticalScore);
@@ -1704,6 +1678,19 @@ class SurveyData
       return SurveyManager.QUESTIONNAIRE_TYPE_DEFAULT;
     else
       return s;
+  }
+
+  public static void main(String[] args)
+  {
+    SurveyData sd = new SurveyData();
+    sd.addQuestion("Q2_2", "A");
+    sd.addQuestion("Q3_7", "A");
+    sd.addQuestion("Q4_1", "A");
+    sd.addQuestion("Q4_6", "0");
+    sd.addQuestion("Q4_2", "A");
+    sd.addQuestion("Q4_4", "A");
+    sd.addQuestion("Q4_5", "A");
+    sd.calculateResults();
   }
 
 }

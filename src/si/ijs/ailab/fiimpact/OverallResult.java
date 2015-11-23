@@ -123,6 +123,16 @@ class OverallResult
     return getSpeedometerPercent(graph.boundaries.med_hi);
   }
 
+  public double getMinScore()
+  {
+    return graph.boundaries.min;
+  }
+
+  public double getMaxScore()
+  {
+    return graph.boundaries.max;
+  }
+
   public void add(SurveyData sd)
   {
 
