@@ -96,7 +96,7 @@ public class FIImpactSecureRequestHandler extends HttpServlet
           groupQuestion = "Q1_1";
           idList = "id_external";
           questionsList = "Q1_1;Q1_2;Q1_3;Q1_4;Q1_22";
-          resultsList = "FEASIBILITY;INNOVATION;MARKET;MARKET_NEEDS_BUSINESS";
+          resultsList = "FEASIBILITY;INNOVATION;MARKET;MARKET_NEEDS";
           resultsDerList = "";
           break;
         }

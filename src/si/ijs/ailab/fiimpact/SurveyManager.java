@@ -64,14 +64,14 @@ public class SurveyManager
                   //"MARKET\t4\t15\t26\t37\n" +
                   "MARKET\t0.7\t2.3\t3.9\t5.5\n" +
                   "FEASIBILITY\t0\t1.8\t3.6\t5.4\n" +
-                  "MARKET_NEEDS_BUSINESS\t0\t4\t7.5\t10\n";*/
+                  "MARKET_NEEDS\t0\t4\t7.5\t10\n";*/
 
   private static String SPEEDOMETER =
           "\tmin\tlow\tmed\thigh\n" +
                   "INNOVATION\t0.0\t1.667\t3.333\t5.000\n" +
                   "MARKET\t0.0\t1.667\t3.333\t5.000\n" +
                   "FEASIBILITY\t0.0\t1.667\t3.333\t5.000\n" +
-                  "MARKET_NEEDS_BUSINESS\t0.0\t1.667\t3.333\t5.000\n";
+                  "MARKET_NEEDS\t0.0\t1.667\t3.333\t5.000\n";
 
 
   private static String SOCIAL_IMPACT = "Q6A_1_A\tQ6A_1_B\tQ6A_1_C\tQ6A_1_D\tQ6A_1_E\tQ6A_1_F\tQ6A_1_G\tQ6A_1_H\tQ6A_1_I\tQ6A_1_J\tQ6A_1_K\tQ6B_1_A\tQ6B_1_B\tQ6B_1_C\tQ6B_1_D\tQ6B_1_E\tQ6B_1_F";
@@ -107,10 +107,10 @@ public class SurveyManager
     }
 
     Map<String, Double> m5A1_Verticals = SurveyData.SCORES.get("Q5A_1_VERTICALS");
-    OverallResult.ScoreBoundaries marketNeedsBusiness = SPEEDOMETER_SLOTS.get("MARKET_NEEDS_BUSINESS");
+    OverallResult.ScoreBoundaries marketNeedsBusiness = SPEEDOMETER_SLOTS.get("MARKET_NEEDS");
     for(String s: m5A1_Verticals.keySet())
     {
-      SPEEDOMETER_SLOTS.put("MARKET_NEEDS_BUSINESS_"+s, marketNeedsBusiness);
+      SPEEDOMETER_SLOTS.put("MARKET_NEEDS_"+s, marketNeedsBusiness);
     }
 
   }
@@ -356,7 +356,7 @@ public class SurveyManager
     surveyData.calculateResults();
     surveyData.saveSurvey(surveyRoot);
     recalcResults();
-    surveyData.writeStructureXML(outputStream);
+    surveyData.writeStructure(outputStream, true);
   }
 
   public synchronized void removeSurvey(ServletOutputStream outputStream, String externalId)
@@ -708,12 +708,12 @@ public class SurveyManager
       addResultKey(json, "INNOVATION", surveyData.results);
       addResultKey(json, "MARKET", surveyData.results);
       addResultKey(json, "FEASIBILITY", surveyData.results);
-      addResultKey(json, "MARKET_NEEDS_BUSINESS", surveyData.results);
+      addResultKey(json, "MARKET_NEEDS", surveyData.results);
 
       addResultKey(json, "INNOVATION_GRAPH_PERCENT", surveyData.resultDerivatives);
       addResultKey(json, "MARKET_GRAPH_PERCENT", surveyData.resultDerivatives);
       addResultKey(json, "FEASIBILITY_GRAPH_PERCENT", surveyData.resultDerivatives);
-      addResultKey(json, "MARKET_NEEDS_BUSINESS_GRAPH_PERCENT", surveyData.resultDerivatives);
+      addResultKey(json, "MARKET_NEEDS_GRAPH_PERCENT", surveyData.resultDerivatives);
 
       json.endObject();
     }

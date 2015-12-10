@@ -271,8 +271,7 @@
 							"list" : "true"
 						}
 					]
-				},
-				{
+				}, {
 					"id" : "19",
 					"lookup" : [{
 							"A" : "Project under preparation"
@@ -591,13 +590,61 @@
 						}
 					]
 
+				}, {
+					"id" : "12",
+					"lookup" : [{
+							"A" : "Consumer: Health and wellness"
+						}, {
+							"B" : "Consumer: Transport and logistics"
+						}, {
+							"C" : "Consumer: Energy and home automation"
+						}, {
+							"D" : "Consumer: Leisure and gaming"
+						}, {
+							"E" : "Consumer: DYI and design"
+						}, {
+							"F" : "Consumer: Shopping"
+						}, {
+							"G" : "Consumer: Education and culture"
+						}, {
+							"H" : "Consumer: Citizen Engagement"
+						}, {
+							"I" : "Consumer: Environment and nature"
+						}, {
+							"J" : "Consumer: Other"
+						}
+					]
+				}, {
+					"id" : "13",
+					"lookup" : [{
+							"A" : "Consumer: Health and wellness"
+						}, {
+							"B" : "Consumer: Transport and logistics"
+						}, {
+							"C" : "Consumer: Energy and home automation"
+						}, {
+							"D" : "Consumer: Leisure and gaming"
+						}, {
+							"E" : "Consumer: DYI and design"
+						}, {
+							"F" : "Consumer: Shopping"
+						}, {
+							"G" : "Consumer: Education and culture"
+						}, {
+							"H" : "Consumer: Citizen Engagement"
+						}, {
+							"I" : "Consumer: Environment and nature"
+						}, {
+							"J" : "Consumer: Other"
+						}
+					]
 				}
 			]
 		}, {
 			"id" : "4",
 			"name" : "FEASIBILITY",
 			"label" : "feasibility",
-			"label_graph":"Feasibility",
+			"label_graph" : "Feasibility",
 			"questions" : [{
 					"id" : "1",
 					"lookup" : [{
@@ -620,7 +667,7 @@
 					]
 				}, {
 					"id" : "3",
-					"postfix": "%",
+					"postfix" : "%",
 					"merge" : [{
 							"id" : "3a"
 						}, {
@@ -659,23 +706,37 @@
 				}
 			]
 		}, {
-			"id" : "5A",
-			"name" : "MARKET_NEEDS_BUSINESS",
+			"id" : "5",
+			"name" : "MARKET_NEEDS",
 			"label" : "market needs",
-			"label_graph": "Market needs",
+			"label_graph" : "Market needs",
+			"complex_result" : {
+				"id": "1",
+				"multiply" : [{
+						"section" : "3",
+						"question" : "3a",
+						"stars" : "Q5A_1"
+					}, {
+						"section" : "3",
+						"question" : "12",
+						"prefix_result" : "F",
+						"stars" : "Q5B_1"
+					}, {
+						"section" : "3",
+						"question" : "3",
+						"stars" : "Q5A_1"
+					}, {
+						"section" : "3",
+						"question" : "13",
+						"prefix_result" : "F",
+						"stars" : "Q5B_1"
+					}
+				]
+			},
+
 			"questions" : [{
-					"id" : "1",
-					"multiply" : [{
-							"section" : "3",
-							"question" : "3a"
-						}, {
-							"section" : "3",
-							"question" : "3"
-						}
-					],
-					"ui_specific": "stars",
-					"result" : "MARKET_NEEDS_BUSINESS",
-					"top_list" : true,
+					"id" : "Q5A_1",
+					"top_list" : "marketNeedsTop5",
 					"multiple_fields" : [{
 							"id" : "A",
 							"label" : "Reducing operational costs"
@@ -709,6 +770,32 @@
 						}, {
 							"id" : "K",
 							"label" : "Improving operational efficiency"
+						}
+					]
+				}, {
+					"id" : "Q5B_1",
+					"top_list" : "marketNeedsTop5F",
+					"multiple_fields" : [{
+							"id" : "A",
+							"label" : "Answering communication or collaboration needs"
+						}, {
+							"id" : "B",
+							"label" : "Providing better entertainment"
+						}, {
+							"id" : "C",
+							"label" : "Improving quality of life"
+						}, {
+							"id" : "D",
+							"label" : "Simplifying daily tasks"
+						}, {
+							"id" : "E",
+							"label" : "Reducing or saving time"
+						}, {
+							"id" : "F",
+							"label" : "Having easier and faster access to information or services"
+						}, {
+							"id" : "G",
+							"label" : "Saving money"
 						}
 					]
 				}
@@ -810,6 +897,19 @@
 		"O" : ["H", "B", "D", "G", "E"],
 		"P" : ["G", "H", "A", "D", "K"],
 		"Q" : ["H", "C", "F", "B", "E"]
+	},
+
+	"marketNeedsTop5F" : {
+		"A" : ["C", "B", "F", "D", "A"],
+		"B" : ["D", "F", "C", "G", "E"],
+		"C" : ["D", "C", "G", "E", "F"],
+		"D" : ["B", "C", "F", "A", "G"],
+		"E" : ["B", "D", "C", "G", "E"],
+		"F" : ["E", "G", "F", "D", "C"],
+		"G" : ["F", "C", "G", "B", "E"],
+		"H" : ["A", "F", "C", "D", "E"],
+		"I" : ["C", "F", "A", "B", "D"],
+		"J" : ["C", "F", "D", "B", "G"]
 	},
 
 	"ranking" : {

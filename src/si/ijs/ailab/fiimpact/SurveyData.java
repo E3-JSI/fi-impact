@@ -4,7 +4,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -37,8 +36,6 @@ class SurveyData
 
   public enum OutputFormat {XML, JSON}
 
-  public enum OutputType {UI, STRUCTURE}
-
   public static final Map<String, Map<String, Double>> SCORES = new TreeMap<>();
 
   private static String SCORES_5A1 =
@@ -55,6 +52,15 @@ class SurveyData
                   "I\t0.166666667\t0.166666667\t0.175292104\t0.166666667\t0.166666667\t0.857009654\t0.166666667\t1.666666667\t1.202654077\t0.166666667\t0.166666667\t0.166666667\t0.166666667\t0.262668297\t0.166666667\t0.179060979\n"+
                   "J\t0.316821663\t0.217659798\t0.166666667\t1.111081921\t0.265609708\t0.384075203\t0.747959145\t0.166666667\t0.774004796\t0.542547136\t0.723117782\t0.413332816\t0.168541489\t0.771010145\t0.618535185\t0.341067579\n"+
                   "K\t0.729747903\t0.713021647\t0.218419291\t1.126336793\t0.869162263\t0.529593496\t1.200075516\t0.944791667\t1.069296523\t0.771207755\t1.549248278\t1.35771179\t0.849352077\t0.715301449\t0.925640333\t1.24679248";
+
+  private static String SCORES_5B1 ="\tA\tB\tC\tD\tE\tF\tG\tH\tI\tJ\n" +
+          "A\t0.3888888888888890\t0.1388888888888890\t0.0972222222222222\t0.3472222000000000\t0.0000000000000000\t0.1388889000000000\t0.2083333000000000\t0.8333333000000000\t0.5555556000000000\t0.1388890000000000\n" +
+          "B\t0.6944444444444450\t0.0000000000000000\t0.0000000000000000\t0.8333333000000000\t0.8333333000000000\t0.0000000000000000\t0.4305556000000000\t0.0000000000000000\t0.3888889000000000\t0.3472220000000000\n" +
+          "C\t0.8333333333333330\t0.6250000000000000\t0.6944444444444450\t0.6944444000000000\t0.5555556000000000\t0.3472222000000000\t0.6944444000000000\t0.6944444000000000\t0.8333333000000000\t0.8333333000000000\n" +
+          "D\t0.4861111111111110\t0.8333333333333330\t0.8333333333333330\t0.0416667000000000\t0.6944444000000000\t0.4444444000000000\t0.0000000000000000\t0.5555556000000000\t0.1388889000000000\t0.5555560000000000\n" +
+          "E\t0.0000000000000000\t0.2777777777777780\t0.3888888888888890\t0.0000000000000000\t0.2777778000000000\t0.8333333000000000\t0.3611111000000000\t0.4166667000000000\t0.0972222000000000\t0.0000000000000000\n" +
+          "F\t0.5555555555555560\t0.6944444444444450\t0.3194444444444440\t0.5277778000000000\t0.1388889000000000\t0.5555556000000000\t0.8333333000000000\t0.7916667000000000\t0.6944444000000000\t0.6944440000000000\n" +
+          "G\t0.2083333333333330\t0.4444444444444440\t0.5555555555555560\t0.0972222000000000\t0.4166667000000000\t0.6944444000000000\t0.5555556000000000\t0.2083333000000000\t0.0000000000000000\t0.2500000000000000";
 
   private static ArrayList<String> JSON_TRUNCATE_DECIMALS = new ArrayList<>();
 
@@ -79,7 +85,7 @@ class SurveyData
     JSON_TRUNCATE_DECIMALS.add("Q4_3d");
     JSON_TRUNCATE_DECIMALS.add("Q4_6");
 
-    //Wiights for calculating scores
+    //Weights for calculating scores
     Map<String, Double> m = new HashMap<>();
 
     m.put("TRL1", 1.0);
@@ -220,24 +226,26 @@ class SurveyData
     m.put("C", 0.8);
     SCORES.put("Q2_2_B_3_7_W4", m);
 
-    String[] arr5aRows = SCORES_5A1.split("\n");
-    String[] arrVerticals = arr5aRows[0].split("\t");
+
+    //5A_1
+    String[] arr5a1Rows = SCORES_5A1.split("\n");
+    String[] arr5a1Verticals = arr5a1Rows[0].split("\t");
 
     HashMap<String, Double> m5A1_Verticals = new HashMap<>();
     HashMap<String, Double> m5A1_Benefits = new HashMap<>();
-    for(int i = 1; i < arrVerticals.length; i++)
-      m5A1_Verticals.put(arrVerticals[i], 0.0);
+    for(int i = 1; i < arr5a1Verticals.length; i++)
+      m5A1_Verticals.put(arr5a1Verticals[i], 0.0);
 
     m = new HashMap<>();
-    for(int i = 1; i < arr5aRows.length; i++)
+    for(int i = 1; i < arr5a1Rows.length; i++)
     {
-      String[] arrRow = arr5aRows[i].split("\t");
+      String[] arrRow = arr5a1Rows[i].split("\t");
 
       m5A1_Benefits.put(arrRow[0], 0.0);
 
       for(int j = 1; j < arrRow.length; j++)
       {
-        String row_column = arrRow[0] + "_" + arrVerticals[j];
+        String row_column = arrRow[0] + "_" + arr5a1Verticals[j];
         double d = AIUtils.parseDecimal(arrRow[j], 0.0);
         //logger.debug("{}: {}", row_column, d);
         m.put(row_column, d);
@@ -246,6 +254,36 @@ class SurveyData
     SCORES.put("Q5A_1", m);
     SCORES.put("Q5A_1_BENEFITS", m5A1_Benefits);
     SCORES.put("Q5A_1_VERTICALS", m5A1_Verticals);
+
+    //5B_1
+    String[] arr5b1Rows = SCORES_5B1.split("\n");
+    String[] arr5b1Verticals = arr5b1Rows[0].split("\t");
+
+    HashMap<String, Double> m5B1_Verticals = new HashMap<>();
+    HashMap<String, Double> m5B1_Benefits = new HashMap<>();
+    for(int i = 1; i < arr5b1Verticals.length; i++)
+      m5B1_Verticals.put(arr5b1Verticals[i], 0.0);
+
+    m = new HashMap<>();
+    for(int i = 1; i < arr5b1Rows.length; i++)
+    {
+      String[] arrRow = arr5b1Rows[i].split("\t");
+
+      m5B1_Benefits.put(arrRow[0], 0.0);
+
+      for(int j = 1; j < arrRow.length; j++)
+      {
+        String row_column = arrRow[0] + "_" + arr5b1Verticals[j];
+        double d = AIUtils.parseDecimal(arrRow[j], 0.0);
+        //logger.debug("{}: {}", row_column, d);
+        m.put(row_column, d);
+      }
+    }
+    SCORES.put("Q5B_1", m);
+    SCORES.put("Q5B_1_BENEFITS", m5A1_Benefits);
+    SCORES.put("Q5B_1_VERTICALS", m5A1_Verticals);
+
+
   }
 
 
@@ -502,98 +540,59 @@ class SurveyData
 
 
 
-  private void write(OutputStream os, OutputFormat outputFormat, OutputType outputType, boolean writeResults) throws IOException
+  public void writeStructure(OutputStream os, boolean writeResults) throws IOException
   {
-    if(outputType == OutputType.STRUCTURE)
+    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    DocumentBuilder db = null;
+    try
     {
-      if (outputFormat == OutputFormat.XML)
-      {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = null;
-        try
-        {
-          db = dbf.newDocumentBuilder();
-        } catch (ParserConfigurationException e)
-        {
-          logger.error("Can't believe this", e);
-        }
-        Document doc = db.newDocument();
-        Element root = doc.createElement("survey");
-        doc.appendChild(root);
-        root.setAttribute("external", externalId);
-        root.setAttribute("id", id);
-
-        for (Map.Entry<String, String> qe : questions.entrySet())
-        {
-          Element q = doc.createElement("q");
-          root.appendChild(q);
-          q.setAttribute("id", qe.getKey());
-          q.setAttribute("answer", qe.getValue());
-        }
-
-        if (writeResults)
-        {
-          for (Map.Entry<String, Double> re : results.entrySet())
-          {
-            Element r = doc.createElement("result");
-            root.appendChild(r);
-            r.setAttribute("id", re.getKey());
-            r.setAttribute("score", SurveyManager.getDecimalFormatter4().format(re.getValue()));
-          }
-          for (Map.Entry<String, Double> re : resultDerivatives.entrySet())
-          {
-            Element r = doc.createElement("result");
-            root.appendChild(r);
-            r.setAttribute("id", re.getKey());
-            r.setAttribute("score", SurveyManager.getDecimalFormatter0().format(re.getValue()));
-          }
-
-        }
-
-        AIUtils.save(doc, os);
-      }
-      else
-      {
-        OutputStreamWriter w = new OutputStreamWriter(os, "utf-8");
-        JSONWriter jsonSurvey = new JSONWriter(w);
-        jsonSurvey.object().key("id").value(id).key("external_id").value(externalId);
-
-        jsonSurvey.key("questions").array();
-        for (Map.Entry<String, String> qe : questions.entrySet())
-        {
-          String id = qe.getKey();
-          String val = qe.getValue();
-          if (JSON_TRUNCATE_DECIMALS.contains(id))
-          {
-            int i = val.indexOf('.');
-            if (i != -1)
-              val = val.substring(0, i);
-          }
-
-          jsonSurvey.array().value(id).value(val).endArray();
-        }
-        jsonSurvey.endArray();
-
-        if (writeResults)
-        {
-          jsonSurvey.key("results").array();
-          for (Map.Entry<String, Double> re : results.entrySet())
-          {
-            jsonSurvey.array().value(re.getKey()).value(SurveyManager.getDecimalFormatter4().format(re.getValue())).endArray();
-          }
-          for (Map.Entry<String, Double> re : resultDerivatives.entrySet())
-          {
-            jsonSurvey.array().value(re.getKey()).value(SurveyManager.getDecimalFormatter4().format(re.getValue())).endArray();
-          }
-          jsonSurvey.endArray();
-        }
-        jsonSurvey.endObject();
-        w.flush();
-        w.close();
-      }
+      db = dbf.newDocumentBuilder();
+    } catch (ParserConfigurationException e)
+    {
+      logger.error("Can't believe this", e);
     }
-    else
+    Document doc = db.newDocument();
+    Element root = doc.createElement("survey");
+    doc.appendChild(root);
+    root.setAttribute("external", externalId);
+    root.setAttribute("id", id);
+
+    for (Map.Entry<String, String> qe : questions.entrySet())
     {
+      Element q = doc.createElement("q");
+      root.appendChild(q);
+      q.setAttribute("id", qe.getKey());
+      q.setAttribute("answer", qe.getValue());
+    }
+
+    if (writeResults)
+    {
+      for (Map.Entry<String, Double> re : results.entrySet())
+      {
+        Element r = doc.createElement("result");
+        root.appendChild(r);
+        r.setAttribute("id", re.getKey());
+        r.setAttribute("score", SurveyManager.getDecimalFormatter4().format(re.getValue()));
+      }
+      for (Map.Entry<String, Double> re : resultDerivatives.entrySet())
+      {
+        Element r = doc.createElement("result");
+        root.appendChild(r);
+        r.setAttribute("id", re.getKey());
+        r.setAttribute("score", SurveyManager.getDecimalFormatter0().format(re.getValue()));
+      }
+
+    }
+
+    AIUtils.save(doc, os);
+
+    logger.info("Saved survey {}/{} with {} questions and {} results", externalId, id, questions.size(), results.size());
+  }
+
+
+  private void writeUI(OutputStream os, OutputFormat outputFormat) throws IOException
+  {
+
       JSONObject jsonSurvey = new JSONObject();
       jsonSurvey.put("id", id);
       jsonSurvey.put("external_id", externalId);
@@ -632,10 +631,12 @@ class SurveyData
         JSONObject answersOut = new JSONObject();
         sectionOut.put("answers", answersOut);
         JSONArray questionsDef = section.getJSONArray("questions");
-        String sQuestionNameRoot = "Q"+section.getString("id")+"_";
+        String sQuestionIDRoot = "Q"+section.getString("id")+"_";
         String sectionName = section.optString("name", null);
         String sectionLabel = section.optString("label", null);
         String sectionLabel2 = section.optString("label_graph", null);
+        JSONObject complexResult = section.optJSONObject("complex_result");
+
 
         if(sectionName != null)
         {
@@ -643,380 +644,380 @@ class SurveyData
           overviewSectionsCnt++;
         }
 
-        logger.info("section {}", sQuestionNameRoot);
-        for(int j  = 0; j < questionsDef.length(); j++)
+        logger.info("section {}", sQuestionIDRoot);
+        if(complexResult != null)
         {
-          //logger.info("question seq: {}", j);
-          JSONObject questionDef = questionsDef.getJSONObject(j);
-          JSONArray lookupDef = questionDef.optJSONArray("lookup");
-          JSONArray mergeDef = questionDef.optJSONArray("merge");
-          JSONArray multipleDef = questionDef.optJSONArray("multiple_fields");
-          String sList = questionDef.optString("list", "false");
-          String sLabel = questionDef.optString("label", null);
-          JSONArray answersListDef = questionDef.optJSONArray("answers_list");
-          String customDef = questionDef.optString("custom", null);
-          String defaultAnswer = questionDef.optString("default", null);
-          String postfixChar = questionDef.optString("postfix", null);
+          String questionID = sQuestionIDRoot + complexResult.getString("id");
+          JSONArray multiplyBy = complexResult.optJSONArray("multiply");
+          JSONArray answer = new JSONArray();
+          answersOut.put(questionID, answer);
 
-          StringBuilder sbAnswer = new StringBuilder();
-          if(customDef != null)
+          String resultID = sectionName;
+          for(int k = 0; k < multiplyBy.length(); k++)
           {
-            String s = questions.get(sQuestionNameRoot + questionDef.getString("id"));
-            if(s!=null)
-            {
-              s = s.trim();
-              if(!s.equals(""))
-              {
-                if(s.contains("A")) //"A" : "My City or Region"
-                {
-                  if (sbAnswer.length() != 0)
-                    sbAnswer.append(", ");
-                  String city = questions.get(getLookup(lookupDef, "A"));
-                  if(city != null && !city.equals(""))
-                    sbAnswer.append(city);
-                  else
-                    sbAnswer.append("My City or Region");
-                }
-                if(s.contains("B")) //"B" : "My country"
-                {
-                  if (sbAnswer.length() != 0)
-                    sbAnswer.append(", ");
-                  String country = questions.get(getLookup(lookupDef, "B"));
-                  if(country != null && !country.equals(""))
-                    sbAnswer.append(country);
-                  else
-                    sbAnswer.append("My country");
+            JSONObject multiplyQuestion = multiplyBy.getJSONObject(k);
+            String mBaseSectionID = multiplyQuestion.getString("section");
+            String mBaseQuestionID = multiplyQuestion.getString("question");
+            String mPrefixResult = multiplyQuestion.optString("prefix_result");
+            String mStarsID = multiplyQuestion.getString("stars");
+            logger.debug("Find {}, {}", mBaseSectionID, mBaseQuestionID);
+            JSONObject mBaseQuestionDef = findQuestionDef(modelSections, mBaseSectionID, mBaseQuestionID);
+            JSONObject mStarsQuestionDef = findQuestionDef(section, mStarsID);
+            String topList = mStarsQuestionDef.optString("top_list");
 
-                }
-                if(s.contains("C")) //"C" : "Multiple Countries"
+            JSONArray mBaseLookupDef = mBaseQuestionDef.optJSONArray("lookup");
+            if(mBaseLookupDef != null)
+            {
+              String smBaseQuestionNameRoot = "Q"+mBaseSectionID+"_";
+              String s = questions.get(smBaseQuestionNameRoot + mBaseQuestionID);
+              logger.debug("User answer: {}", s);
+              if(s!=null)
+              {
+                String[] sArr = s.split(",");
+                logger.debug("Answers: {}", sArr.length);
+                for(String sSegmentId: sArr)
                 {
-                  String countryList = questions.get(getLookup(lookupDef, "C"));
-                  if (sbAnswer.length() != 0)
-                    sbAnswer.append(", ");
-                  sbAnswer.append("Multiple Countries");
-                  boolean bFirstcouny = true;
-                  if(countryList!=null)
+                  sSegmentId = sSegmentId.trim();
+                  String sSegment = getLookup(mBaseLookupDef, sSegmentId);
+                  if(!sSegment.equals("") && !sSegment.equals(sSegmentId))
                   {
-                    sbAnswer.append(" (");
-                    String[] sArr = countryList.split(",");
-                    for(String sSegment: sArr)
+                    JSONObject segmentAnswer = new JSONObject();
+                    answer.put(segmentAnswer);
+                    segmentAnswer.put("label", sSegment);
+                    if(resultID != null)
                     {
-                      sSegment = sSegment.trim();
-                      if(!sSegment.equals(""))
+                      String segmentResultId = resultID + "_";
+                      if(mPrefixResult != null)
+                        segmentResultId+=mPrefixResult;
+                      segmentResultId+=sSegmentId;
+                      Double res = results.get(segmentResultId);
+                      if(res == null)
+                        res = 0.0;
+                      segmentAnswer.put("result", SurveyManager.getDecimalFormatter2().format(res));
+                    }
+
+                    JSONArray subSegmentAnswers = new JSONArray();
+                    segmentAnswer.put("answers", subSegmentAnswers);
+                    JSONArray starFields = mStarsQuestionDef.getJSONArray("multiple_fields");
+                    for(int l = 0; l < starFields.length(); l++)
+                    {
+                      JSONObject def = starFields.getJSONObject(l);
+                      String key = def.getString("id");
+                      String sValue = questions.get(mStarsQuestionDef.getString("id") + "_" + key);
+                      JSONObject subSegmentAnswer = new JSONObject();
+                      subSegmentAnswers.put(subSegmentAnswer);
+                      subSegmentAnswer.put("id", key);
+                      subSegmentAnswer.put("label", def.getString("label"));
+                      if (sValue != null)
                       {
-                        if (bFirstcouny)
+                        subSegmentAnswer.put("value", sValue);
+                        int score = AIUtils.parseInteger(sValue, 0);
+                        JSONArray jesusChristSuperstar = new JSONArray();
+                        subSegmentAnswer.put("star", jesusChristSuperstar);
+                        for (int iStar = 0; iStar < score; iStar++)
                         {
-                          sbAnswer.append(sSegment);
-                          bFirstcouny = false;
+                          jesusChristSuperstar.put(new JSONObject());
                         }
-                        else
-                          sbAnswer.append(", ").append(sSegment);
                       }
-                    }
-                    sbAnswer.append(")");
-                  }
-
-                }
-                if(s.contains("D")) //"D" : "Global"
-                {
-                  String sSegment = getLookup(lookupDef, "D");
-                  if (sbAnswer.length() != 0)
-                    sbAnswer.append(", ");
-                  sbAnswer.append(sSegment);
-
-                }
-                if(s.contains("E")) //"E" : "Other"
-                {
-                  String sSegment = getLookup(lookupDef, "E");
-                  if (sbAnswer.length() != 0)
-                    sbAnswer.append(", ");
-                  sbAnswer.append(sSegment);
-
-                }
-              }
-            }
-          }
-          else if(mergeDef != null)
-          {
-            for (int k = 0; k < mergeDef.length(); k++)
-            {
-              JSONObject mergeObjectDef = mergeDef.getJSONObject(k);
-              String sValue = questions.get(sQuestionNameRoot + mergeObjectDef.getString("id"));
-              if (sValue != null)
-              {
-                lookupDef = mergeObjectDef.optJSONArray("lookup");
-                if (lookupDef != null)
-                {
-                  sValue = getLookup(lookupDef, sValue);
-                }
-                else
-                  sValue = truncateDecimals(sQuestionNameRoot + mergeObjectDef.getString("id"), sValue);
-
-                if(!sValue.equals(""))
-                {
-                  if (sbAnswer.length() != 0)
-                    sbAnswer.append(", ").append(sValue);
-                  else
-                    sbAnswer.append(sValue);
-                  if(postfixChar!=null)
-                    sbAnswer.append(postfixChar);
-                }
-              }
-            }
-          }
-          else if(answersListDef != null)
-          {
-
-            JSONArray answer = new JSONArray();
-            answersOut.put(sQuestionNameRoot + questionDef.getString("id"), answer);
-            JSONObject segmentAnswer = new JSONObject();
-            answer.put(segmentAnswer);
-            JSONArray subSegmentAnswers = new JSONArray();
-            segmentAnswer.put("answers", subSegmentAnswers);
-            for (int k = 0; k < answersListDef.length(); k++)
-            {
-              JSONObject def = answersListDef.getJSONObject(k);
-
-              String sValue = questions.get(sQuestionNameRoot + def.getString("id"));
-              if (sValue != null)
-              {
-
-                String sSubSegmentList = def.optString("list", "false");
-                sValue = sValue.trim();
-                if(!sSubSegmentList.equals("true"))
-                  sValue = truncateDecimals(sQuestionNameRoot + def.getString("id"), sValue);
-
-                if (!sValue.equals(""))
-                {
-                  JSONObject subSegmentAnswer = new JSONObject();
-                  subSegmentAnswers.put(subSegmentAnswer);
-                  subSegmentAnswer.put("id", sQuestionNameRoot + def.getString("id"));
-                  subSegmentAnswer.put("label", def.getString("label"));
-                  if (sSubSegmentList.equals("true"))
-                  {
-                    String[] sArr = sValue.split(",");
-                    for(String sSegment: sArr)
-                    {
-                      sSegment = sSegment.trim();
-                      if(!sSegment.equals(""))
+                      else
                       {
-                        if (sbAnswer.length() != 0)
-                          sbAnswer.append(", ").append(sSegment);
-                        else
-                          sbAnswer.append(sSegment);
-                        if(postfixChar!=null)
-                          sbAnswer.append(postfixChar);
-
+                        subSegmentAnswer.put("value", "0");
                       }
                     }
+
+                    if(topList != null)
+                    {
+                      logger.debug("adding top list for {}", sSegmentId);
+                      JSONArray subSegmentTop = new JSONArray();
+                      segmentAnswer.put("top_list", subSegmentTop);
+
+                      JSONArray jsonTopListDef = SurveyManager.fiImpactModel.getJSONObject(topList).optJSONArray(sSegmentId);
+                      if(jsonTopListDef != null)
+                      {
+                        for(int l = 0; l < jsonTopListDef.length(); l++)
+                        {
+                          String topEntryId = jsonTopListDef.getString(l);
+                          String topEntryLabel = getLookup(starFields, topEntryId);
+                          JSONObject topEntry = new JSONObject();
+                          topEntry.put("id", topEntryId);
+                          topEntry.put("label", topEntryLabel);
+                          subSegmentTop.put(topEntry);
+                        }
+                      }
+
+                    }
                   }
-                  else
+                }
+              }
+            }
+          }
+        }
+        else
+        {
+
+          for (int j = 0; j < questionsDef.length(); j++)
+          {
+            //logger.info("question seq: {}", j);
+            JSONObject questionDef = questionsDef.getJSONObject(j);
+            JSONArray lookupDef = questionDef.optJSONArray("lookup");
+            JSONArray mergeDef = questionDef.optJSONArray("merge");
+            JSONArray multipleDef = questionDef.optJSONArray("multiple_fields");
+            String sList = questionDef.optString("list", "false");
+            String sLabel = questionDef.optString("label", null);
+            JSONArray answersListDef = questionDef.optJSONArray("answers_list");
+            String customDef = questionDef.optString("custom", null);
+            String defaultAnswer = questionDef.optString("default", null);
+            String postfixChar = questionDef.optString("postfix", null);
+
+            String questionID = questionDef.optString("id");
+            if (questionID != null)
+            {
+              questionID = sQuestionIDRoot + questionID;
+            } else
+              questionID = questionDef.getString("full_id");
+
+            StringBuilder sbAnswer = new StringBuilder();
+            if (customDef != null)
+            {
+
+              String s = questions.get(questionID);
+              if (s != null)
+              {
+                s = s.trim();
+                if (!s.equals(""))
+                {
+                  if (s.contains("A")) //"A" : "My City or Region"
                   {
-                    sbAnswer.append(sValue);
-                    if(postfixChar!=null)
+                    if (sbAnswer.length() != 0)
+                      sbAnswer.append(", ");
+                    String city = questions.get(getLookup(lookupDef, "A"));
+                    if (city != null && !city.equals(""))
+                      sbAnswer.append(city);
+                    else
+                      sbAnswer.append("My City or Region");
+                  }
+                  if (s.contains("B")) //"B" : "My country"
+                  {
+                    if (sbAnswer.length() != 0)
+                      sbAnswer.append(", ");
+                    String country = questions.get(getLookup(lookupDef, "B"));
+                    if (country != null && !country.equals(""))
+                      sbAnswer.append(country);
+                    else
+                      sbAnswer.append("My country");
+
+                  }
+                  if (s.contains("C")) //"C" : "Multiple Countries"
+                  {
+                    String countryList = questions.get(getLookup(lookupDef, "C"));
+                    if (sbAnswer.length() != 0)
+                      sbAnswer.append(", ");
+                    sbAnswer.append("Multiple Countries");
+                    boolean bFirstcouny = true;
+                    if (countryList != null)
+                    {
+                      sbAnswer.append(" (");
+                      String[] sArr = countryList.split(",");
+                      for (String sSegment : sArr)
+                      {
+                        sSegment = sSegment.trim();
+                        if (!sSegment.equals(""))
+                        {
+                          if (bFirstcouny)
+                          {
+                            sbAnswer.append(sSegment);
+                            bFirstcouny = false;
+                          } else
+                            sbAnswer.append(", ").append(sSegment);
+                        }
+                      }
+                      sbAnswer.append(")");
+                    }
+
+                  }
+                  if (s.contains("D")) //"D" : "Global"
+                  {
+                    String sSegment = getLookup(lookupDef, "D");
+                    if (sbAnswer.length() != 0)
+                      sbAnswer.append(", ");
+                    sbAnswer.append(sSegment);
+
+                  }
+                  if (s.contains("E")) //"E" : "Other"
+                  {
+                    String sSegment = getLookup(lookupDef, "E");
+                    if (sbAnswer.length() != 0)
+                      sbAnswer.append(", ");
+                    sbAnswer.append(sSegment);
+
+                  }
+                }
+              }
+            } else if (mergeDef != null)
+            {
+              for (int k = 0; k < mergeDef.length(); k++)
+              {
+                JSONObject mergeObjectDef = mergeDef.getJSONObject(k);
+                String sValue = questions.get(sQuestionIDRoot + mergeObjectDef.getString("id"));
+                if (sValue != null)
+                {
+                  lookupDef = mergeObjectDef.optJSONArray("lookup");
+                  if (lookupDef != null)
+                  {
+                    sValue = getLookup(lookupDef, sValue);
+                  } else
+                    sValue = truncateDecimals(sQuestionIDRoot + mergeObjectDef.getString("id"), sValue);
+
+                  if (!sValue.equals(""))
+                  {
+                    if (sbAnswer.length() != 0)
+                      sbAnswer.append(", ").append(sValue);
+                    else
+                      sbAnswer.append(sValue);
+                    if (postfixChar != null)
                       sbAnswer.append(postfixChar);
                   }
-                  subSegmentAnswer.put("value", sbAnswer.toString());
-                  sbAnswer.setLength(0);
                 }
               }
-            }
-          }
-          else if(lookupDef != null)
-          {
-            String s = questions.get(sQuestionNameRoot + questionDef.getString("id"));
-            boolean bLinks = questionDef.optBoolean("links", false);
-            if(s==null || s.equals(""))
-              if(defaultAnswer != null)
-                s = defaultAnswer;
-            if(s!=null)
+            } else if (answersListDef != null)
             {
-              String[] sArr = s.split(",");
-              if(bLinks)
-              {
-                JSONArray answersArr = new JSONArray();
-                answersOut.put(sQuestionNameRoot + questionDef.getString("id"), answersArr);
-                for (String sSegmentID : sArr)
-                {
-                  sSegmentID = sSegmentID.trim();
-                  String sSegment = getLookup(lookupDef, sSegmentID);
-                  if (!sSegment.equals(""))
-                  {
 
-                    JSONObject answer = new JSONObject();
-                    answersArr.put(answer);
-                    //answer.put("id", );
-                    answer.put("label", sSegmentID);
-                    if(!sSegmentID.equals(sSegment))
-                      answer.put("link", sSegment);
+              JSONArray answer = new JSONArray();
+              answersOut.put(questionID, answer);
+              JSONObject segmentAnswer = new JSONObject();
+              answer.put(segmentAnswer);
+              JSONArray subSegmentAnswers = new JSONArray();
+              segmentAnswer.put("answers", subSegmentAnswers);
+              for (int k = 0; k < answersListDef.length(); k++)
+              {
+                JSONObject def = answersListDef.getJSONObject(k);
+
+                String sValue = questions.get(sQuestionIDRoot + def.getString("id"));
+                if (sValue != null)
+                {
+
+                  String sSubSegmentList = def.optString("list", "false");
+                  sValue = sValue.trim();
+                  if (!sSubSegmentList.equals("true"))
+                    sValue = truncateDecimals(sQuestionIDRoot + def.getString("id"), sValue);
+
+                  if (!sValue.equals(""))
+                  {
+                    JSONObject subSegmentAnswer = new JSONObject();
+                    subSegmentAnswers.put(subSegmentAnswer);
+                    subSegmentAnswer.put("id", sQuestionIDRoot + def.getString("id"));
+                    subSegmentAnswer.put("label", def.getString("label"));
+                    if (sSubSegmentList.equals("true"))
+                    {
+                      String[] sArr = sValue.split(",");
+                      for (String sSegment : sArr)
+                      {
+                        sSegment = sSegment.trim();
+                        if (!sSegment.equals(""))
+                        {
+                          if (sbAnswer.length() != 0)
+                            sbAnswer.append(", ").append(sSegment);
+                          else
+                            sbAnswer.append(sSegment);
+                          if (postfixChar != null)
+                            sbAnswer.append(postfixChar);
+
+                        }
+                      }
+                    } else
+                    {
+                      sbAnswer.append(sValue);
+                      if (postfixChar != null)
+                        sbAnswer.append(postfixChar);
+                    }
+                    subSegmentAnswer.put("value", sbAnswer.toString());
+                    sbAnswer.setLength(0);
                   }
                 }
-
               }
-              else
+            } else if (lookupDef != null)
+            {
+              String s = questions.get(questionID);
+              boolean bLinks = questionDef.optBoolean("links", false);
+              if (s == null || s.equals(""))
+                if (defaultAnswer != null)
+                  s = defaultAnswer;
+              if (s != null)
               {
-                for (String sSegmentID : sArr)
+                String[] sArr = s.split(",");
+                if (bLinks)
                 {
-                  sSegmentID = sSegmentID.trim();
-                  String sSegment = getLookup(lookupDef, sSegmentID);
+                  JSONArray answersArr = new JSONArray();
+                  answersOut.put(questionID, answersArr);
+                  for (String sSegmentID : sArr)
+                  {
+                    sSegmentID = sSegmentID.trim();
+                    String sSegment = getLookup(lookupDef, sSegmentID);
+                    if (!sSegment.equals(""))
+                    {
+
+                      JSONObject answer = new JSONObject();
+                      answersArr.put(answer);
+                      //answer.put("id", );
+                      answer.put("label", sSegmentID);
+                      if (!sSegmentID.equals(sSegment))
+                        answer.put("link", sSegment);
+                    }
+                  }
+
+                } else
+                {
+                  for (String sSegmentID : sArr)
+                  {
+                    sSegmentID = sSegmentID.trim();
+                    String sSegment = getLookup(lookupDef, sSegmentID);
+                    if (!sSegment.equals(""))
+                    {
+                      if (sbAnswer.length() != 0)
+                        sbAnswer.append(", ").append(sSegment);
+                      else
+                        sbAnswer.append(sSegment);
+                    }
+                  }
+                }
+              }
+            } else if (sList.equals("true"))
+            {
+              String s = questions.get(questionID);
+              if (s == null || s.equals(""))
+                if (defaultAnswer != null)
+                  s = defaultAnswer;
+
+              if (s != null)
+              {
+                String[] sArr = s.split(",");
+                for (String sSegment : sArr)
+                {
+                  sSegment = sSegment.trim();
                   if (!sSegment.equals(""))
                   {
                     if (sbAnswer.length() != 0)
                       sbAnswer.append(", ").append(sSegment);
                     else
                       sbAnswer.append(sSegment);
+                    if (postfixChar != null)
+                      sbAnswer.append(postfixChar);
                   }
                 }
               }
-            }
-          }
-          else if(sList.equals("true"))
-          {
-            String s = questions.get(sQuestionNameRoot + questionDef.getString("id"));
-            if(s==null || s.equals(""))
-              if(defaultAnswer != null)
-                s = defaultAnswer;
 
-            if(s!=null)
-            {
-              String[] sArr = s.split(",");
-              for(String sSegment: sArr)
-              {
-                sSegment = sSegment.trim();
-                if(!sSegment.equals(""))
-                {
-                  if (sbAnswer.length() != 0)
-                    sbAnswer.append(", ").append(sSegment);
-                  else
-                    sbAnswer.append(sSegment);
-                  if(postfixChar!=null)
-                    sbAnswer.append(postfixChar);
-                }
-              }
-            }
-
-          }
-          else if(multipleDef != null)
-          {
-            JSONArray multiplyBy = questionDef.optJSONArray("multiply");
-            String ui_specific = questionDef.optString("ui_specific", "");
-            boolean doStars = ui_specific.equals("stars");
-
-            if(multiplyBy != null && multiplyBy.length() > 0)
-            {
-              boolean topList = questionDef.optBoolean("top_list", false);
-              JSONArray answer = new JSONArray();
-              answersOut.put(sQuestionNameRoot + questionDef.getString("id"), answer);
-              String resultID = questionDef.optString("result", null);
-              for(int k = 0; k < multiplyBy.length(); k++)
-              {
-                JSONObject multiplyQuestion = multiplyBy.getJSONObject(k);
-                String mSectionID = multiplyQuestion.getString("section");
-                String mQuestionID = multiplyQuestion.getString("question");
-                logger.debug("Find {}, {}", mSectionID, mQuestionID);
-                JSONObject mQuestionDef = findQuestionDef(modelSections, mSectionID, mQuestionID);
-                JSONArray mLookupDef = mQuestionDef.optJSONArray("lookup");
-                if(mLookupDef != null)
-                {
-                  String smQuestionNameRoot = "Q"+mSectionID+"_";
-                  String s = questions.get(smQuestionNameRoot + mQuestionID);
-                  logger.debug("User answer: {}", s);
-                  if(s!=null)
-                  {
-                    String[] sArr = s.split(",");
-                    logger.debug("Answers: {}", sArr.length);
-                    for(String sSegmentId: sArr)
-                    {
-                      sSegmentId = sSegmentId.trim();
-                      String sSegment = getLookup(mLookupDef, sSegmentId);
-                      if(!sSegment.equals("") && !sSegment.equals(sSegmentId))
-                      {
-                        JSONObject segmentAnswer = new JSONObject();
-                        answer.put(segmentAnswer);
-                        segmentAnswer.put("label", sSegment);
-                        if(resultID != null)
-                        {
-                          Double res = results.get(resultID + "_" + sSegmentId);
-                          if(res == null)
-                            res = 0.0;
-                          segmentAnswer.put("result", SurveyManager.getDecimalFormatter2().format(res));
-                        }
-
-
-                        JSONArray subSegmentAnswers = new JSONArray();
-                        segmentAnswer.put("answers", subSegmentAnswers);
-                        for(int l = 0; l < multipleDef.length(); l++)
-                        {
-                          JSONObject def = multipleDef.getJSONObject(l);
-                          String key = def.getString("id");
-                          String sValue = questions.get(sQuestionNameRoot + questionDef.getString("id") + "_" + key);
-                          JSONObject subSegmentAnswer = new JSONObject();
-                          subSegmentAnswers.put(subSegmentAnswer);
-                          subSegmentAnswer.put("id", key);
-                          subSegmentAnswer.put("label", def.getString("label"));
-                          if (sValue != null)
-                          {
-                            subSegmentAnswer.put("value", sValue);
-                            if(doStars)
-                            {
-                              int score = AIUtils.parseInteger(sValue, 0);
-                              JSONArray jesusChristSuperstar = new JSONArray();
-                              subSegmentAnswer.put("star", jesusChristSuperstar);
-                              for (int iStar = 0; iStar < score; iStar++)
-                              {
-                                jesusChristSuperstar.put(new JSONObject());
-                              }
-                            }
-                          }
-                          else
-                          {
-                            subSegmentAnswer.put("value", "0");
-                          }
-                        }
-
-                        if(topList)
-                        {
-                          logger.debug("adding top list for {}", sSegmentId);
-                          JSONArray subSegmentTop = new JSONArray();
-                          segmentAnswer.put("top_list", subSegmentTop);
-
-
-
-                          JSONArray jsonTopListDef = SurveyManager.fiImpactModel.getJSONObject("marketNeedsTop5").optJSONArray(sSegmentId);
-                          if(jsonTopListDef != null)
-                          {
-                            for(int l = 0; l < jsonTopListDef.length(); l++)
-                            {
-                              String topEntryId = jsonTopListDef.getString(l);
-                              String topEntryLabel = getLookup(multipleDef, topEntryId);
-                              JSONObject topEntry = new JSONObject();
-                              topEntry.put("id", topEntryId);
-                              topEntry.put("label", topEntryLabel);
-                              subSegmentTop.put(topEntry);
-                            }
-                          }
-
-                        }
-
-
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            else
+            } else if (multipleDef != null)
             {
               JSONObject segmentAnswer = new JSONObject();
               JSONArray subSegmentAnswers = new JSONArray();
               segmentAnswer.put("answers", subSegmentAnswers);
-              answersOut.put(sQuestionNameRoot + questionDef.getString("id"), segmentAnswer);
+              answersOut.put(questionID, segmentAnswer);
 
               String lineAverage = "";
               String lineResult = "";
 
 
-              for(int l = 0; l < multipleDef.length(); l++)
+              for (int l = 0; l < multipleDef.length(); l++)
               {
                 JSONObject def = multipleDef.getJSONObject(l);
                 String key = def.getString("id");
@@ -1027,12 +1028,12 @@ class SurveyData
                 String type = getType();
                 if (type.equals("S"))
                   type = "IS";
-                OverallResult or = SurveyManager.getSurveyManager().getResults().get(type).get(sQuestionNameRoot + questionDef.getString("id") + "_" + key);
-                if(or!=null)
+                OverallResult or = SurveyManager.getSurveyManager().getResults().get(type).get(questionID + "_" + key);
+                if (or != null)
                 {
-                  Double dResult = results.get(sQuestionNameRoot + questionDef.getString("id") + "_" + key);
+                  Double dResult = results.get(questionID + "_" + key);
                   double dPercentResult = 0.0;
-                  if(dResult != null)
+                  if (dResult != null)
                   {
                     dPercentResult = or.getSpeedometerPercent(dResult);
                   }
@@ -1047,53 +1048,52 @@ class SurveyData
                   JSONObject xy = new JSONObject();
                   subSegmentAnswer.put("result_coord", xy);
                   String svg = getSegmentSVG(R, l, multipleDef.length(), dPercentResult, xy);
-                  if(lineResult.length() > 0)
-                    lineResult+=" ";
-                  lineResult+=svg;
+                  if (lineResult.length() > 0)
+                    lineResult += " ";
+                  lineResult += svg;
 
 
                   xy = new JSONObject();
                   subSegmentAnswer.put("avg_coord", xy);
                   svg = getSegmentSVG(R, l, multipleDef.length(), dPercentAverage, xy);
-                  if(lineAverage.length() > 0)
-                    lineAverage+=" ";
-                  lineAverage+=svg;
+                  if (lineAverage.length() > 0)
+                    lineAverage += " ";
+                  lineAverage += svg;
                 }
 
               }
               segmentAnswer.put("line_average", lineAverage);
               segmentAnswer.put("line_result", lineResult);
 
-            }
-          }
-          else
-          {
-            String sValue = questions.get(sQuestionNameRoot + questionDef.getString("id"));
-            if(sValue==null || sValue.equals(""))
-              if(defaultAnswer != null)
-                sValue = defaultAnswer;
-
-            if(sValue != null)
+            } else
             {
-              sbAnswer.append(sValue);
-              if(postfixChar!=null)
-                sbAnswer.append(postfixChar);
-            }
-          }
+              String sValue = questions.get(questionID);
+              if (sValue == null || sValue.equals(""))
+                if (defaultAnswer != null)
+                  sValue = defaultAnswer;
 
-          if(sbAnswer.length() != 0)
-          {
-            String sAnswer = truncateDecimals(sQuestionNameRoot + questionDef.getString("id"), sbAnswer.toString());
-            if(!sAnswer.equals(""))
+              if (sValue != null)
+              {
+                sbAnswer.append(sValue);
+                if (postfixChar != null)
+                  sbAnswer.append(postfixChar);
+              }
+            }
+
+            if (sbAnswer.length() != 0)
             {
-              JSONObject answer = new JSONObject();
-              answersOut.put(sQuestionNameRoot + questionDef.getString("id"), answer);
-              answer.put("value", sAnswer);
-              if (sLabel != null)
-                answer.put("label", sLabel);
+              String sAnswer = truncateDecimals(questionID, sbAnswer.toString());
+              if (!sAnswer.equals(""))
+              {
+                JSONObject answer = new JSONObject();
+                answersOut.put(questionID, answer);
+                answer.put("value", sAnswer);
+                if (sLabel != null)
+                  answer.put("label", sLabel);
+              }
             }
-          }
 
+          }
         }
       }
 
@@ -1125,10 +1125,8 @@ class SurveyData
         AIUtils.save(doc, os);
 
       }
-    }
     logger.info("Saved survey {}/{} with {} questions and {} results", externalId, id, questions.size(), results.size());
   }
-
 
   private String truncateDecimals(String id, String sAnswer)
   {
@@ -1146,7 +1144,6 @@ class SurveyData
 
   private String getLookup(JSONArray lookupDef, String sValue)
   {
-    String ret = sValue;
     for(int i = 0; i < lookupDef.length(); i++)
     {
       JSONObject json = lookupDef.getJSONObject(i);
@@ -1183,6 +1180,19 @@ class SurveyData
             return question;
         }
       }
+    }
+    return null;
+  }
+
+  private JSONObject findQuestionDef(JSONObject section, String questionID)
+  {
+    JSONArray questions = section.getJSONArray("questions");
+    for(int j = 0; j < questions.length(); j++)
+    {
+      JSONObject question = questions.getJSONObject(j);
+
+      if((question.getString("id")).equals(questionID))
+        return question;
     }
     return null;
   }
@@ -1264,26 +1274,22 @@ class SurveyData
     Path p = root.resolve("survey-" + id + ".xml");
     try
     {
-      write(new FileOutputStream(p.toFile()), OutputFormat.XML, OutputType.STRUCTURE, false);
+      writeStructure(new FileOutputStream(p.toFile()), false);
     } catch (IOException e)
     {
       logger.error("Cannot save survey {}", p.toString());
     }
   }
 
-  public void writeStructureXML(OutputStream os) throws IOException
-  {
-    write(os, OutputFormat.XML, OutputType.STRUCTURE, true);
-  }
 
   public void writeUIXML(OutputStream os) throws IOException
   {
-    write(os, OutputFormat.XML, OutputType.UI, true);
+    writeUI(os, OutputFormat.XML);
   }
 
   public void writeUIJSON(OutputStream os) throws IOException
   {
-    write(os, OutputFormat.JSON, OutputType.UI, true);
+    writeUI(os, OutputFormat.JSON);
   }
 
   public void read(InputStream is) throws ParserConfigurationException, IOException, SAXException
@@ -1503,10 +1509,9 @@ class SurveyData
 
     }
 
-    //------------5A Market needs - Business and Public sector (B2B/B2G)--------------------
+    //------------5 - Market needs--------------------
 
 
-    //String Q3_3 = questions.get("Q3_3");
     HashMap<String, Integer> Q5A1_list = new HashMap<>();
 
     Map<String, Double> m5A1_Benefits = SCORES.get("Q5A_1_BENEFITS");
@@ -1514,11 +1519,20 @@ class SurveyData
 
     Map<String, Double> m5A1_weights = SCORES.get("Q5A_1");
 
+    HashMap<String, Integer> Q5B1_list = new HashMap<>();
+
+    Map<String, Double> m5B1_Benefits = SCORES.get("Q5B_1_BENEFITS");
+    Map<String, Double> m5B1_Verticals = SCORES.get("Q5B_1_VERTICALS");
+
+    Map<String, Double> m5B1_weights = SCORES.get("Q5B_1");
+
     //questionnaire v1 has all market sectors in 3_3.
     //questionnaire v2 has main market sector in 3_3a and "other" sectors in 3_3a.
-    //in both cases we simply sum the number of choices.
+    //questionnaire KPI Survey V5.1 has implemented Consumer needs in 3_12 (primary), and 3_13 (other)
     String Q3_3 = questions.get("Q3_3");
     String Q3_3a = questions.get("Q3_3a");
+    String Q3_12 = questions.get("Q3_12");
+    String Q3_13 = questions.get("Q3_13");
 
 
     for (String s : m5A1_Benefits.keySet())
@@ -1527,11 +1541,19 @@ class SurveyData
       if (Q5 != null && !Q5.equals(""))
         Q5A1_list.put(s, AIUtils.parseInteger(Q5, 0));
     }
+    for (String s : m5B1_Benefits.keySet())
+    {
+      String Q5 = questions.get("Q5B_1_" + s);
+      if (Q5 != null && !Q5.equals(""))
+        Q5B1_list.put(s, AIUtils.parseInteger(Q5, 0));
+    }
 
     logger.debug("Q3_3: {} Q3_3a: {} Q5A1 list size {}", Q3_3, Q3_3a, Q5A1_list.size());
+    logger.debug("Q3_12: {} Q3_13: {} Q5B1 list size {}", Q3_12, Q3_13, Q5B1_list.size());
 
-    if ((Q3_3 != null || Q3_3a != null)&& Q5A1_list.size() > 0)
+    if (((Q3_3 != null || Q3_3a != null)&& Q5A1_list.size() > 0) || ((Q3_12 != null || Q3_13 != null)&& Q5B1_list.size() > 0))
     {
+      double maxVerticalScore = 0.0;
 
       ArrayList<String> Q3_3_allSelections = new ArrayList<>();
       if(Q3_3a != null)
@@ -1542,16 +1564,13 @@ class SurveyData
         String[] arrQ3_3 = Q3_3.split(",");
         Collections.addAll(Q3_3_allSelections, arrQ3_3);
       }
+
       if (Q3_3_allSelections.size() > 0)
       {
-        //double r = 0.0;
-        //int verticals = 0;
-        double maxVerticalScore = 0.0;
         for (String vertical : Q3_3_allSelections)
         {
           if (m5A1_Verticals.containsKey(vertical))
           {
-            //verticals++;
             double verticalScore = 0.0;
             for (Map.Entry<String, Integer> rowScore : Q5A1_list.entrySet())
             {
@@ -1560,28 +1579,72 @@ class SurveyData
                 verticalScore += weight * rowScore.getValue();
             }
             //Normalisation
-            verticalScore = verticalScore / 2.0;
+            //3. Normalised score :
+            //a. 3_3a!=F: @R5N=(@R5-1)*5/9
+            //b. 3_3a=F: @R5N=@R5
+
+            verticalScore = (verticalScore - 1.0) * 5.0 / 9.0;
 
             logger.debug("Market needs - Business {}: {}", vertical, verticalScore);
-            results.put("MARKET_NEEDS_BUSINESS_"+vertical, verticalScore);
+            results.put("MARKET_NEEDS_" + vertical, verticalScore);
 
-            if(Q3_3a == null)
+            if (Q3_3a == null)
             {
               if (verticalScore > maxVerticalScore)
                 maxVerticalScore = verticalScore;
-            }
-            else if(vertical.equals(Q3_3a))
+            } else if (vertical.equals(Q3_3a))
             {
               maxVerticalScore = verticalScore;
             }
           }
         }
-        //if (verticals > 0)
-          //r = r / verticals;
-
-        logger.debug("Market needs - Business: {}", maxVerticalScore);
-        results.put("MARKET_NEEDS_BUSINESS", maxVerticalScore);
       }
+      ArrayList<String> Q3_consumer_allSelections = new ArrayList<>();
+      if(Q3_12 != null)
+        Q3_consumer_allSelections.add(Q3_12);
+
+      if(Q3_13 != null)
+      {
+        String[] arrQ3_13 = Q3_13.split(",");
+        Collections.addAll(Q3_consumer_allSelections, arrQ3_13);
+      }
+
+      if (Q3_consumer_allSelections.size() > 0)
+      {
+
+        for (String vertical : Q3_consumer_allSelections)
+        {
+          if (m5B1_Verticals.containsKey(vertical))
+          {
+            double verticalScore = 0.0;
+            for (Map.Entry<String, Integer> rowScore : Q5B1_list.entrySet())
+            {
+              Double weight = m5B1_weights.get(rowScore.getKey() + "_" + vertical);
+              if (weight != null)
+                verticalScore += weight * rowScore.getValue();
+            }
+            //Normalisation - not needed
+            //3. Normalised score :
+            //a. 3_3a!=F: @R5N=(@R5-1)*5/9
+            //b. 3_3a=F: @R5N=@R5
+
+            logger.debug("Market needs - Consumer {}: {}", vertical, verticalScore);
+            results.put("MARKET_NEEDS_F" + vertical, verticalScore);
+
+            if (Q3_12 == null)
+            {
+              if (verticalScore > maxVerticalScore)
+                maxVerticalScore = verticalScore;
+            } else if (vertical.equals(Q3_12))
+            {
+              maxVerticalScore = verticalScore;
+            }
+          }
+        }
+      }
+
+      logger.debug("Market needs : {}", maxVerticalScore);
+      results.put("MARKET_NEEDS", maxVerticalScore);
     }
 
 
@@ -1690,6 +1753,21 @@ class SurveyData
     sd.addQuestion("Q4_2", "A");
     sd.addQuestion("Q4_4", "A");
     sd.addQuestion("Q4_5", "A");
+
+
+    sd.addQuestion("Q3_3a", "F");
+    sd.addQuestion("Q3_3", "B");
+    sd.addQuestion("Q3_12", "A");
+    sd.addQuestion("Q3_13", "B,C");
+
+    sd.addQuestion("Q5A_1_A", "1");
+    sd.addQuestion("Q5A_1_G", "1");
+    sd.addQuestion("Q5A_1_K", "4");
+
+    sd.addQuestion("Q5B_1_C", "2");
+    sd.addQuestion("Q5B_1_D", "2");
+    sd.addQuestion("Q5B_1_G", "2");
+
     sd.calculateResults();
   }
 
