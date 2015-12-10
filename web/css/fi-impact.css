@@ -1,5 +1,10 @@
 .navbar .nav .summary { color: #00f0f0; }
-.navbar .nav .summary:hover { color: #00b0b0; }
+.navbar .nav .summary:hover { color: #00b0b0; }	
+.navbar .nav #pdfDownload { color: #00f0f0; cursor: pointer; }
+.navbar .nav #pdfDownload:hover { color: #00b0b0; }
+.navbar-right { font-size: .9em; }
+.nav>li>a { padding: 20px 10px 10px 10px; }
+.nav>li>span { padding: 20px 10px 10px 10px; }
 
 header .intro-text .intro-heading { text-transform: none; }
 .linkMore { text-align: right; }
@@ -45,8 +50,7 @@ header .intro-text .intro-heading { text-transform: none; }
 }
 .mnSector h3 { margin-top: 1em; color: #1F71AB; }
 section .onBg .mnSector  p { text-align: center; }
-.mnSector .theScore { font-size: 3em; color: #36abfe;
-	font-family: "Kaushan Script","Helvetica Neue",Helvetica,Arial,cursive; }
+.mnSector .theScore { font-size: 3em; color: #36abfe; font-family: "Kaushan Script","Helvetica Neue",Helvetica,Arial,cursive; }
 .topNeeds .section-subheading { text-align: left; }
 .topNeeds .mnSource { font-size: .8em; text-align: right; }
 #socialImpact { background-image:url('../img/people.jpg'); }

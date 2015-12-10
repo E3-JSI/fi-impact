@@ -18,7 +18,7 @@ public class FIImpactSecureRequestHandler extends HttpServlet
   final static Logger logger = LogManager.getLogger(FIImpactSecureRequestHandler.class.getName());
   //SurveyManager surveyManager;
   String importDir;
-  String exportFile;
+  String exportDir;
 
   @Override
   public void init(ServletConfig config) throws ServletException
@@ -27,9 +27,9 @@ public class FIImpactSecureRequestHandler extends HttpServlet
     //E:\Dropbox\FI-IMPACT\data\FI-IMPACT_Export_20150624
     importDir = config.getServletContext().getInitParameter("import-dir");
     //E:\Dropbox\FI-IMPACT\data\export.txt
-    exportFile = config.getServletContext().getInitParameter("export-file");
+    exportDir = config.getServletContext().getInitParameter("export-dir");
     logger.info("import-dir={}", importDir);
-    logger.info("export-file={}", exportFile);
+    logger.info("export-dir={}", exportDir);
   }
 
   @Override
@@ -72,9 +72,39 @@ public class FIImpactSecureRequestHandler extends HttpServlet
     }
     else if (sAction.equals("export"))
     {
+      String sType = request.getParameter("type");
+      if(sType != null)
+        sType = new String(sType.getBytes("iso-8859-1"), "UTF-8");
+
+      if(sType == null || sType.equals(""))
+        sType = "full";
+
+      String groupQuestion = null;
+      String idList = null;
+      String questionsList = null;
+      String resultsList = null;
+      String resultsDerList = null;
+      switch (sType)
+      {
+        case "full":
+        {
+
+          break;
+        }
+        case "accelerator":
+        {
+          groupQuestion = "Q1_1";
+          idList = "id_external";
+          questionsList = "Q1_1;Q1_2;Q1_3;Q1_4;Q1_22";
+          resultsList = "FEASIBILITY;INNOVATION;MARKET;MARKET_NEEDS";
+          resultsDerList = "";
+          break;
+        }
+      }
+
       response.setContentType("application/json");
       response.setCharacterEncoding("utf-8");
-      SurveyManager.getSurveyManager().exportTXT(response.getOutputStream(), exportFile);
+      SurveyManager.getSurveyManager().exportTXT(response.getOutputStream(), exportDir, sType, groupQuestion, idList, questionsList, resultsList, resultsDerList);
     }
   }
 
