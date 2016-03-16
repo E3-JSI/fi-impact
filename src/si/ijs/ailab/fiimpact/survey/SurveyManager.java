@@ -1,4 +1,4 @@
-package si.ijs.ailab.fiimpact;
+package si.ijs.ailab.fiimpact.survey;
 import javax.servlet.ServletOutputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -20,6 +20,7 @@ import org.xml.sax.SAXException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import si.ijs.ailab.fiimpact.indicators.OverallResult;
 import si.ijs.ailab.util.AIUtils;
 
 
@@ -85,10 +86,10 @@ public class SurveyManager
       String[] arrRow = arrSpeedometerRows[i].split("\t");
       String id = arrRow[0];
       OverallResult.ScoreBoundaries boundaries = new OverallResult.ScoreBoundaries();
-      boundaries.min = AIUtils.parseDecimal(arrRow[1], 0.0);
-      boundaries.lo_med = AIUtils.parseDecimal(arrRow[2], 0.0);
-      boundaries.med_hi = AIUtils.parseDecimal(arrRow[3], 0.0);
-      boundaries.max = AIUtils.parseDecimal(arrRow[4], 0.0);
+      boundaries.setMin(AIUtils.parseDecimal(arrRow[1], 0.0));
+      boundaries.setLo_med(AIUtils.parseDecimal(arrRow[2], 0.0));
+      boundaries.setMed_hi(AIUtils.parseDecimal(arrRow[3], 0.0));
+      boundaries.setMax(AIUtils.parseDecimal(arrRow[4], 0.0));
       SPEEDOMETER_SLOTS.put(id, boundaries);
     }
     String[] arrSocialImpact = SOCIAL_IMPACT.split("\t");
@@ -98,10 +99,10 @@ public class SurveyManager
     for(String s: SOCIAL_IMPACT_QUESTIONS)
     {
       OverallResult.ScoreBoundaries boundaries = new OverallResult.ScoreBoundaries();
-      boundaries.min = 0.0;
-      boundaries.lo_med = 2.5;
-      boundaries.med_hi = 3.5;
-      boundaries.max = 5.0;
+      boundaries.setMin(0.0);
+      boundaries.setLo_med(2.5);
+      boundaries.setMed_hi(3.5);
+      boundaries.setMax(5.0);
       SPEEDOMETER_SLOTS.put(s, boundaries);
 
     }
@@ -252,6 +253,8 @@ public class SurveyManager
       {
         typeResults.put(entry.getKey(), new OverallResult(type, entry.getKey(), entry.getValue()));
       }
+      //TODO Same loop for mattermark slots  -  ProjectManager.getMattemrarkSlots()
+
     }
 
     logger.info("Recalc results for {} surveys.", surveys.size());
@@ -282,7 +285,7 @@ public class SurveyManager
     for(Map<String, OverallResult> typeResults: resultsNew.values())
       for(OverallResult overallResult: typeResults.values())
       {
-        logger.info("Recalc: {}", overallResult.id);
+        logger.info("Recalc: {}", overallResult.getId());
         overallResult.calculate();
       }
     results = resultsNew;
@@ -714,6 +717,13 @@ public class SurveyManager
       addResultKey(json, "MARKET_GRAPH_PERCENT", surveyData.resultDerivatives);
       addResultKey(json, "FEASIBILITY_GRAPH_PERCENT", surveyData.resultDerivatives);
       addResultKey(json, "MARKET_NEEDS_GRAPH_PERCENT", surveyData.resultDerivatives);
+
+      //TODO add results for all mattermark indicators
+      //1. ProjectManager.getProjectManager()
+      //2. projectManager.getMattermarkIndicators()
+      //3. loop through all indicators:
+      //    addResultKey(json, "MATTERMARK_"+indicator, surveyData.results);
+      //    addResultKey(json, "MATTERMARK_"+indicator+"_GRAPH_PERCENT", surveyData.resultDerivatives);
 
       json.endObject();
     }

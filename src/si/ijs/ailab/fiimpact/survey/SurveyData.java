@@ -1,4 +1,4 @@
-package si.ijs.ailab.fiimpact;
+package si.ijs.ailab.fiimpact.survey;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,6 +8,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import si.ijs.ailab.fiimpact.indicators.OverallResult;
 import si.ijs.ailab.util.AIStructures;
 import si.ijs.ailab.util.AIUtils;
 
@@ -23,7 +24,7 @@ import java.util.*;
  * Created by flavio on 13/07/2015.
  */
 
-class SurveyData
+public class SurveyData
 {
 
   final static Logger logger = LogManager.getLogger(SurveyData.class.getName());
@@ -460,14 +461,14 @@ class SurveyData
     jsonResult.put("score_min", SurveyManager.getDecimalFormatter0().format(or.getMinScore()));
     jsonResult.put("score_max", SurveyManager.getDecimalFormatter0().format(or.getMaxScore()));
 
-    jsonResult.put("average_percent", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercent(or.average)));
-    jsonOverviewPoint.put("average_percent", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercent(or.average)));
+    jsonResult.put("average_percent", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercent(or.getAverage())));
+    jsonOverviewPoint.put("average_percent", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercent(or.getAverage())));
     jsonResult.put("speedometer_histogram", or.toJSONHistogram());
 
 
     xy = new JSONObject();
     jsonOverviewPoint.put("avg_coord", xy);
-    svg = getSegmentSVG(R, overviewSectionsCnt, overviewSectionsTotal, or.getSpeedometerPercent(or.average), xy);
+    svg = getSegmentSVG(R, overviewSectionsCnt, overviewSectionsTotal, or.getSpeedometerPercent(or.getAverage()), xy);
     if(overviewOutLineAverage.length() > 0)
       overviewOutLineAverage+=" ";
     overviewOutLineAverage+=svg;
@@ -496,7 +497,7 @@ class SurveyData
 
       AIStructures.AIInteger cnt = or.graph.graphValues.get(i + 1);
 
-      double total = or.n;
+      double total = or.getN();
       double segmentN = 0.0;
 
       if(cnt != null)
@@ -516,7 +517,7 @@ class SurveyData
 
     }
 
-    double averagePercent = or.getSpeedometerPercent(or.average);
+    double averagePercent = or.getSpeedometerPercent(or.getAverage());
     getAverageSVG(averagePercent, jsonSpeedometerSVG);
     svg = getResultSVG(dPercentResult);
     jsonSpeedometerSVG.put("result", svg);
@@ -531,7 +532,7 @@ class SurveyData
 
     scoreInWords = String.format(scoreInWords,
             sectionLabel, SurveyManager.fiImpactModel.getJSONObject("ranking").getString(Integer.toString(dSlot.intValue())),
-            Integer.toString(dPercent.intValue()), Integer.toString(or.n));
+            Integer.toString(dPercent.intValue()), Integer.toString(or.getN()));
      response = String.format(response, sectionLabel, sectionLabel);
      jsonResult.put("interpretation", scoreInWords + " " + response);
 
@@ -1038,10 +1039,10 @@ class SurveyData
                     dPercentResult = or.getSpeedometerPercent(dResult);
                   }
 
-                  double dPercentAverage = or.getSpeedometerPercent(or.average);
+                  double dPercentAverage = or.getSpeedometerPercent(or.getAverage());
 
                   subSegmentAnswer.put("result_percent", SurveyManager.getDecimalFormatter2().format(dPercentResult));
-                  subSegmentAnswer.put("average_percent", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercent(or.average)));
+                  subSegmentAnswer.put("average_percent", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercent(or.getAverage())));
 
                   double R = 200;
 
@@ -1664,7 +1665,26 @@ class SurveyData
       }
     }
     logger.debug("Calc social impact done.");
+    //TODO calculate mattermark results - normalise to scale 0.0 - 5.0
+    /*
+    ProjectManager pm = ProjectManager.getProjectManager();
+    ArrayList<String> mattermarkIndicators = pm.getMattermarkIndicators();
+    for(String indicator: mattermarkIndicators)
+      results.put("MATTERMARK_"+indicator, 0.0);
 
+    ProjectData pd = pm.getProjects.get(id);
+    if(pd!=null)
+    {
+      for(String indicator: mattermarkIndicators)
+      {
+        Double dInd = pd.getMattermarkFields.get(indicator);
+        if(dInd != null)
+        {
+          dInd = normalise to 0.0 - 5.0 scale by using ProjectManger.get.... min/max values
+          results.put("MATTERMARK_"+indicator, dNormalisedResult);
+      }
+
+    }*/
   }
 
   public void clear()

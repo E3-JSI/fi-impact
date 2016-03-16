@@ -1,7 +1,8 @@
-package si.ijs.ailab.fiimpact;
+package si.ijs.ailab.fiimpact.servlet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import si.ijs.ailab.fiimpact.survey.SurveyManager;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -16,14 +17,12 @@ import java.io.IOException;
 public class FIImpactSecureRequestHandler extends HttpServlet
 {
   final static Logger logger = LogManager.getLogger(FIImpactSecureRequestHandler.class.getName());
-  //SurveyManager surveyManager;
   String importDir;
   String exportDir;
 
   @Override
   public void init(ServletConfig config) throws ServletException
   {
-    //surveyManager = SurveyManager.getSurveyManager(config.getServletContext().getRealPath("/"));
     //E:\Dropbox\FI-IMPACT\data\FI-IMPACT_Export_20150624
     importDir = config.getServletContext().getInitParameter("import-dir");
     //E:\Dropbox\FI-IMPACT\data\export.txt
@@ -43,6 +42,7 @@ public class FIImpactSecureRequestHandler extends HttpServlet
      clear
      */
     String sAction = request.getParameter("action");
+    //TODO add actions "refresh-projects", "refresh-mattermark"
 
     logger.info("Received request: action={}.", sAction);
     if (sAction == null || sAction.equals(""))

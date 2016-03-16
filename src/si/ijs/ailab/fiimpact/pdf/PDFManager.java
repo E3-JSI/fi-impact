@@ -1,4 +1,4 @@
-package si.ijs.ailab.fiimpact;
+package si.ijs.ailab.fiimpact.pdf;
 
 import org.apache.fop.apps.FOPException;
 import org.apache.logging.log4j.LogManager;
@@ -15,6 +15,8 @@ import org.apache.fop.apps.MimeConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+import si.ijs.ailab.fiimpact.survey.SurveyData;
+import si.ijs.ailab.fiimpact.survey.SurveyManager;
 import si.ijs.ailab.util.AIUtils;
 
 import javax.servlet.ServletOutputStream;

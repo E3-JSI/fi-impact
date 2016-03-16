@@ -1,16 +1,14 @@
-package si.ijs.ailab.fiimpact;
+package si.ijs.ailab.fiimpact.servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 
 import java.io.*;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import si.ijs.ailab.util.AIUtils;
+import si.ijs.ailab.fiimpact.pdf.PDFManager;
+import si.ijs.ailab.fiimpact.survey.SurveyManager;
 
 /**
  * Created by flavio on 01/06/2015.
@@ -21,28 +19,17 @@ public class FIImpactRequestHandler extends HttpServlet
   SurveyManager surveyManager;
   PDFManager pdfManager;
 
+  //TODO declare ProjectManager
+
+
   @Override
   public void init(ServletConfig config) throws ServletException
   {
-    /*Map<String, Integer> slots = new HashMap<>();
-     Enumeration params = config.getServletContext().getInitParameterNames();
-    while(params.hasMoreElements())
-    {
-      String paramName = (String)params.nextElement();
-      if(paramName.startsWith("slot_"))
-      {
-        String paramValue = getInitParameter(paramName);
-        Integer intVal = AIUtils.parseInteger(paramValue, 10);
-        paramName = paramName.substring("slot_".length());
-        logger.info("Histogram slots for {}: {}", paramName, intVal);
-        slots.put(paramName, intVal);
-      }
-    }
-
-    surveyManager = SurveyManager.getSurveyManager(config.getServletContext().getRealPath("/"), slots);
-    */
     surveyManager = SurveyManager.getSurveyManager(config.getServletContext().getRealPath("/"));
     pdfManager = pdfManager.getPDFManager(config.getServletContext().getRealPath("/"));
+    //TODO init projectManager
+
+    //TODO later (not now!!!) - on timer refresh for mattermark data
   }
 
   @Override
