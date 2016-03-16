@@ -44,6 +44,26 @@ public class FIImpactSecureRequestHandler extends HttpServlet
     String sAction = request.getParameter("action");
     //TODO add actions "refresh-projects", "refresh-mattermark"
 
+    //TODO later - export to csv - specification still in progress
+    /*
+      Adapt the exportTXT method to take into account addtional parameters and also to be able to export to either stream or file.
+      action=csv
+      response.setContentType("application/json"); - should be set to csv or text - check how should this be done.
+      export to CSV parameters
+      assesment=self/impact/all
+      master=survey/project/merge
+      data=survey;project;mattermark;survey-additional;project-aditional;mattermark-additional;
+
+      scope=all,accelerator.
+
+      scope has to be checked aginst the role of the current logged in user.
+      we should have roles:
+        accelerator (sees only accelerator filtered data),
+        fiimpact (sees everything),
+        fiware (sees all projects, but limited number of columns)
+
+     */
+
     logger.info("Received request: action={}.", sAction);
     if (sAction == null || sAction.equals(""))
       setBadRequest(response, "Parameter 'action' not defined.");
