@@ -31,10 +31,10 @@
 		<filed column="SOFTWARE SECONDARY MARKET" label="SOFTWARE SECONDARY MARKET" fieldid="P28" missing="0;#N/A;?"/>
 		<filed column="CALL" label="CALL" fieldid="P29"/>
 		<filed column="RESPONDENT TO FIMPACT ASSESSMENT?" label="RESPONDED TO FIMPACT ASSESSMENT" fieldid="P30" usage="ignore"/>
-		<filed column="WEBSITE URL" label="WEBSITE URL" fieldid="P31" usage="clean-url" missing="0;#N/A;?"/>
-		<filed column="CLEAN WEBSITE URL" label="CLEAN WEBSITE URL" fieldid="P32" missing="0;#N/A;?"/>
-		<filed column="SME/STARTUP" label="SME/STARTUP" fieldid="P33" missing="0;#N/A;?"/>
-		<filed column="ACCELERATOR FUNDING" label="ACCELERATOR FUNDING" fieldid="P34" missing="#N/A;?"/>
+		<filed column="WEBSITE URL" label="WEBSITE URL" fieldid="P31" missing="0;#N/A;?"/>
+		<filed column="SME/STARTUP" label="SME/STARTUP" fieldid="P32" missing="0;#N/A;?"/>
+		<filed column="ACCELERATOR FUNDING" label="ACCELERATOR FUNDING" fieldid="P33" missing="#N/A;?"/>
+		<filed column="CLEAN WEBSITE URL" label="CLEAN WEBSITE URL" fieldid="P34" usage="clean-url" missing="0;#N/A"/>
 	</list>
 	<list name="mattermark-export">
 		<filed column="Company Name" label="Company Name" field-id="M01"/>
