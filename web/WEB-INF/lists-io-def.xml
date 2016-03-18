@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lists>
+	<list name="project-list">
+		<filed column="PROGRESSIVE NUMBER" label="PROGRESSIVE NUMBER" fieldid="P01"/>
+		<filed column="FI-IMPACT IDENTIFIER" label="FI-IMPACT IDENTIFIER" fieldid="P02" usage="id"/>
+		<filed column="Help" label="Help" fieldid="P03" usage="ignore"/>
+		<filed column="ACCELERATOR" label="ACCELERATOR" fieldid="P04"/>
+		<filed column="COUNTRY" label="COUNTRY" fieldid="P05"/>
+		<filed column="ORGANIZATION NAME" label="ORGANIZATION NAME" fieldid="P06" missing="0;-"/>
+		<filed column="PROJECT NAME" label="PROJECT NAME" fieldid="P07" missing="0"/>
+		<filed column="ADDRESS" label="ADDRESS" fieldid="P08" missing="0;-"/>
+		<filed column="VERTICAL MARKET (IDC ANALYSIS)" label="VERTICAL MARKET" fieldid="P09" missing="0"/>
+		<filed column="B2B/B2C" label="B2B/B2C" fieldid="P10" missing="0"/>
+		<filed column="N. OF TEAM MEMBERS" label="N. OF TEAM MEMBERS" fieldid="P11" missing="#N/A;N/A;Not available"/>
+		<filed column="N. OF YEARS OF EXPERIENCE" label="YEARS OF EXPERIENCE" fieldid="P12" missing="#N/A;N/A;Not available;-"/>
+		<filed column="SELECTED (YES/NO)" label="SELECTED" fieldid="P13" include-record-when="YES"/>
+		<filed column="STATUS" label="STATUS" fieldid="P14" missing="0"/>
+		<filed column="NAME OF PROJECT COORDINATOR" label="PROJECT COORDINATOR" fieldid="P15" missing="0;#N/A"/>
+		<filed column="ABSTRACT" label="ABSTRACT" fieldid="P16" missing="0"/>
+		<filed column="TECH PROVIDER OR SERVICE PROVIDER (NON-IT) IDC" label="PROVIDER TYPE" fieldid="P17" missing="0"/>
+		<filed column="SMART CITY" label="SMART CITY" fieldid="P18"/>
+		<filed column="CLOUD" label="CLOUD" fieldid="P19"/>
+		<filed column="SOCIAL MEDIA" label="SOCIAL MEDIA" fieldid="P20"/>
+		<filed column="MOBILE" label="MOBILE" fieldid="P21"/>
+		<filed column="BIG DATA/ANALYTICS" label="BIG DATA/ANALYTICS" fieldid="P22"/>
+		<filed column="IOT" label="IOT" fieldid="P23"/>
+		<filed column="3D PRINTING" label="3D PRINTING" fieldid="P24"/>
+		<filed column="SOFTWARE OR HARDWARE (ONLY FOR TECH PROVIDERS) IDC" label="SOFTWARE/HARDWARE " fieldid="P25" missing="0;#N/A;?"/>
+		<filed column="SOFTWARE INDIVIDUAL MARKET (ONLY SOFTWARE) IDC" label="SOFTWARE INDIVIDUAL MARKET" fieldid="P26" missing="0;#N/A;?"/>
+		<filed column="SOFTWARE PRIMARY MARKET" label="SOFTWARE PRIMARY MARKET" fieldid="P27" missing="0;#N/A;?"/>
+		<filed column="SOFTWARE SECONDARY MARKET" label="SOFTWARE SECONDARY MARKET" fieldid="P28" missing="0;#N/A;?"/>
+		<filed column="CALL" label="CALL" fieldid="P29"/>
+		<filed column="RESPONDENT TO FIMPACT ASSESSMENT?" label="RESPONDED TO FIMPACT ASSESSMENT" fieldid="P30" usage="ignore"/>
+		<filed column="WEBSITE URL" label="WEBSITE URL" fieldid="P31" usage="clean-url" missing="0;#N/A;?"/>
+		<filed column="CLEAN WEBSITE URL" label="CLEAN WEBSITE URL" fieldid="P32" missing="0;#N/A;?"/>
+		<filed column="SME/STARTUP" label="SME/STARTUP" fieldid="P33" missing="0;#N/A;?"/>
+		<filed column="ACCELERATOR FUNDING" label="ACCELERATOR FUNDING" fieldid="P34" missing="#N/A;?"/>
+	</list>
+	<list name="mattermark-export">
+		<filed column="Company Name" label="Company Name" field-id="M01"/>
+		<filed column="Growth Score" label="Growth Score" field-id="M02" usage="indicator"/>
+		<filed column="Mindshare Score" label="Mindshare Score" field-id="M03"/>
+		<filed column="Momentum Score" label="Momentum Score" field-id="M04"/>
+		<filed column="Mattermark URL" label="Mattermark URL" field-id="M05" usage="external"/>
+		<filed column="Website" label="Website" field-id="M06" usage="clean-url"/>
+		<filed column="Description" label="Description" field-id="M07"/>
+		<filed column="Is Raising On AngelList" label="Is Raising On AngelList" field-id="M08"/>
+		<filed column="AngelList Raising Amount" label="AngelList Raising Amount" field-id="M09"/>
+		<filed column="AngelList Pre-Money Valuation" label="AngelList Pre-Money Valuation" field-id="M10"/>
+		<filed column="AngelList Raised Amount" label="AngelList Raised Amount" field-id="M11"/>
+		<filed column="Industry" label="Industry" field-id="M12"/>
+		<filed column="Business Model" label="Business Model" field-id="M13"/>
+		<filed column="Keywords" label="Keywords" field-id="M14"/>
+		<filed column="Investors" label="Investors" field-id="M15"/>
+		<filed column="Employee Count" label="Employee Count" field-id="M16"/>
+		<filed column="Employees Month Ago" label="Employees Month Ago" field-id="M17"/>
+		<filed column="Employees Added This Month" label="Employees Added This Month" field-id="M18"/>
+		<filed column="Employees MoM" label="Employees MoM" field-id="M19"/>
+		<filed column="Employees 6 Months Ago" label="Employees 6 Months Ago" field-id="M20"/>
+		<filed column="Employees Added In 6 Months" label="Employees Added In 6 Months" field-id="M21"/>
+		<filed column="Employees 6 Months Growth" label="Employees 6 Months Growth" field-id="M22"/>
+		<filed column="Est. Monthly Uniques" label="Est. Monthly Uniques" field-id="M23" usage="indicator"/>
+		<filed column="Monthly Uniques Week Ago" label="Monthly Uniques Week Ago" field-id="M24"/>
+		<filed column="Monthly Uniques WoW" label="Monthly Uniques WoW" field-id="M25"/>
+		<filed column="Monthly Uniques Month Ago" label="Monthly Uniques Month Ago" field-id="M26"/>
+		<filed column="Monthly Uniques MoM" label="Monthly Uniques MoM" field-id="M27"/>
+		<filed column="Est. Monthly Mobile Downloads" label="Est. Monthly Mobile Downloads" field-id="M28"/>
+		<filed column="Mobile Downloads Week Ago" label="Mobile Downloads Week Ago" field-id="M29"/>
+		<filed column="Mobile Downloads WoW" label="Mobile Downloads WoW" field-id="M30"/>
+		<filed column="Mobile Downloads Month Ago" label="Mobile Downloads Month Ago" field-id="M31"/>
+		<filed column="Mobile Downloads MoM" label="Mobile Downloads MoM" field-id="M32"/>
+		<filed column="Twitter Followers" label="Twitter Followers" field-id="M33"/>
+		<filed column="Twitter Followers Week Ago" label="Twitter Followers Week Ago" field-id="M34"/>
+		<filed column="Twitter Followers WoW" label="Twitter Followers WoW" field-id="M35"/>
+		<filed column="Twitter Followers Month Ago" label="Twitter Followers Month Ago" field-id="M36"/>
+		<filed column="Twitter Followers MoM" label="Twitter Followers MoM" field-id="M37"/>
+		<filed column="Twitter Mentions Last Week" label="Twitter Mentions Last Week" field-id="M38"/>
+		<filed column="Twitter Mentions 2 Weeks Ago" label="Twitter Mentions 2 Weeks Ago" field-id="M39"/>
+		<filed column="Twitter Mentions WoW" label="Twitter Mentions WoW" field-id="M40"/>
+		<filed column="Twitter Mentions Last Month" label="Twitter Mentions Last Month" field-id="M41"/>
+		<filed column="Twitter Mentions 2 Months Ago" label="Twitter Mentions 2 Months Ago" field-id="M42"/>
+		<filed column="Twitter Mentions MoM" label="Twitter Mentions MoM" field-id="M43"/>
+		<filed column="Facebook Likes" label="Facebook Likes" field-id="M44"/>
+		<filed column="Facebook Likes Week Ago" label="Facebook Likes Week Ago" field-id="M45"/>
+		<filed column="Facebook Likes Wow" label="Facebook Likes Wow" field-id="M46"/>
+		<filed column="Facebook Likes Month Ago" label="Facebook Likes Month Ago" field-id="M47"/>
+		<filed column="Facebook Likes MoM" label="Facebook Likes MoM" field-id="M48"/>
+		<filed column="Facebook Talking Last Week" label="Facebook Talking Last Week" field-id="M49"/>
+		<filed column="Facebook Talking 2 Weeks Ago" label="Facebook Talking 2 Weeks Ago" field-id="M50"/>
+		<filed column="Facebook Talking WoW" label="Facebook Talking WoW" field-id="M51"/>
+		<filed column="Facebook Talking Month Ago" label="Facebook Talking Month Ago" field-id="M52"/>
+		<filed column="Facebook Talking 2 Months Ago" label="Facebook Talking 2 Months Ago" field-id="M53"/>
+		<filed column="Facebook Talking MoM" label="Facebook Talking MoM" field-id="M54"/>
+		<filed column="LinkedIn Follows" label="LinkedIn Follows" field-id="M55"/>
+		<filed column="LinkedIn Follows Week Ago" label="LinkedIn Follows Week Ago" field-id="M56"/>
+		<filed column="LinkedIn Follows WoW" label="LinkedIn Follows WoW" field-id="M57"/>
+		<filed column="LinkedIn Follows Month Ago" label="LinkedIn Follows Month Ago" field-id="M58"/>
+		<filed column="LinkedIn Follows MoM" label="LinkedIn Follows MoM" field-id="M59"/>
+		<filed column="Est. Founding Date" label="Est. Founding Date" field-id="M60"/>
+		<filed column="Stage" label="Stage" field-id="M61"/>
+		<filed column="Total Funding" label="Total Funding" field-id="M62" usage="indicator"/>
+		<filed column="Last Funding Date" label="Last Funding Date" field-id="M63"/>
+		<filed column="Last Funding Amount" label="Last Funding Amount" field-id="M64"/>
+		<filed column="Location" label="Location" field-id="M65"/>
+		<filed column="City" label="City" field-id="M66"/>
+		<filed column="Region" label="Region" field-id="M67"/>
+		<filed column="State" label="State" field-id="M68"/>
+		<filed column="Country" label="Country" field-id="M69"/>
+		<filed column="Continent" label="Continent" field-id="M70"/>
+		<filed column="Has Mobile App" label="Has Mobile App" field-id="M71"/>
+		<filed column="Has Google Play App" label="Has Google Play App" field-id="M72"/>
+		<filed column="Has iTunes App" label="Has iTunes App" field-id="M73"/>
+		<filed column="Months since last funding" label="Months since last funding" field-id="M74"/>
+		<filed column="Employees added since last funding" label="Employees added since last funding" field-id="M75"/>
+		<filed column="New person months since last funding" label="New person months since last funding" field-id="M76"/>
+		<filed column="New funding employee growth" label="New funding employee growth" field-id="M77" usage="indicator"/>
+		<filed column="Date Added" label="Date Added" field-id="M78"/>
+	</list>
+</lists>

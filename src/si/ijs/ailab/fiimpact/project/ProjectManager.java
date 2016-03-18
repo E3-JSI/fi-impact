@@ -60,7 +60,23 @@ public class ProjectManager
       }
     }
     loadProjects();
+    //TODO load import/export definitions from webappRoot.resolve("WEB-INF").resolve("lists-io-def.xml");
+    //Create a private structure to this class to handle the definitions.
+    //Map<String, IOListDefinition> ioDefinitions
+    /*class IOListDefinition
+    {
+      String id;
+      maps for field lists...
+    }
+    class IOListField
+    {
+      String column;
+      String label;
+      String ....
+    }
 
+    */
+    //loadListsDefinitions();
 
   }
 
@@ -223,9 +239,13 @@ public class ProjectManager
   //TODO adapt this import to the definition in the file lists-io-def.xml, <list name="project-list">
   public void importProjects(ServletOutputStream outputStream, String fileName) throws IOException
   {
+    //Check the TODO in the ProjectManager constructor before this one
+
+
     Path p = webappRoot.resolve("WEB-INF").resolve(fileName);
     logger.info("Load data from {}", p.toString());
-    BufferedReader brData = new BufferedReader(new FileReader(p.toFile()));
+
+    BufferedReader brData = new BufferedReader(new InputStreamReader(new FileInputStream(p.toFile()), "utf-8"));
     String line = brData.readLine();
     String[] headerArr = line.split(";");
     line = brData.readLine();

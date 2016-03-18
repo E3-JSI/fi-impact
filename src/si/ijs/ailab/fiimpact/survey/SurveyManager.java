@@ -480,7 +480,7 @@ public class SurveyManager
   {
     Path p = webappRoot.resolve("WEB-INF").resolve(fileName);
     logger.info("Load data from {}", p.toString());
-    BufferedReader brData = new BufferedReader(new FileReader(p.toFile()));
+    BufferedReader brData = new BufferedReader(new InputStreamReader(new FileInputStream(p.toFile()), "utf-8"));
     String line = brData.readLine();
     String[] headerArr = line.split(";");
     line = brData.readLine();
