@@ -2,12 +2,16 @@ package si.ijs.ailab.fiimpact.servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
+import javax.xml.parsers.ParserConfigurationException;
 
 import java.io.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.xml.sax.SAXException;
+
 import si.ijs.ailab.fiimpact.pdf.PDFManager;
+import si.ijs.ailab.fiimpact.project.ProjectManager;
 import si.ijs.ailab.fiimpact.survey.SurveyManager;
 
 /**
@@ -20,12 +24,20 @@ public class FIImpactRequestHandler extends HttpServlet
   PDFManager pdfManager;
 
   //TODO declare ProjectManager
-
+  ProjectManager projectManager;
 
   @Override
   public void init(ServletConfig config) throws ServletException
   {
     surveyManager = SurveyManager.getSurveyManager(config.getServletContext().getRealPath("/"));
+
+	try {
+		projectManager=ProjectManager.getProjectManager(config.getServletContext().getRealPath("/"));
+	} catch (ParserConfigurationException | SAXException | IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
     pdfManager = pdfManager.getPDFManager(config.getServletContext().getRealPath("/"));
     //TODO init projectManager
 

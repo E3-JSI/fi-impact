@@ -7,7 +7,7 @@
 	</context-param>
 	<context-param>
 		<param-name>export-file</param-name>
-		<param-value>D:\server\Tomcat7\webapps\fi-impact-test\WEB-INF\transfer\export.txt</param-value>
+		<param-value>C:\Users\Matej\Desktop\Tomcat7\webapps\fi-impact-test\WEB-INF\transfer\export.txt</param-value>
 	</context-param>
 	<welcome-file-list>
 		<welcome-file>
