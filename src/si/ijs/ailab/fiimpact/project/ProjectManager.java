@@ -4,11 +4,25 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.util.EntityUtils;
+
+import org.json.JSONObject;
 import org.json.JSONWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -23,6 +37,8 @@ import si.ijs.ailab.util.AIUtils;
 /**
  * Created by flavio on 01/06/2015.
  */
+
+//TODO implemnt Mattermark API: https://mattermark.com/api/documentation/
 
 public class ProjectManager
 {
@@ -39,14 +55,25 @@ public class ProjectManager
 
   final static Logger logger = LogManager.getLogger(ProjectManager.class.getName());
   private static ProjectManager projectManager;
+  String mattermarkBaseURL;
+  String mattermarkAPIKey;
 
 
-  private ProjectManager(String _webappRoot)
+  private ProjectManager(String _webappRoot, String _mattermarkBaseURL, String _mattermarkAPIKey)
   {
     webappRoot = new File(_webappRoot).toPath();
     projectsList = new File(_webappRoot).toPath().resolve("WEB-INF").resolve("projects-id-list.txt");
     projectsRoot = new File(_webappRoot).toPath().resolve("WEB-INF").resolve("projects");
-    logger.debug("Root: {}", _webappRoot);
+    logger.info("Root: {}", _webappRoot);
+    mattermarkBaseURL = _mattermarkBaseURL;
+    if(mattermarkBaseURL != null && !mattermarkBaseURL.endsWith("/"))
+      mattermarkBaseURL+="/";
+
+    logger.info("Mattermark base: {}", mattermarkBaseURL);
+
+    mattermarkAPIKey = _mattermarkAPIKey;
+    logger.info("Mattermark key: {}", mattermarkAPIKey);
+
     if(Files.notExists(projectsRoot))
     {
       try
@@ -80,11 +107,11 @@ public class ProjectManager
 
   }
 
-  public static synchronized ProjectManager getProjectManager(String _webappRoot)
+  public static synchronized ProjectManager getProjectManager(String _webappRoot, String _mattermarkBaseURL, String _mattermarkAPIKey)
   {
     if(projectManager == null)
     {
-      projectManager = new ProjectManager(_webappRoot);//, _slots);
+      projectManager = new ProjectManager(_webappRoot, _mattermarkBaseURL, _mattermarkAPIKey);
     }
     return projectManager;
   }
@@ -312,6 +339,123 @@ public class ProjectManager
       Save each ProjectData insance and the list.
      */
   }
+
+
+  //TODO same as previous... but you get mattermar data from through the REST API
+  public void importMattermarkFromAPI(ServletOutputStream outputStream) throws IOException
+  {
+    //use getMattermarkCompanyInfo to get the mattermark data.
+  }
+
+  //TODO this method
+  private JSONObject getMattermarkCompanyInfo(String companyURL)
+  {
+    JSONObject detailedCompanyInfo = null;
+    StringBuilder sbUrl = new StringBuilder();
+    //https://api.mattermark.com/companies/?key=[YOUR KEY]&domain=facebook.com
+    sbUrl.append(mattermarkBaseURL);
+    sbUrl.append("companies/?key=").append(mattermarkAPIKey).append("&domain=").append(companyURL);
+    /*
+      Example result
+      {
+      "meta": {
+          "total_record_count": 149,
+          "total_pages": 3,
+          "current_page": 1,
+          "per_page": 50
+      },
+      "companies": [
+          {
+              "company_name": "Blue Smoke LLC",
+              "domain": "bluesmokellc.net",
+              "id": "10808576",
+              "url": "https://api.mattermark.com/companies/10808576"
+          }
+      ]
+  }
+
+   */
+    JSONObject companiesList = getMattermarkJSON(sbUrl.toString());
+    if(companiesList == null)
+    {
+      logger.error("Error getting company info for {}", companyURL);
+    }
+    else
+    {
+      //TODO check if the "companies" array contains only one element. If not -> log error and return null
+      //if cont=1 then get the company id from JSON and then
+      sbUrl.setLength(0);
+      //"https://api.mattermark.com/companies/143115?key=[YOUR KEY]
+      sbUrl.append(mattermarkBaseURL);
+      sbUrl.append("companies/").append("TODO ID HERE").append("?key=").append(mattermarkAPIKey);
+      detailedCompanyInfo = getMattermarkJSON(sbUrl.toString());
+
+    }
+
+    return detailedCompanyInfo;
+  }
+
+
+  //TODO This is for getting Mattermark data through the API. Should work.
+  private JSONObject getMattermarkJSON(String mattermarkURL)
+  {
+    HttpClient httpClient = null;
+    JSONObject json = null;
+    try
+    {
+
+      HttpGet get = new HttpGet(mattermarkURL);
+      httpClient = new DefaultHttpClient();
+      HttpParams httpParams = httpClient.getParams();
+      get.setHeader("User-Agent", "FIIMpact/0.1 (http://ailab.ijs.si; flavio.fuart@ijs.si) BasedOnJava/1.7");
+      HttpConnectionParams.setConnectionTimeout(httpParams, 60 * 1000);//60 seconds
+      HttpConnectionParams.setSoTimeout(httpParams, 60 * 1000);
+      HttpResponse response = httpClient.execute(get);
+
+      logger.info("SP returned {}", response.getStatusLine().getStatusCode());
+
+      if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+      {
+        HttpEntity entity = response.getEntity();
+        if(entity != null)
+        {
+          //parse result....
+          StringBuilder sbJSON = new StringBuilder();
+          BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(entity.getContent(), "UTF-8"));
+          String line = bufferedReader.readLine();
+          while(line != null)
+          {
+            sbJSON.append(line);
+            sbJSON.append('\n');
+            line = bufferedReader.readLine();
+          }
+          json = new JSONObject(sbJSON.toString());
+          logger.info("Done.");
+        }
+        logger.debug("done OK");
+      }
+      else
+      {
+        logger.error("Error getting Mattermark data: {}/{}", response.getStatusLine(), mattermarkURL);
+        EntityUtils.consumeQuietly(response.getEntity());
+        logger.debug("cleared response entity.");
+      }
+
+    }
+    catch (IOException e)
+    {
+      logger.error("Error getting Mattermark data: "+mattermarkURL, e);
+    }
+    finally
+    {
+      if(httpClient != null )
+        httpClient.getConnectionManager().shutdown();
+    }
+
+    return json;
+  }
+
+
 
   public void listProjects(ServletOutputStream outputStream) throws IOException
   {

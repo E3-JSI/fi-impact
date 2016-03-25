@@ -43,6 +43,7 @@ public class FIImpactSecureRequestHandler extends HttpServlet
      */
     String sAction = request.getParameter("action");
     //TODO add actions "refresh-projects", "refresh-mattermark"
+    //TODO add action "refresh-mattermark-from-api"
 
     //TODO later - export to csv - specification still in progress
     /*

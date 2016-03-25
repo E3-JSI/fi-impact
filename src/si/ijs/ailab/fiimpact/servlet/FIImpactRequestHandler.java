@@ -30,6 +30,13 @@ public class FIImpactRequestHandler extends HttpServlet
     //TODO init projectManager
 
     //TODO later (not now!!!) - on timer refresh for mattermark data
+
+    //TODO when initalising ProjectManager you have to get the following parameters from web.xml
+    String mattermarkBaseUrl = config.getServletContext().getInitParameter("mattermark-base");
+    String mattermarkAPIkey = config.getServletContext().getInitParameter("mattermark-key");
+    logger.info("mattermark-base={}", mattermarkBaseUrl);
+    logger.info("mattermark-key={}", mattermarkAPIkey);
+
   }
 
   @Override
