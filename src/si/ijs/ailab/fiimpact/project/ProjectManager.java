@@ -352,7 +352,7 @@ public class ProjectManager {
 		IOListDefinition ioListDefinition=ioDefinitions.get("project-list");
 		ArrayList<IOListField> listDefinition =ioListDefinition.getArrayList();
 		
-		String data=AIUtils.readFile("C:\\Users\\Matej\\Desktop\\Tomcat7\\webapps\\fi-impact\\WEB-INF\\import\\project-list.csv");
+		String data=AIUtils.readFile(p);
 		int pos=0;
 		String state="OUT";
 		ArrayList<String> fields=new ArrayList<String>();
@@ -501,6 +501,9 @@ public class ProjectManager {
 	// TODO same as import projects - import Mattermark data
 	public void importMattermark(ServletOutputStream outputStream, String fileName) throws IOException {
 
+		IOListDefinition ioListDefinition=ioDefinitions.get("project-list");
+		ArrayList<IOListField> listDefinition =ioListDefinition.getArrayList();
+		
 		// adapt this import to the definition in the file lists-io-def.xml,
 		// <list name="mattermark-export">
 
