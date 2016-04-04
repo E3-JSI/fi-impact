@@ -315,21 +315,30 @@ public class ProjectManager {
 		}
 	}
 
-	public void addProject(String[] header,ArrayList<String> fields){
-		String id = fields.get(1);
+	public void addProject(ArrayList<IOListField> orderListDefinition,String[] header,ArrayList<String> fields){
+		int index=0;
+		for(IOListField ioListField:orderListDefinition){
+			index=index+1;
+			if(ioListField.getUsage().equals("id")||ioListField.getUsage().equals("indicator"))
+				break;
+			
+			
+		}
+		String id = fields.get(index);
 		ProjectData pd = projects.get(id);					
 		if (pd == null) 
 		{
 			pd = new ProjectData();
+			
 			pd.setId(id);
 			projects.put(id, pd);
 			saveProjectsList();
 		}
 
-					
-		pd.addFields(header, fields.toArray(new String[header.length]));
+		String[] s=fields.toArray(new String[header.length]);			
+		pd.addFields(header,s );
 		pd.save(projectsRoot);
-		fields.clear();
+
 		
 	}
 	
@@ -425,7 +434,7 @@ public class ProjectManager {
 
 							if(skipProject==false)
 							{	
-								addProject(header,fields);
+								addProject(orderListDefinition,header,fields);
 								System.out.println("Add project"+projectCounter);
 								projectCounter=projectCounter+1;	
 							}				
@@ -479,7 +488,7 @@ public class ProjectManager {
 		
 		if(fields.size()>0)
 		{
-			addProject(header,fields);
+			addProject(orderListDefinition,header,fields);
 			projectCounter=projectCounter+1;	
 			fields.clear();
 		}
@@ -500,9 +509,168 @@ public class ProjectManager {
 
 	// TODO same as import projects - import Mattermark data
 	public void importMattermark(ServletOutputStream outputStream, String fileName) throws IOException {
+		Path p = webappRoot.resolve("WEB-INF").resolve(fileName);
+		logger.info("Load data from {}", p.toString());
 
-		IOListDefinition ioListDefinition=ioDefinitions.get("project-list");
+
+		OutputStreamWriter w = null;///new OutputStreamWriter(outputStream, "utf-8");
+	//	JSONWriter json = new JSONWriter(w);
+	//	json.object().key("total_before").value(projects.size());
+
+		
+		IOListDefinition ioListDefinition=ioDefinitions.get("mattermark-export");
 		ArrayList<IOListField> listDefinition =ioListDefinition.getArrayList();
+		
+		String data=AIUtils.readFile(p);
+		int pos=0;
+		String state="OUT";
+		ArrayList<String> fields=new ArrayList<String>();
+		StringBuilder buffer=new StringBuilder();
+		int index=0;
+		ArrayList<IOListField> orderListDefinition=null;
+		String[] header = null;
+		int projectCounter=0;//number add projects
+		int projectSkipCounter=0;//skiped projects
+		boolean skipProject=false;
+		/*
+		1. go through all ProjectData instances and clear mattermark
+		 * information*/
+		
+		for(String key: projects.keySet())
+		{
+			ProjectData projectData=projects.get(key);
+			projectData.mattermarkFields.clear();
+		}
+		/*2.load the file - use the clean-url usage information to
+		 * match it with the correct ProjectData instance You may create a
+		 * temporary map, where you have the clean-url as key in order to find
+		 * the correct project. Save each ProjectData insance and the list.
+		 */
+		
+		while(pos<data.length()){
+			String c=data.substring(pos,pos+1);
+			switch(state){
+				case "OUT":
+					switch(c){
+					case "\n":
+						fields.add(buffer.toString());
+						buffer.setLength(0);
+						index=0;
+						
+						if(orderListDefinition==null)
+						{
+							//mapping header and definition
+							header=new String[fields.size()];
+							orderListDefinition=new ArrayList<>();
+							for(String attributes: fields)
+							{
+								for(IOListField ioListField:listDefinition )
+								{
+
+									if(attributes.trim().equals(ioListField.getColumn()))
+									{
+										orderListDefinition.add(ioListField);
+										header[index]=ioListField.getFieldid();
+										break;
+									}
+								}
+
+								index=index+1;
+							}
+						}
+						else
+						{
+						
+							//fix 
+							for(IOListField ioListField:orderListDefinition )
+							{
+								
+								if(ioListField.getMissing().length()!=0)
+								{
+									for(String missing:ioListField.getMissing().split(";"))
+										if(missing.equals(fields.get(index)))
+										{
+											fields.set(index, "");
+											break;
+										}
+								}
+	
+								if(ioListField.getInclude_record_when().length()!=0)
+									if(!ioListField.getInclude_record_when().toLowerCase().equals(fields.get(index).toLowerCase().trim()))
+									{
+										projectSkipCounter=projectSkipCounter+1;
+										System.out.println("skip project"+projectSkipCounter);
+										skipProject=true;
+									}
+										
+								index++;
+	
+							}
+
+							if(skipProject==false)
+							{	
+								addProject(orderListDefinition,header,fields);
+								System.out.println("Add project"+projectCounter);
+								projectCounter=projectCounter+1;	
+							}				
+
+						}
+						fields.clear();
+						skipProject=false;
+						break;
+					case ",":
+						fields.add(buffer.toString());
+						buffer.setLength(0);
+						
+						break;
+					case "\"":
+						buffer.setLength(0);
+						state="IN_STRING";
+						
+					default:
+						buffer.append(c);
+						//buffer.add(c);
+						break;
+					
+					}
+					
+				break;
+				case "IN_STRING":
+					switch(c){
+					case "\"":
+						state="OUT";
+						break;
+
+						
+					default:
+						buffer.append(c);
+
+						break;
+					
+					}	
+				
+					
+				break;
+					
+			
+			}	
+		
+		pos++;	
+		}
+		
+		if(buffer.length()>0)
+			fields.add(buffer.toString());
+		
+		if(fields.size()>0)
+		{
+			addProject(orderListDefinition,header,fields);
+			projectCounter=projectCounter+1;	
+			fields.clear();
+		}
+		
+		logger.info("Added {} projects, total {}.", projectCounter, projects.size());
+		logger.info("Skipped {} projects",projectSkipCounter);
+		
 		
 		// adapt this import to the definition in the file lists-io-def.xml,
 		// <list name="mattermark-export">
