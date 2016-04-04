@@ -2,6 +2,9 @@ package si.ijs.ailab.fiimpact.servlet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.xml.sax.SAXException;
+
+import si.ijs.ailab.fiimpact.project.ProjectManager;
 import si.ijs.ailab.fiimpact.survey.SurveyManager;
 
 import javax.servlet.ServletConfig;
@@ -9,6 +12,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.ParserConfigurationException;
+
 import java.io.IOException;
 
 /**
@@ -19,7 +24,8 @@ public class FIImpactSecureRequestHandler extends HttpServlet
   final static Logger logger = LogManager.getLogger(FIImpactSecureRequestHandler.class.getName());
   String importDir;
   String exportDir;
-
+  ProjectManager projectManager;
+	
   @Override
   public void init(ServletConfig config) throws ServletException
   {
@@ -29,6 +35,13 @@ public class FIImpactSecureRequestHandler extends HttpServlet
     exportDir = config.getServletContext().getInitParameter("export-dir");
     logger.info("import-dir={}", importDir);
     logger.info("export-dir={}", exportDir);
+    
+
+    try {
+		projectManager=ProjectManager.getProjectManager(config.getServletContext().getRealPath("/"));
+	} catch (ParserConfigurationException | SAXException | IOException e) {
+		logger.error(e.getMessage().toString());
+	}
   }
 
   @Override
@@ -64,10 +77,11 @@ public class FIImpactSecureRequestHandler extends HttpServlet
 
      */
 
+   
     logger.info("Received request: action={}.", sAction);
     if (sAction == null || sAction.equals(""))
       setBadRequest(response, "Parameter 'action' not defined.");
-    else if (!(sAction.equals("load") || sAction.equals("list") || sAction.equals("clear") || sAction.equals("export")))
+    else if (!(sAction.equals("load") || sAction.equals("list") || sAction.equals("clear") || sAction.equals("export")|| sAction.equals("refresh-projects")||sAction.equals("refresh-mattermark")))
       setBadRequest(response, "Parameter 'action' not valid: "+sAction);
     else if (sAction.equals("load"))
     {
@@ -125,6 +139,14 @@ public class FIImpactSecureRequestHandler extends HttpServlet
       response.setContentType("application/json");
       response.setCharacterEncoding("utf-8");
       SurveyManager.getSurveyManager().exportTXT(response.getOutputStream(), exportDir, sType, groupQuestion, idList, questionsList, resultsList, resultsDerList);
+    }
+    else if(sAction.equals("refresh-projects"))
+    {
+      projectManager.importProjects(response.getOutputStream(), "import/project-list.csv");   	
+    }
+    else if(sAction.equals("refresh-mattermark"))
+    {
+	  projectManager.importProjects(response.getOutputStream(), "import/mattermark-export.csv");
     }
   }
 

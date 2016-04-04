@@ -23,23 +23,19 @@ public class FIImpactRequestHandler extends HttpServlet
   SurveyManager surveyManager;
   PDFManager pdfManager;
 
-  //TODO declare ProjectManager
   ProjectManager projectManager;
 
   @Override
   public void init(ServletConfig config) throws ServletException
   {
     surveyManager = SurveyManager.getSurveyManager(config.getServletContext().getRealPath("/"));
-
-	try {
+    pdfManager = pdfManager.getPDFManager(config.getServletContext().getRealPath("/"));
+    
+    try {
 		projectManager=ProjectManager.getProjectManager(config.getServletContext().getRealPath("/"));
 	} catch (ParserConfigurationException | SAXException | IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
+		logger.error(e.getMessage().toString());
 	}
-	
-    pdfManager = pdfManager.getPDFManager(config.getServletContext().getRealPath("/"));
-    //TODO init projectManager
 
     //TODO later (not now!!!) - on timer refresh for mattermark data
   }

@@ -17,6 +17,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import si.ijs.ailab.fiimpact.indicators.OverallResult;
@@ -37,6 +38,10 @@ class IOListDefinition {
 
 	public void addArrayList(IOListField IOListField) {
 		IOList.add(IOListField);
+	}
+	
+	public ArrayList<IOListField> getArrayList(){
+		return IOList;
 	}
 
 	public String toString() {
@@ -64,6 +69,29 @@ class IOListField {
 		this.missing = missing;
 		this.include_record_when = include_record_when;
 	}
+	
+	
+	 public String getColumn() {
+		return column;
+	}
+	 
+	 public String getFieldid() {
+		return fieldid;
+	}
+	 
+	 public String getInclude_record_when() {
+		return include_record_when;
+	}
+	 public String getLabel() {
+		return label;
+	}
+	 public String getMissing() {
+		return missing;
+	}
+	 
+	 public String getUsage() {
+		return usage;
+	}
 
 	public String toString() {
 		return "Column: " + column + " Label: " + label + " Fieldid: " + fieldid + " Usage: " + usage + " Missing: "
@@ -88,7 +116,7 @@ public class ProjectManager {
 	final static Logger logger = LogManager.getLogger(ProjectManager.class.getName());
 	private static ProjectManager projectManager;
 
-	private ProjectManager(String _webappRoot) {
+	ProjectManager(String _webappRoot) {
 		webappRoot = new File(_webappRoot).toPath();
 		projectsList = new File(_webappRoot).toPath().resolve("WEB-INF").resolve("projects-id-list.txt");
 		projectsRoot = new File(_webappRoot).toPath().resolve("WEB-INF").resolve("projects");
@@ -107,9 +135,7 @@ public class ProjectManager {
 		ioDefinitions = new HashMap<String, IOListDefinition>();
 		File listIoDef = webappRoot.resolve("WEB-INF").resolve("lists-io-def.xml").toFile();
 		importIOdef(listIoDef);
-
-
-		// TODO load import/export definitions from
+		// load import/export definitions from
 		// webappRoot.resolve("WEB-INF").resolve("lists-io-def.xml");
 		// Create a private structure to this class to handle the definitions.
 		// Map<String, IOListDefinition> ioDefinitions
@@ -151,7 +177,7 @@ public class ProjectManager {
 						IOListField ioListField = new IOListField(eElement.getAttribute("column"),
 								eElement.getAttribute("label"), eElement.getAttribute("fieldid"),
 								eElement.getAttribute("usage"), eElement.getAttribute("missing"),
-								eElement.getAttribute("include_record_when"));
+								eElement.getAttribute("include-record-when"));
 						ioListDefinition.addArrayList(ioListField);
 					}
 
@@ -289,58 +315,188 @@ public class ProjectManager {
 		}
 	}
 
+	public void addProject(String[] header,ArrayList<String> fields){
+		String id = fields.get(1);
+		ProjectData pd = projects.get(id);					
+		if (pd == null) 
+		{
+			pd = new ProjectData();
+			pd.setId(id);
+			projects.put(id, pd);
+			saveProjectsList();
+		}
+
+					
+		pd.addFields(header, fields.toArray(new String[header.length]));
+		pd.save(projectsRoot);
+		fields.clear();
+		
+	}
+	
+
+	
 	// TODO adapt this import to the definition in the file lists-io-def.xml,
 	// <list name="project-list">
 	public void importProjects(ServletOutputStream outputStream, String fileName) throws IOException {
-		// Check the TODO in the ProjectManager constructor before this one
-
+	
 		Path p = webappRoot.resolve("WEB-INF").resolve(fileName);
 		logger.info("Load data from {}", p.toString());
 
-		BufferedReader brData = new BufferedReader(new InputStreamReader(new FileInputStream(p.toFile()), "utf-8"));
-		String line = brData.readLine();
-		String[] headerArr = line.split(";");
-		line = brData.readLine();
-		int lineCnt = 1;
 
 		OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
 		JSONWriter json = new JSONWriter(w);
-		json.object().key("total_before").value(projects.size());
+		JSONWriter array = json.array();
+		array.object().key("total_before").value(projects.size()).endObject();
 
-		while (line != null) {
-			String[] lineArr = line.split(";");
-			if (lineArr.length != headerArr.length) {
-				logger.error("Ignore line {}: data length doesn't match ({}/{}).", lineCnt, headerArr.length,
-						lineArr.length);
-			} else {
-				// TODO Get id index from the metadata description
-				String id = lineArr[0];
-				ProjectData pd = projects.get(id);
-				if (pd == null) {
-					pd = new ProjectData();
-					pd.setId(id);
-					projects.put(id, pd);
-					saveProjectsList();
-				}
-				// TODO "headerArr" should be replaced with the list of field
-				// identifiers from the metadata description.
-				// You can also replace array structures with something more
-				// appropriate, like a map of id/values
-				pd.addFields(headerArr, lineArr);
-				pd.save(projectsRoot);
-			}
-			line = brData.readLine();
-			lineCnt++;
+		
+		IOListDefinition ioListDefinition=ioDefinitions.get("project-list");
+		ArrayList<IOListField> listDefinition =ioListDefinition.getArrayList();
+		
+		String data=AIUtils.readFile("C:\\Users\\Matej\\Desktop\\Tomcat7\\webapps\\fi-impact\\WEB-INF\\import\\project-list.csv");
+		int pos=0;
+		String state="OUT";
+		ArrayList<String> fields=new ArrayList<String>();
+		StringBuilder buffer=new StringBuilder();
+		int index=0;
+		ArrayList<IOListField> orderListDefinition=null;
+		String[] header = null;
+		int projectCounter=0;//number add projects
+		int projectSkipCounter=0;//skiped projects
+		boolean skipProject=false;
+		while(pos<data.length()){
+			String c=data.substring(pos,pos+1);
+			switch(state){
+				case "OUT":
+					switch(c){
+					case "\n":
+						fields.add(buffer.toString());
+						buffer.setLength(0);
+						index=0;
+						
+						if(orderListDefinition==null)
+						{
+							//mapping header and definition
+							header=new String[fields.size()];
+							orderListDefinition=new ArrayList<>();
+							for(String attributes: fields)
+							{
+								for(IOListField ioListField:listDefinition )
+								{
+
+									if(attributes.trim().equals(ioListField.getColumn()))
+									{
+										orderListDefinition.add(ioListField);
+										header[index]=ioListField.getFieldid();
+										break;
+									}
+								}
+
+								index=index+1;
+							}
+						}
+						else
+						{
+						
+							//fix 
+							for(IOListField ioListField:orderListDefinition )
+							{
+								
+								if(ioListField.getMissing().length()!=0)
+								{
+									for(String missing:ioListField.getMissing().split(";"))
+										if(missing.equals(fields.get(index)))
+										{
+											fields.set(index, "");
+											break;
+										}
+								}
+	
+								if(ioListField.getInclude_record_when().length()!=0)
+									if(!ioListField.getInclude_record_when().toLowerCase().equals(fields.get(index).toLowerCase().trim()))
+									{
+										projectSkipCounter=projectSkipCounter+1;
+										System.out.println("skip project"+projectSkipCounter);
+										skipProject=true;
+									}
+										
+								index++;
+	
+							}
+
+							if(skipProject==false)
+							{	
+								addProject(header,fields);
+								System.out.println("Add project"+projectCounter);
+								projectCounter=projectCounter+1;	
+							}				
+
+						}
+						fields.clear();
+						skipProject=false;
+						break;
+					case ",":
+						fields.add(buffer.toString());
+						buffer.setLength(0);
+						
+						break;
+					case "\"":
+						buffer.setLength(0);
+						state="IN_STRING";
+						
+					default:
+						buffer.append(c);
+						//buffer.add(c);
+						break;
+					
+					}
+					
+				break;
+				case "IN_STRING":
+					switch(c){
+					case "\"":
+						state="OUT";
+						break;
+
+						
+					default:
+						buffer.append(c);
+
+						break;
+					
+					}	
+				
+					
+				break;
+					
+			
+			}	
+		
+		pos++;	
 		}
-		logger.info("Added {} projects, total {}.", lineCnt - 1, projects.size());
-		json.object().key("total_added").value(lineCnt - 1);
-		json.object().key("total_after").value(projects.size());
-		json.endArray();
-		json.endObject();
+		
+		if(buffer.length()>0)
+			fields.add(buffer.toString());
+		
+		if(fields.size()>0)
+		{
+			addProject(header,fields);
+			projectCounter=projectCounter+1;	
+			fields.clear();
+		}
+		
+		logger.info("Added {} projects, total {}.", projectCounter, projects.size());
+		logger.info("Skipped {} projects",projectSkipCounter);
+		array.object().key("total_added").value(projectCounter).endObject();
+		array.object().key("total_after").value(projects.size()).endObject();
+		
+		array.endArray();
 		w.flush();
 		w.close();
 
+		
 	}
+	
+
 
 	// TODO same as import projects - import Mattermark data
 	public void importMattermark(ServletOutputStream outputStream, String fileName) throws IOException {
