@@ -146,7 +146,7 @@ public class FIImpactSecureRequestHandler extends HttpServlet
     }
     else if(sAction.equals("refresh-mattermark"))
     {
-	  projectManager.importProjects(response.getOutputStream(), "import/mattermark-export.csv");
+	  projectManager.importMattermark(response.getOutputStream(), "import/mattermark-export.csv");
     }
   }
 

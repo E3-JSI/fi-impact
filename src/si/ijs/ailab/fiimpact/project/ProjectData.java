@@ -32,7 +32,7 @@ public class ProjectData {
 
 	public Map<String, String> mattermarkFields = new TreeMap<>();
 
-	private void w(OutputStream os, Map<String, String> tempFields) throws IOException {
+	public void write(OutputStream os) throws IOException {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = null;
 		try {
@@ -45,26 +45,32 @@ public class ProjectData {
 		doc.appendChild(root);
 		root.setAttribute("id", id);
 
-		for (Map.Entry<String, String> fe : tempFields.entrySet()) {
+		for (Map.Entry<String, String> fe : fields.entrySet()) {
 			Element f = doc.createElement("field");
 			root.appendChild(f);
 			f.setAttribute("id", fe.getKey());
 			f.setAttribute("val", fe.getValue());
 		}
+		
+		Element matermark = doc.createElement("matermark");
+		root.appendChild(matermark);
+
+		for (Map.Entry<String, String> fe : mattermarkFields.entrySet()) {
+			Element f = doc.createElement("field");
+			matermark.appendChild(f);
+			f.setAttribute("id", fe.getKey());
+			f.setAttribute("val", fe.getValue());
+		}		
+		
+		
 		AIUtils.save(doc, os);
 
-		logger.info("Saved project data for {} with {} fields", id, tempFields.size());
+		logger.info("Saved project data for {} with {} fields", id, fields.size());
 	}
 
-	public void write(OutputStream os) throws IOException {
-		w(os, fields);
-	}
 
-	public void writeMatermark(OutputStream os) throws IOException {
-		w(os, mattermarkFields);
-	}
 
-	private void wUI(OutputStream os, Map<String, String> tempFields) throws IOException {
+	public void writeUI(OutputStream os) throws IOException {
 		JSONObject jsonProject = new JSONObject();
 		jsonProject.put("id", id);
 		SimpleDateFormat format = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
@@ -73,28 +79,24 @@ public class ProjectData {
 		jsonProject.put("timestamp_report_display", format.format(curDate));
 		JSONObject jsonFields = new JSONObject();
 		jsonProject.put("fields", jsonFields);
-		for (Map.Entry<String, String> fe : tempFields.entrySet()) {
+		for (Map.Entry<String, String> fe : fields.entrySet()) {
 			JSONObject jsonField = new JSONObject();
 			jsonField.put("val", fe.getValue());
 			jsonFields.put(fe.getKey(), jsonField);
 		}
-
+		
+		for (Map.Entry<String, String> fe : mattermarkFields.entrySet()) {
+			JSONObject jsonField = new JSONObject();
+			jsonField.put("val", fe.getValue());
+			jsonFields.put(fe.getKey(), jsonField);
+		}
 		OutputStreamWriter w = new OutputStreamWriter(os, "utf-8");
 		jsonProject.write(w);
 		w.flush();
 		w.close();
-		logger.info("Saved project {} with {} fields", id, tempFields.size());
+		logger.info("Saved project {} with {} fields", id, fields.size());
 	}
 
-	public void writeUI(OutputStream os) throws IOException {
-
-		wUI(os, fields);
-	}
-
-	public void writeUIMatermark(OutputStream os) throws IOException {
-
-		wUI(os, mattermarkFields);
-	}
 
 	public void save(Path root) {
 		Path p = root.resolve("project-" + id + ".xml");
@@ -105,9 +107,10 @@ public class ProjectData {
 		}
 	}
 
-	public Map<String, String> r(InputStream is, Map<String, String> tempFields)
-			throws ParserConfigurationException, IOException, SAXException {
-		tempFields.clear();
+
+	public void read(InputStream is) throws ParserConfigurationException, IOException, SAXException {
+		fields.clear();
+		mattermarkFields.clear();
 
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
@@ -118,61 +121,46 @@ public class ProjectData {
 
 		for (int i = 0; i < nl.getLength(); i++) {
 			Element e = (Element) nl.item(i);
-			tempFields.put(e.getAttribute("id"), e.getAttribute("val"));
+			fields.put(e.getAttribute("id"), e.getAttribute("val"));
 
 		}
+		
 
-		logger.info("Loaded project {} with {} fields.", id, tempFields.size());
-		return tempFields;
+		logger.info("Loaded project {} with {} fields.", id, fields.size());
 	}
 
-	public void read(InputStream is) throws ParserConfigurationException, IOException, SAXException {
-		fields = r(is, fields);
-	}
 
-	public void readMattermark(InputStream is) throws ParserConfigurationException, IOException, SAXException {
-		mattermarkFields = r(is, mattermarkFields);
-	}
 
-	public Map<String, String> addF(String[] arrFields, Map<String, String> tempFields) {
-		tempFields.clear();
+	public void addFields(String[] arrFields) {
+		fields.clear();
 		for (String s : arrFields) {
 			String[] arr = s.split(";");
 			if (arr.length == 1)
 				logger.error("Empty answer for: {}. Ignore.", arr[0]);
 			else
-				tempFields.put(arr[0], arr[1]);
+				fields.put(arr[0], arr[1]);
 		}
-		return tempFields;
-	}
-
-	public void addFields(String[] arrFields) {
-		fields = addF(arrFields, fields);
 
 	}
 
-	public void addFieldsMattermark(String[] arrFields) {
-		mattermarkFields = addF(arrFields, mattermarkFields);
 
-	}
-
-	public Map<String, String> addF(String[] headerArr, String[] lineArr, Map<String, String> tempFields) {
-		tempFields.clear();
+	public void addFields(String[] headerArr, String[] lineArr) {
+		fields.clear();
 		for (int i = 0; i < headerArr.length; i++) {
 			String fieldID = headerArr[i];
 			String fieldVal = lineArr[i];
-			tempFields.put(fieldID, fieldVal);
+			fields.put(fieldID, fieldVal);
 		}
-		return tempFields;
-	}
-
-	public void addFields(String[] headerArr, String[] lineArr) {
-		fields = addF(headerArr, lineArr, fields);
 
 	}
 
 	public void addFieldsMattermark(String[] headerArr, String[] lineArr) {
-		mattermarkFields = addF(headerArr, lineArr, mattermarkFields);
+		mattermarkFields.clear();
+		for (int i = 0; i < headerArr.length; i++) {
+			String fieldID = headerArr[i];
+			String fieldVal = lineArr[i];
+			mattermarkFields.put(fieldID, fieldVal);
+		}
 
 	}
 

@@ -315,13 +315,14 @@ public class ProjectManager {
 		}
 	}
 
-	public void addProject(ArrayList<IOListField> orderListDefinition,String[] header,ArrayList<String> fields){
+	public int addProject(int projectCounter,ArrayList<IOListField> orderListDefinition,String[] header,ArrayList<String> fields)
+	{
 		int index=0;
 		for(IOListField ioListField:orderListDefinition){
-			index=index+1;
-			if(ioListField.getUsage().equals("id")||ioListField.getUsage().equals("indicator"))
+
+			if(ioListField.getUsage().equals("id"))
 				break;
-			
+			index=index+1;			
 			
 		}
 		String id = fields.get(index);
@@ -329,15 +330,40 @@ public class ProjectManager {
 		if (pd == null) 
 		{
 			pd = new ProjectData();
-			
+			projectCounter=projectCounter+1;
 			pd.setId(id);
 			projects.put(id, pd);
 			saveProjectsList();
 		}
-
+		
 		String[] s=fields.toArray(new String[header.length]);			
 		pd.addFields(header,s );
 		pd.save(projectsRoot);
+		return projectCounter;
+
+		
+	}
+	
+	public String cleanURL(String rawURL){
+		if(rawURL.length()>0)
+			if(rawURL.lastIndexOf("/")==rawURL.length()-1)
+				rawURL=rawURL.substring(0,rawURL.length()-1);
+		
+		return rawURL.replaceFirst("^(https://www.|http://www.|http://|https://|www.|)","");
+	}
+
+
+	public int addProjectMatermark(int projectCounter, ProjectData projectData,ArrayList<IOListField> orderListDefinition,String[] header,ArrayList<String> fields){
+		if(projectData!=null)
+			if(projects.containsKey(projectData.getId()))
+			{
+				ProjectData pd = projects.get(projectData.getId());					
+				projectCounter=projectCounter+1;
+				String[] s=fields.toArray(new String[header.length]);			
+				pd.addFieldsMattermark(header,s );
+				pd.save(projectsRoot);
+			}
+		return projectCounter;
 
 		
 	}
@@ -371,14 +397,14 @@ public class ProjectManager {
 		String[] header = null;
 		int projectCounter=0;//number add projects
 		int projectSkipCounter=0;//skiped projects
-		boolean skipProject=false;
+		boolean skipProject=false;//false=save project;true=skip project
 		while(pos<data.length()){
 			String c=data.substring(pos,pos+1);
 			switch(state){
 				case "OUT":
 					switch(c){
 					case "\n":
-						fields.add(buffer.toString());
+						fields.add(buffer.toString().trim());
 						buffer.setLength(0);
 						index=0;
 						
@@ -391,7 +417,6 @@ public class ProjectManager {
 							{
 								for(IOListField ioListField:listDefinition )
 								{
-
 									if(attributes.trim().equals(ioListField.getColumn()))
 									{
 										orderListDefinition.add(ioListField);
@@ -399,17 +424,15 @@ public class ProjectManager {
 										break;
 									}
 								}
-
 								index=index+1;
 							}
 						}
 						else
 						{
 						
-							//fix 
+							//clean meassing, and include record if yes
 							for(IOListField ioListField:orderListDefinition )
 							{
-								
 								if(ioListField.getMissing().length()!=0)
 								{
 									for(String missing:ioListField.getMissing().split(";"))
@@ -419,26 +442,20 @@ public class ProjectManager {
 											break;
 										}
 								}
-	
 								if(ioListField.getInclude_record_when().length()!=0)
 									if(!ioListField.getInclude_record_when().toLowerCase().equals(fields.get(index).toLowerCase().trim()))
 									{
 										projectSkipCounter=projectSkipCounter+1;
-										System.out.println("skip project"+projectSkipCounter);
 										skipProject=true;
 									}
 										
 								index++;
 	
 							}
-
 							if(skipProject==false)
-							{	
-								addProject(orderListDefinition,header,fields);
-								System.out.println("Add project"+projectCounter);
-								projectCounter=projectCounter+1;	
+							{	//	
+								projectCounter=addProject(projectCounter,orderListDefinition,header,fields);		
 							}				
-
 						}
 						fields.clear();
 						skipProject=false;
@@ -454,7 +471,6 @@ public class ProjectManager {
 						
 					default:
 						buffer.append(c);
-						//buffer.add(c);
 						break;
 					
 					}
@@ -464,20 +480,13 @@ public class ProjectManager {
 					switch(c){
 					case "\"":
 						state="OUT";
-						break;
-
-						
+						break;	
 					default:
 						buffer.append(c);
-
 						break;
 					
 					}	
-				
-					
-				break;
-					
-			
+				break;		
 			}	
 		
 		pos++;	
@@ -488,7 +497,7 @@ public class ProjectManager {
 		
 		if(fields.size()>0)
 		{
-			addProject(orderListDefinition,header,fields);
+			projectCounter=addProject(projectCounter,orderListDefinition,header,fields);
 			projectCounter=projectCounter+1;	
 			fields.clear();
 		}
@@ -513,13 +522,14 @@ public class ProjectManager {
 		logger.info("Load data from {}", p.toString());
 
 
-		OutputStreamWriter w = null;///new OutputStreamWriter(outputStream, "utf-8");
-	//	JSONWriter json = new JSONWriter(w);
-	//	json.object().key("total_before").value(projects.size());
-
+		OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
+		JSONWriter json = new JSONWriter(w);
+		JSONWriter array = json.array();
+		array.object().key("total_before").value(projects.size()).endObject();
+		
 		
 		IOListDefinition ioListDefinition=ioDefinitions.get("mattermark-export");
-		ArrayList<IOListField> listDefinition =ioListDefinition.getArrayList();
+		ArrayList<IOListField> listDefinitionMatermark =ioListDefinition.getArrayList();
 		
 		String data=AIUtils.readFile(p);
 		int pos=0;
@@ -530,30 +540,52 @@ public class ProjectManager {
 		ArrayList<IOListField> orderListDefinition=null;
 		String[] header = null;
 		int projectCounter=0;//number add projects
-		int projectSkipCounter=0;//skiped projects
-		boolean skipProject=false;
+
 		/*
 		1. go through all ProjectData instances and clear mattermark
 		 * information*/
-		
 		for(String key: projects.keySet())
 		{
 			ProjectData projectData=projects.get(key);
 			projectData.mattermarkFields.clear();
 		}
+		
 		/*2.load the file - use the clean-url usage information to
 		 * match it with the correct ProjectData instance You may create a
 		 * temporary map, where you have the clean-url as key in order to find
 		 * the correct project. Save each ProjectData insance and the list.
 		 */
-		
+		//	clean-url
+		orderListDefinition=ioDefinitions.get("project-list").getArrayList();
+		Map<String,ProjectData> tempMap=new HashMap<>();
+		for(IOListField ioListField:orderListDefinition )
+		{
+			
+			if(ioListField.getUsage().equals("clean-url"))
+			{	
+				for(String key: projects.keySet())
+				{
+					ProjectData projectData=projects.get(key);
+					if(projectData!=null&& projectData.fields.get(ioListField.getFieldid())!=null){
+						String p1=projectData.fields.get(ioListField.getFieldid());
+						tempMap.put(cleanURL(p1.trim()), projectData);	
+
+						}
+
+				}
+				break;
+			}
+
+		}
+		orderListDefinition=null;
 		while(pos<data.length()){
+			
 			String c=data.substring(pos,pos+1);
 			switch(state){
 				case "OUT":
 					switch(c){
 					case "\n":
-						fields.add(buffer.toString());
+						fields.add(buffer.toString().trim());
 						buffer.setLength(0);
 						index=0;
 						
@@ -564,7 +596,7 @@ public class ProjectManager {
 							orderListDefinition=new ArrayList<>();
 							for(String attributes: fields)
 							{
-								for(IOListField ioListField:listDefinition )
+								for(IOListField ioListField:listDefinitionMatermark )
 								{
 
 									if(attributes.trim().equals(ioListField.getColumn()))
@@ -580,11 +612,10 @@ public class ProjectManager {
 						}
 						else
 						{
-						
+							String id = null;
 							//fix 
 							for(IOListField ioListField:orderListDefinition )
-							{
-								
+							{			
 								if(ioListField.getMissing().length()!=0)
 								{
 									for(String missing:ioListField.getMissing().split(";"))
@@ -592,31 +623,22 @@ public class ProjectManager {
 										{
 											fields.set(index, "");
 											break;
-										}
+										}	
 								}
-	
-								if(ioListField.getInclude_record_when().length()!=0)
-									if(!ioListField.getInclude_record_when().toLowerCase().equals(fields.get(index).toLowerCase().trim()))
-									{
-										projectSkipCounter=projectSkipCounter+1;
-										System.out.println("skip project"+projectSkipCounter);
-										skipProject=true;
+								if(ioListField.getUsage().length()!=0)
+									if(ioListField.getUsage().equals("clean-url")){
+											id=cleanURL(fields.get(index).trim());
 									}
-										
+								
 								index++;
-	
 							}
-
-							if(skipProject==false)
-							{	
-								addProject(orderListDefinition,header,fields);
-								System.out.println("Add project"+projectCounter);
-								projectCounter=projectCounter+1;	
-							}				
-
+								if(id!=null){									
+									ProjectData projectData=tempMap.get(id);			
+									projectCounter=addProjectMatermark(projectCounter,projectData,orderListDefinition,header,fields);		
+								}
 						}
 						fields.clear();
-						skipProject=false;
+
 						break;
 					case ",":
 						fields.add(buffer.toString());
@@ -663,31 +685,21 @@ public class ProjectManager {
 		
 		if(fields.size()>0)
 		{
-			addProject(orderListDefinition,header,fields);
-			projectCounter=projectCounter+1;	
+			String id=cleanURL(fields.get(index).trim());
+			ProjectData projectData=tempMap.get(id);
+			addProjectMatermark(projectCounter,projectData,orderListDefinition,header,fields);	
 			fields.clear();
 		}
 		
-		logger.info("Added {} projects, total {}.", projectCounter, projects.size());
-		logger.info("Skipped {} projects",projectSkipCounter);
+		logger.info("Added mattermark {} projects, total {}.", projectCounter, projects.size());
+		array.object().key("added mattermark").value(projectCounter).endObject();
+		array.object().key("total_after").value(projects.size()).endObject();
+		
+		array.endArray();
+		w.flush();
+		w.close();
 		
 		
-		// adapt this import to the definition in the file lists-io-def.xml,
-		// <list name="mattermark-export">
-
-		/*
-		 * You have to expand the ProjectData class - add a new map to it (like
-		 * the existing "fields" map). - getters/setters, persistence
-		 * (load/save) -add getter for clean-url metadata
-		 */
-
-		/*
-		 * 1. go through all ProjectData instances and clear mattermark
-		 * information 2.load the file - use the clean-url usage information to
-		 * match it with the correct ProjectData instance You may create a
-		 * temporary map, where you have the clean-url as key in order to find
-		 * the correct project. Save each ProjectData insance and the list.
-		 */
 	}
 
 	public void listProjects(ServletOutputStream outputStream) throws IOException {
