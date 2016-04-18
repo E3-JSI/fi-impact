@@ -23,7 +23,8 @@ import java.util.*;
  * Created by flavio on 13/07/2015.
  */
 
-public class ProjectData {
+public class ProjectData
+{
 
 	final static Logger logger = LogManager.getLogger(ProjectData.class.getName());
 
@@ -32,12 +33,15 @@ public class ProjectData {
 
 	public Map<String, String> mattermarkFields = new TreeMap<>();
 
-	public void write(OutputStream os) throws IOException {
+	public void write(OutputStream os) throws IOException
+	{
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = null;
-		try {
+		try
+		{
 			db = dbf.newDocumentBuilder();
-		} catch (ParserConfigurationException e) {
+		} catch (ParserConfigurationException e)
+		{
 			logger.error("Can't believe this", e);
 		}
 		Document doc = db.newDocument();
@@ -45,32 +49,32 @@ public class ProjectData {
 		doc.appendChild(root);
 		root.setAttribute("id", id);
 
-		for (Map.Entry<String, String> fe : fields.entrySet()) {
+		for (Map.Entry<String, String> fe : fields.entrySet())
+		{
 			Element f = doc.createElement("field");
 			root.appendChild(f);
 			f.setAttribute("id", fe.getKey());
 			f.setAttribute("val", fe.getValue());
 		}
-		
+
 		Element matermark = doc.createElement("matermark");
 		root.appendChild(matermark);
 
-		for (Map.Entry<String, String> fe : mattermarkFields.entrySet()) {
+		for (Map.Entry<String, String> fe : mattermarkFields.entrySet())
+		{
 			Element f = doc.createElement("field");
 			matermark.appendChild(f);
 			f.setAttribute("id", fe.getKey());
 			f.setAttribute("val", fe.getValue());
-		}		
-		
-		
+		}
+
 		AIUtils.save(doc, os);
 
 		logger.info("Saved project data for {} with {} fields", id, fields.size());
 	}
 
-
-
-	public void writeUI(OutputStream os) throws IOException {
+	public void writeUI(OutputStream os) throws IOException
+	{
 		JSONObject jsonProject = new JSONObject();
 		jsonProject.put("id", id);
 		SimpleDateFormat format = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
@@ -79,13 +83,15 @@ public class ProjectData {
 		jsonProject.put("timestamp_report_display", format.format(curDate));
 		JSONObject jsonFields = new JSONObject();
 		jsonProject.put("fields", jsonFields);
-		for (Map.Entry<String, String> fe : fields.entrySet()) {
+		for (Map.Entry<String, String> fe : fields.entrySet())
+		{
 			JSONObject jsonField = new JSONObject();
 			jsonField.put("val", fe.getValue());
 			jsonFields.put(fe.getKey(), jsonField);
 		}
-		
-		for (Map.Entry<String, String> fe : mattermarkFields.entrySet()) {
+
+		for (Map.Entry<String, String> fe : mattermarkFields.entrySet())
+		{
 			JSONObject jsonField = new JSONObject();
 			jsonField.put("val", fe.getValue());
 			jsonFields.put(fe.getKey(), jsonField);
@@ -97,21 +103,25 @@ public class ProjectData {
 		logger.info("Saved project {} with {} fields", id, fields.size());
 	}
 
-
-	public void save(Path root) {
+	public void save(Path root)
+	{
 		Path p = root.resolve("project-" + id + ".xml");
-		try {
+		try
+		{
 			write(new FileOutputStream(p.toFile()));
-		} catch (IOException e) {
+		} catch (IOException e)
+		{
 			logger.error("Cannot save project {}", p.toString());
 		}
 	}
 
-	public Map<String, String> getMattermarkFields() {
+	public Map<String, String> getMattermarkFields()
+	{
 		return mattermarkFields;
 	}
 
-	public void read(InputStream is) throws ParserConfigurationException, IOException, SAXException {
+	public void read(InputStream is) throws ParserConfigurationException, IOException, SAXException
+	{
 		fields.clear();
 		mattermarkFields.clear();
 
@@ -122,21 +132,21 @@ public class ProjectData {
 
 		NodeList nl = doc.getElementsByTagName("field");
 
-		for (int i = 0; i < nl.getLength(); i++) {
+		for (int i = 0; i < nl.getLength(); i++)
+		{
 			Element e = (Element) nl.item(i);
 			fields.put(e.getAttribute("id"), e.getAttribute("val"));
 
 		}
-		
 
 		logger.info("Loaded project {} with {} fields.", id, fields.size());
 	}
 
-
-
-	public void addFields(String[] arrFields) {
+	public void addFields(String[] arrFields)
+	{
 		fields.clear();
-		for (String s : arrFields) {
+		for (String s : arrFields)
+		{
 			String[] arr = s.split(";");
 			if (arr.length == 1)
 				logger.error("Empty answer for: {}. Ignore.", arr[0]);
@@ -146,10 +156,11 @@ public class ProjectData {
 
 	}
 
-
-	public void addFields(String[] headerArr, String[] lineArr) {
+	public void addFields(String[] headerArr, String[] lineArr)
+	{
 		fields.clear();
-		for (int i = 0; i < headerArr.length; i++) {
+		for (int i = 0; i < headerArr.length; i++)
+		{
 			String fieldID = headerArr[i];
 			String fieldVal = lineArr[i];
 			fields.put(fieldID, fieldVal);
@@ -157,9 +168,11 @@ public class ProjectData {
 
 	}
 
-	public void addFieldsMattermark(String[] headerArr, String[] lineArr) {
+	public void addFieldsMattermark(String[] headerArr, String[] lineArr)
+	{
 		mattermarkFields.clear();
-		for (int i = 0; i < headerArr.length; i++) {
+		for (int i = 0; i < headerArr.length; i++)
+		{
 			String fieldID = headerArr[i];
 			String fieldVal = lineArr[i];
 			mattermarkFields.put(fieldID, fieldVal);
@@ -167,23 +180,28 @@ public class ProjectData {
 
 	}
 
-	public void clear() {
+	public void clear()
+	{
 		fields.clear();
 	}
 
-	public void clearMattermark() {
+	public void clearMattermark()
+	{
 		mattermarkFields.clear();
 	}
 
-	public String getId() {
+	public String getId()
+	{
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(String id)
+	{
 		this.id = id;
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args)
+	{
 	}
 
 }
