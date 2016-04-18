@@ -21,6 +21,7 @@ import org.xml.sax.SAXException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import si.ijs.ailab.fiimpact.indicators.OverallResult;
+import si.ijs.ailab.fiimpact.indicators.OverallResult.ScoreBoundaries;
 import si.ijs.ailab.fiimpact.project.ProjectManager;
 import si.ijs.ailab.util.AIUtils;
 
@@ -254,12 +255,16 @@ public class SurveyManager
       {
         typeResults.put(entry.getKey(), new OverallResult(type, entry.getKey(), entry.getValue()));
       }
-      //TODO Same loop for mattermark slots  -  ProjectManager.getMattemrarkSlots()
+      // Same loop for mattermark slots  -  ProjectManager.getMattemrarkSlots()
+     for(Map.Entry<String, ScoreBoundaries> entry:ProjectManager.getMattemrarkSlots().entrySet()){
+    	 typeResults.put(entry.getKey(), new OverallResult(type, entry.getKey(), entry.getValue()));
+     }
      ProjectManager projectManager=ProjectManager.getProjectManager();
      for(Map.Entry<String, OverallResult.ScoreBoundaries> entry: SPEEDOMETER_SLOTS.entrySet())
      {
        typeResults.put(entry.getKey(), new OverallResult(type, entry.getKey(), entry.getValue()));
-     }     
+     }
+    
 
     }
 

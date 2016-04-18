@@ -55,7 +55,7 @@ public class FIImpactSecureRequestHandler extends HttpServlet
      clear
      */
     String sAction = request.getParameter("action");
-    //TODO add actions "refresh-projects", "refresh-mattermark"
+    // add actions "refresh-projects", "refresh-mattermark"
 
     //TODO later - export to csv - specification still in progress
     /*

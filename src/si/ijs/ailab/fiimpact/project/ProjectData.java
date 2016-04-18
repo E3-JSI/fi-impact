@@ -107,6 +107,9 @@ public class ProjectData {
 		}
 	}
 
+	public Map<String, String> getMattermarkFields() {
+		return mattermarkFields;
+	}
 
 	public void read(InputStream is) throws ParserConfigurationException, IOException, SAXException {
 		fields.clear();

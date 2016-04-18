@@ -9,6 +9,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import si.ijs.ailab.fiimpact.indicators.OverallResult;
+import si.ijs.ailab.fiimpact.project.ProjectData;
+import si.ijs.ailab.fiimpact.project.ProjectManager;
 import si.ijs.ailab.util.AIStructures;
 import si.ijs.ailab.util.AIUtils;
 
@@ -1666,25 +1668,30 @@ public class SurveyData
     }
     logger.debug("Calc social impact done.");
     //TODO calculate mattermark results - normalise to scale 0.0 - 5.0
-    /*
+    
     ProjectManager pm = ProjectManager.getProjectManager();
     ArrayList<String> mattermarkIndicators = pm.getMattermarkIndicators();
     for(String indicator: mattermarkIndicators)
       results.put("MATTERMARK_"+indicator, 0.0);
 
-    ProjectData pd = pm.getProjects.get(id);
+    
+    ProjectData pd = pm.getProjects().get(id);
     if(pd!=null)
     {
       for(String indicator: mattermarkIndicators)
       {
-        Double dInd = pd.getMattermarkFields.get(indicator);
+    	
+        Double dInd = Double.valueOf(pd.getMattermarkFields().get(indicator));
         if(dInd != null)
         {
-          dInd = normalise to 0.0 - 5.0 scale by using ProjectManger.get.... min/max values
-          results.put("MATTERMARK_"+indicator, dNormalisedResult);
-      }
+        	//normalize equation: normalized_x = ((ceil - floor) * (x - minimum))/(maximum - minimum) + floor
+        	double dNormalisedResult=(0.5*(dInd-ProjectManager.getMattermarkMinValue(indicator)))/ProjectManager.getMattermarkMaxValue(indicator)-ProjectManager.getMattermarkMinValue(indicator);
+         // dInd = normalise to 0.0 - 5.0 scale by using ProjectManger.get.... min/max values
+        	results.put("MATTERMARK_"+indicator, dNormalisedResult);
+        }
 
-    }*/
+       }
+     }
   }
 
   public void clear()

@@ -370,7 +370,7 @@ public class ProjectManager {
 	
 
 	
-	// TODO adapt this import to the definition in the file lists-io-def.xml,
+	// adapt this import to the definition in the file lists-io-def.xml,
 	// <list name="project-list">
 	public void importProjects(ServletOutputStream outputStream, String fileName) throws IOException {
 	
@@ -516,7 +516,7 @@ public class ProjectManager {
 	
 
 
-	// TODO same as import projects - import Mattermark data
+	// same as import projects - import Mattermark data
 	public void importMattermark(ServletOutputStream outputStream, String fileName) throws IOException {
 		Path p = webappRoot.resolve("WEB-INF").resolve(fileName);
 		logger.info("Load data from {}", p.toString());
@@ -712,7 +712,7 @@ public class ProjectManager {
 			json.object();
 			json.key("id").value(pd.getId());
 			// TODO Add field keys for the list view.
-			// addFieldKey(json, "Q1_1", pd.fields);
+			addFieldKey(json, "Q1_1", pd.fields);
 			json.endObject();
 		}
 		json.endArray();
@@ -820,19 +820,27 @@ public class ProjectManager {
 		w.close();
 	}
 
-	// TODO return the list of "indicator" field identifiers
+	// return the list of "indicator" field identifiers
 	public ArrayList<String> getMattermarkIndicators() {
-		return null;
+		ArrayList<String> mattermarkIndicators=new ArrayList<>();
+		IOListDefinition ioListDefinition=ioDefinitions.get("mattermark-export");
+		ArrayList<IOListField> listDefinitionMatermark =ioListDefinition.getArrayList();
+		
+		for(IOListField ioListField:listDefinitionMatermark){
+			if(ioListField.getUsage().equals("indicator"))
+				mattermarkIndicators.add(ioListField.getFieldid());
+		}
+		return mattermarkIndicators;
 	}
 
 	// TODO when loading or importing mattermark data store min/max/n values for
 	// "indicator" fields in a data structure
 	// and return them here
-	public double getMattermarkMinValue(String fieldId) {
+	public static double getMattermarkMinValue(String fieldId) {
 		return 0.0;
 	}
 
-	public double getMattermarkMaxValue(String fieldId) {
+	public static double getMattermarkMaxValue(String fieldId) {
 		return 0.0;
 	}
 
@@ -848,7 +856,7 @@ public class ProjectManager {
 	 * SPEEDOMETER_SLOTS. Entries are mattemrak "indicator" fields with the
 	 * "MATTERMARK_" prefix.
 	 */
-	public Map<String, OverallResult.ScoreBoundaries> getMattemrarkSlots() {
+	public static Map<String, OverallResult.ScoreBoundaries> getMattemrarkSlots() {
 		return null;
 	}
 
