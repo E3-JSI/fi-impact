@@ -1,13 +1,19 @@
-package si.ijs.ailab.fiimpact;
+package si.ijs.ailab.fiimpact.servlet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.xml.sax.SAXException;
+
+import si.ijs.ailab.fiimpact.project.ProjectManager;
+import si.ijs.ailab.fiimpact.survey.SurveyManager;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.ParserConfigurationException;
+
 import java.io.IOException;
 
 /**
@@ -16,20 +22,21 @@ import java.io.IOException;
 public class FIImpactSecureRequestHandler extends HttpServlet
 {
   final static Logger logger = LogManager.getLogger(FIImpactSecureRequestHandler.class.getName());
-  //SurveyManager surveyManager;
   String importDir;
   String exportDir;
-
+  ProjectManager projectManager;
+	
   @Override
   public void init(ServletConfig config) throws ServletException
   {
-    //surveyManager = SurveyManager.getSurveyManager(config.getServletContext().getRealPath("/"));
     //E:\Dropbox\FI-IMPACT\data\FI-IMPACT_Export_20150624
     importDir = config.getServletContext().getInitParameter("import-dir");
     //E:\Dropbox\FI-IMPACT\data\export.txt
     exportDir = config.getServletContext().getInitParameter("export-dir");
     logger.info("import-dir={}", importDir);
     logger.info("export-dir={}", exportDir);
+
+		projectManager=ProjectManager.getProjectManager(config.getServletContext().getRealPath("/"));
   }
 
   @Override
@@ -43,11 +50,31 @@ public class FIImpactSecureRequestHandler extends HttpServlet
      clear
      */
     String sAction = request.getParameter("action");
+    //TODO later - export to csv - specification still in progress
+    /*
+      Adapt the exportTXT method to take into account addtional parameters and also to be able to export to either stream or file.
+      action=csv
+      response.setContentType("application/json"); - should be set to csv or text - check how should this be done.
+      export to CSV parameters
+      assesment=self/impact/all
+      master=survey/project/merge
+      data=survey;project;mattermark;survey-additional;project-aditional;mattermark-additional;
 
+      scope=all,accelerator.
+
+      scope has to be checked aginst the role of the current logged in user.
+      we should have roles:
+        accelerator (sees only accelerator filtered data),
+        fiimpact (sees everything),
+        fiware (sees all projects, but limited number of columns)
+
+     */
+
+   
     logger.info("Received request: action={}.", sAction);
     if (sAction == null || sAction.equals(""))
       setBadRequest(response, "Parameter 'action' not defined.");
-    else if (!(sAction.equals("load") || sAction.equals("list") || sAction.equals("clear") || sAction.equals("export")))
+    else if (!(sAction.equals("load") || sAction.equals("list") || sAction.equals("clear") || sAction.equals("export")|| sAction.equals("refresh-projects")||sAction.equals("refresh-mattermark")))
       setBadRequest(response, "Parameter 'action' not valid: "+sAction);
     else if (sAction.equals("load"))
     {
@@ -105,6 +132,14 @@ public class FIImpactSecureRequestHandler extends HttpServlet
       response.setContentType("application/json");
       response.setCharacterEncoding("utf-8");
       SurveyManager.getSurveyManager().exportTXT(response.getOutputStream(), exportDir, sType, groupQuestion, idList, questionsList, resultsList, resultsDerList);
+    }
+    else if(sAction.equals("refresh-projects"))
+    {
+      projectManager.importProjects(response.getOutputStream(), "import/project-list.csv");   	
+    }
+    else if(sAction.equals("refresh-mattermark"))
+    {
+	  projectManager.importMattermark(response.getOutputStream(), "import/mattermark-export.csv");
     }
   }
 

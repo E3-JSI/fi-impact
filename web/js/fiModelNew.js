@@ -867,7 +867,31 @@
 					]
 				}
 			]
-		}
+		}, {
+			"id" : "7a",
+			"name" : "MATTERMARK_M02",
+			"label" : "Growth Score",
+			"label_graph" : "Growth Score",
+			"questions" : []
+		}, {
+			"id" : "7b",
+			"name" : "MATTERMARK_M23",
+			"label" : "Est. Monthly Uniques",
+			"label_graph" : "Est. Monthly Uniques",
+			"questions" : []
+		}, {
+			"id" : "7c",
+			"name" : "MATTERMARK_M62",
+			"label" : "Total Funding",
+			"label_graph" : "Total Funding",
+			"questions" : []
+		}, {
+			"id" : "7d",
+			"name" : "MATTERMARK_M77",
+			"label" : "New funding employee growth",
+			"label_graph" : "New funding employee growth",
+			"questions" : []
+			}
 	],
 
 	"tooltips" : ["Low", "Medium", "High"],

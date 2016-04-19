@@ -1,16 +1,18 @@
-package si.ijs.ailab.fiimpact;
+package si.ijs.ailab.fiimpact.servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
+import javax.xml.parsers.ParserConfigurationException;
 
 import java.io.*;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import si.ijs.ailab.util.AIUtils;
+import org.xml.sax.SAXException;
+
+import si.ijs.ailab.fiimpact.pdf.PDFManager;
+import si.ijs.ailab.fiimpact.project.ProjectManager;
+import si.ijs.ailab.fiimpact.survey.SurveyManager;
 
 /**
  * Created by flavio on 01/06/2015.
@@ -21,26 +23,12 @@ public class FIImpactRequestHandler extends HttpServlet
   SurveyManager surveyManager;
   PDFManager pdfManager;
 
+  ProjectManager projectManager;
+
   @Override
   public void init(ServletConfig config) throws ServletException
   {
-    /*Map<String, Integer> slots = new HashMap<>();
-     Enumeration params = config.getServletContext().getInitParameterNames();
-    while(params.hasMoreElements())
-    {
-      String paramName = (String)params.nextElement();
-      if(paramName.startsWith("slot_"))
-      {
-        String paramValue = getInitParameter(paramName);
-        Integer intVal = AIUtils.parseInteger(paramValue, 10);
-        paramName = paramName.substring("slot_".length());
-        logger.info("Histogram slots for {}: {}", paramName, intVal);
-        slots.put(paramName, intVal);
-      }
-    }
-
-    surveyManager = SurveyManager.getSurveyManager(config.getServletContext().getRealPath("/"), slots);
-    */
+    projectManager=ProjectManager.getProjectManager(config.getServletContext().getRealPath("/"));
     surveyManager = SurveyManager.getSurveyManager(config.getServletContext().getRealPath("/"));
     pdfManager = pdfManager.getPDFManager(config.getServletContext().getRealPath("/"));
   }

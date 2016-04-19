@@ -1,7 +1,9 @@
-package si.ijs.ailab.fiimpact;
+package si.ijs.ailab.fiimpact.indicators;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import si.ijs.ailab.fiimpact.survey.SurveyData;
+import si.ijs.ailab.fiimpact.survey.SurveyManager;
 import si.ijs.ailab.util.AIStructures;
 
 import java.util.ArrayList;
@@ -10,7 +12,7 @@ import java.util.Collections;
 /**
  * Created by flavio on 08/09/2015.
  */
-class OverallResult
+public class OverallResult
 {
 
   String id;
@@ -18,12 +20,50 @@ class OverallResult
   int n;
   double sum;
   double average;
-  //double min;
-  //double max;
 
   public static class ScoreBoundaries
   {
     double min, lo_med, med_hi, max;
+
+    public double getMin()
+    {
+      return min;
+    }
+
+    public void setMin(double min)
+    {
+      this.min = min;
+    }
+
+    public double getLo_med()
+    {
+      return lo_med;
+    }
+
+    public void setLo_med(double lo_med)
+    {
+      this.lo_med = lo_med;
+    }
+
+    public double getMed_hi()
+    {
+      return med_hi;
+    }
+
+    public void setMed_hi(double med_hi)
+    {
+      this.med_hi = med_hi;
+    }
+
+    public double getMax()
+    {
+      return max;
+    }
+
+    public void setMax(double max)
+    {
+      this.max = max;
+    }
   }
 
   public class ResultGraph
@@ -52,7 +92,7 @@ class OverallResult
         add(sd);
     }
 
-    public void add(SurveyData surveyData)
+    private void add(SurveyData surveyData)
     {
       int slot;
       Double score = surveyData.results.get(id);
@@ -204,5 +244,30 @@ class OverallResult
   public int getAverageSlot()
   {
     return graph.getSlot(average);
+  }
+
+  public String getId()
+  {
+    return id;
+  }
+
+  public String getType()
+  {
+    return type;
+  }
+
+  public int getN()
+  {
+    return n;
+  }
+
+  public double getSum()
+  {
+    return sum;
+  }
+
+  public double getAverage()
+  {
+    return average;
   }
 }
