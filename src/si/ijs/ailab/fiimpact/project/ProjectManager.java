@@ -510,7 +510,7 @@ public class ProjectManager
   // import according to the definition in the file lists-io-def.xml, <list name="project-list">
   public void importProjects(ServletOutputStream outputStream, String fileName) throws IOException
   {
-     projects.clear();
+    projects.clear();
     Path p = webappRoot.resolve("WEB-INF").resolve(fileName);
     logger.info("Load data from {}", p.toString());
 

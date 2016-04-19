@@ -48,10 +48,13 @@ public class ProjectData
 		doc.appendChild(root);
 		root.setAttribute("id", id);
 
+    Element idc = doc.createElement("idc");
+    root.appendChild(idc);
+
 		for (Map.Entry<String, String> fe : fields.entrySet())
 		{
 			Element f = doc.createElement("field");
-			root.appendChild(f);
+			idc.appendChild(f);
 			f.setAttribute("id", fe.getKey());
 			f.setAttribute("val", fe.getValue());
 		}
@@ -129,7 +132,7 @@ public class ProjectData
 		Document doc = db.parse(is);
 		id = doc.getDocumentElement().getAttribute("id");
 
-    NodeList nl = doc.getElementsByTagName("project");
+    NodeList nl = doc.getElementsByTagName("idc");
     if(nl.getLength() == 1)
     {
       nl = ((Element) nl.item(0)).getElementsByTagName("field");

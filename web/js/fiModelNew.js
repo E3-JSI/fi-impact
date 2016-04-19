@@ -874,7 +874,7 @@
 			"label_graph" : "Growth Score",
 			"questions" : []
 		}, {
-			"id" : "7b,
+			"id" : "7b",
 			"name" : "MATTERMARK_M23",
 			"label" : "Est. Monthly Uniques",
 			"label_graph" : "Est. Monthly Uniques",
