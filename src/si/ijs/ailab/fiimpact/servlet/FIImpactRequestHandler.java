@@ -2,12 +2,16 @@ package si.ijs.ailab.fiimpact.servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
+import javax.xml.parsers.ParserConfigurationException;
 
 import java.io.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.xml.sax.SAXException;
+
 import si.ijs.ailab.fiimpact.pdf.PDFManager;
+import si.ijs.ailab.fiimpact.project.ProjectManager;
 import si.ijs.ailab.fiimpact.survey.SurveyManager;
 
 /**
@@ -19,24 +23,14 @@ public class FIImpactRequestHandler extends HttpServlet
   SurveyManager surveyManager;
   PDFManager pdfManager;
 
-  //TODO declare ProjectManager
-
+  ProjectManager projectManager;
 
   @Override
   public void init(ServletConfig config) throws ServletException
   {
+    projectManager=ProjectManager.getProjectManager(config.getServletContext().getRealPath("/"));
     surveyManager = SurveyManager.getSurveyManager(config.getServletContext().getRealPath("/"));
     pdfManager = pdfManager.getPDFManager(config.getServletContext().getRealPath("/"));
-    //TODO init projectManager
-
-    //TODO later (not now!!!) - on timer refresh for mattermark data
-
-    //TODO when initalising ProjectManager you have to get the following parameters from web.xml
-    String mattermarkBaseUrl = config.getServletContext().getInitParameter("mattermark-base");
-    String mattermarkAPIkey = config.getServletContext().getInitParameter("mattermark-key");
-    logger.info("mattermark-base={}", mattermarkBaseUrl);
-    logger.info("mattermark-key={}", mattermarkAPIkey);
-
   }
 
   @Override

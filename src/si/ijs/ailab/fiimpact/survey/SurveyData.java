@@ -9,6 +9,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import si.ijs.ailab.fiimpact.indicators.OverallResult;
+import si.ijs.ailab.fiimpact.project.ProjectData;
+import si.ijs.ailab.fiimpact.project.ProjectManager;
 import si.ijs.ailab.util.AIStructures;
 import si.ijs.ailab.util.AIUtils;
 
@@ -27,17 +29,17 @@ import java.util.*;
 public class SurveyData
 {
 
-  final static Logger logger = LogManager.getLogger(SurveyData.class.getName());
+  private final static Logger logger = LogManager.getLogger(SurveyData.class.getName());
 
   private String externalId;
   private String id;
-  public Map<String, String> questions = new TreeMap<>();
+  Map<String, String> questions = new TreeMap<>();
   public Map<String, Double> results = new TreeMap<>();
   public Map<String, Double> resultDerivatives = new TreeMap<>();
 
-  public enum OutputFormat {XML, JSON}
+  private enum OutputFormat {XML, JSON}
 
-  public static final Map<String, Map<String, Double>> SCORES = new TreeMap<>();
+  static final Map<String, Map<String, Double>> SCORES = new TreeMap<>();
 
   private static String SCORES_5A1 =
 
@@ -294,6 +296,13 @@ public class SurveyData
   private static String SPEEDOMETER_ARC_SVG = "M %s %s A %s %s 0 0 1 %s %s L %s %s A %s %s 0 0 0 %s %s";
   private static String[] SPEEDOMETER_COLORS = {"#923933", "#F4B900", "#00A54F"};
   private static String SPEEDOMETER_NEEDLE_SVG = "M %s %s L %s %s L %s %s";
+
+  private ProjectManager projectManager;
+
+  public SurveyData()
+  {
+    projectManager = ProjectManager.getProjectManager();
+  }
 
   private String getSVGArc(double dR, double dr, double boundaryLo, double boundaryHi)
   {
@@ -1665,26 +1674,30 @@ public class SurveyData
       }
     }
     logger.debug("Calc social impact done.");
-    //TODO calculate mattermark results - normalise to scale 0.0 - 5.0
-    /*
+    //calculate mattermark results - normalise to scale 0.0 - 5.0
+    
     ProjectManager pm = ProjectManager.getProjectManager();
     ArrayList<String> mattermarkIndicators = pm.getMattermarkIndicators();
     for(String indicator: mattermarkIndicators)
       results.put("MATTERMARK_"+indicator, 0.0);
 
-    ProjectData pd = pm.getProjects.get(id);
+    ProjectData pd = pm.getProjects().get(id);
     if(pd!=null)
     {
       for(String indicator: mattermarkIndicators)
       {
-        Double dInd = pd.getMattermarkFields.get(indicator);
+    	
+        Double dInd = Double.valueOf(pd.getMattermarkFields().get(indicator));
         if(dInd != null)
         {
-          dInd = normalise to 0.0 - 5.0 scale by using ProjectManger.get.... min/max values
-          results.put("MATTERMARK_"+indicator, dNormalisedResult);
-      }
 
-    }*/
+          ProjectManager.MattermarkIndicatorInfo mattermarkIndicatorInfo = projectManager.getMattermarkIndicatorInfo(indicator);
+          // dInd = normalise to 0.0 - 5.0 scale by using ProjectManger.get.... min/max values
+        	double dNormalisedResult=(dInd-mattermarkIndicatorInfo.getMin())/(mattermarkIndicatorInfo.getMax()-mattermarkIndicatorInfo.getMin())*5.0;
+        	results.put("MATTERMARK_"+indicator, dNormalisedResult);
+        }
+      }
+    }
   }
 
   public void clear()

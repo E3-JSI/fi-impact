@@ -21,6 +21,8 @@ import org.xml.sax.SAXException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import si.ijs.ailab.fiimpact.indicators.OverallResult;
+import si.ijs.ailab.fiimpact.indicators.OverallResult.ScoreBoundaries;
+import si.ijs.ailab.fiimpact.project.ProjectManager;
 import si.ijs.ailab.util.AIUtils;
 
 
@@ -145,10 +147,13 @@ public class SurveyManager
     byte[] encoded = Files.readAllBytes(file);
     return new String(encoded, encoding);
   }
+  private ProjectManager projectManager;
 
   //private SurveyManager(String _webappRoot, Map<String, Integer> _slots)
   private SurveyManager(String _webappRoot)
   {
+    projectManager = ProjectManager.getProjectManager();
+
     webappRoot = new File(_webappRoot).toPath();
     mapFile = new File(_webappRoot).toPath().resolve("WEB-INF").resolve("survey-id-list.txt");
     surveyRoot = new File(_webappRoot).toPath().resolve("WEB-INF").resolve("survey");
@@ -253,8 +258,11 @@ public class SurveyManager
       {
         typeResults.put(entry.getKey(), new OverallResult(type, entry.getKey(), entry.getValue()));
       }
-      //TODO Same loop for mattermark slots  -  ProjectManager.getMattemrarkSlots()
-
+      //Same loop for mattermark slots  -  ProjectManager.getMattemrarkSlots()
+     for(Map.Entry<String, ScoreBoundaries> entry:projectManager.getMattemrarkSlots().entrySet())
+     {
+    	 typeResults.put(entry.getKey(), new OverallResult(type, entry.getKey(), entry.getValue()));
+     }
     }
 
     logger.info("Recalc results for {} surveys.", surveys.size());
@@ -725,6 +733,14 @@ public class SurveyManager
       //    addResultKey(json, "MATTERMARK_"+indicator, surveyData.results);
       //    addResultKey(json, "MATTERMARK_"+indicator+"_GRAPH_PERCENT", surveyData.resultDerivatives);
 
+      ProjectManager projectManager=ProjectManager.getProjectManager();
+      ArrayList<String>ListIndicator=projectManager.getMattermarkIndicators();
+      for(String stringIndicator:ListIndicator){
+          addResultKey(json, "MATTERMARK_"+stringIndicator, surveyData.results);
+          addResultKey(json, "MATTERMARK_"+stringIndicator+"_GRAPH_PERCENT", surveyData.resultDerivatives);    	  
+      }
+    	  
+      
       json.endObject();
     }
     json.endArray();
