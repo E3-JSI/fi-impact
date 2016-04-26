@@ -1,7 +1,7 @@
 var fiData = function (id) { // id is optional
 	
 	this.model = {
-		"speedometers": {"S_2": "innovation", "S_4": "feasibility", "S_3": "market"},
+		"speedometers": {"S_2": "innovation", "S_4": "feasibility", "S_3": "market", "S_7a": "growth", "S_7b": "uniques", "S_7c": "funding", "S_7d": "employees", },
 		"tooltips": ["Low", "Medium", "High"],
 		"radarLevelsSocial": {
 			"1": "No Impact",
