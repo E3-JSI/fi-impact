@@ -13,9 +13,6 @@ import org.json.JSONWriter;
 public class test {
 
 	public static void main(String[] args) throws IOException {
-		// TODO Auto-generated method stub
-
-
 
 		BufferedReader brData = new BufferedReader(new InputStreamReader(new FileInputStream("C:\\Users\\Matej\\Desktop\\Tomcat7\\webapps\\fi-impact\\WEB-INF\\import\\project-list.csv"), "utf-8"));
 		String line = brData.readLine();

@@ -1359,7 +1359,7 @@ public class SurveyData
 
     logger.debug("Q2_X: {}, {}, {}, {}, {}", Q2_1, Q2_2, Q2_3, Q2_4, Q2_5);
 
-    if (Q2_1 != null && Q2_2 != null && Q2_3 != null && Q2_4 != null && Q2_5 != null)
+    if(Q2_1 != null && Q2_2 != null && Q2_3 != null && Q2_4 != null && Q2_5 != null)
     {
       Double A2_1 = SCORES.get("Q2_1").get(Q2_1);
       Double A2_2 = SCORES.get("Q2_2").get(Q2_2);
@@ -1369,11 +1369,11 @@ public class SurveyData
 
       logger.debug("A2_X: {}, {}, {}, {}, {}", A2_1, A2_2, A2_3, A2_4, A2_5);
 
-      if (A2_1 != null && A2_2 != null && A2_3 != null && A2_4 != null && A2_5 != null)
+      if(A2_1 != null && A2_2 != null && A2_3 != null && A2_4 != null && A2_5 != null)
       {
         Double r = A2_1 * A2_3 + A2_2 + A2_4 + A2_5;
         //normalise
-        r = (r-3.75)*5.0/1.55;
+        r = (r - 3.75) * 5.0 / 1.55;
         logger.debug("R2: {}", r);
         results.put("INNOVATION", r);
       }
@@ -1394,7 +1394,7 @@ public class SurveyData
 
     logger.debug("Q3_X: {}, {}, {}, {}, {}, {}", Q3_5, Q3_7, Q3_8, Q3_9, Q3_10, Q3_11);
 
-    if (Q3_5 != null && Q3_7 != null && Q3_8 != null && Q3_9 != null && Q3_10 != null && Q3_11 != null && Q2_2 != null)
+    if(Q3_5 != null && Q3_7 != null && Q3_8 != null && Q3_9 != null && Q3_10 != null && Q3_11 != null && Q2_2 != null)
     {
 
 
@@ -1406,21 +1406,21 @@ public class SurveyData
       String keyQ2_2 = "Q2_2_" + Q2_2 + "_3_7_";
       Map<String, Double> m = SCORES.get(keyQ2_2 + "W1");
 
-      if (m != null)
+      if(m != null)
       {
         W1 = m.get(Q3_7);
       }
 
       m = SCORES.get(keyQ2_2 + "W2");
 
-      if (m != null)
+      if(m != null)
       {
         W2 = m.get(Q3_7);
       }
 
       String[] arr = Q3_5.split(",");
       Double A3_5 = SCORES.get("Q3_5").get("E");
-      for(String s: arr)
+      for(String s : arr)
       {
         Double dTmp = SCORES.get("Q3_5").get(s);
         if(dTmp != null && dTmp > A3_5)
@@ -1432,7 +1432,7 @@ public class SurveyData
       Double A3_10 = SCORES.get("Q3_10").get(Q3_10);
       Double A3_11 = SCORES.get("Q3_11").get(Q3_11);
 
-      if (A3_5 != null && A3_8 != null && A3_9 != null && A3_10 != null && A3_11 != null && W1 != null && W2 != null)
+      if(A3_5 != null && A3_8 != null && A3_9 != null && A3_10 != null && A3_11 != null && W1 != null && W2 != null)
       {
         logger.debug("A3_X: 5: {}, 8: {}, 9: {}, 10: {}, 11: {}, W1: {}, W2: {}", A3_5, A3_8, A3_9, A3_10, A3_11, W1, W2);
 
@@ -1443,7 +1443,7 @@ public class SurveyData
         Normalisation to range 0 - 5: @R3N=(@R3-2)*5/8
         */
         Double r = W1 * (A3_8 + A3_9) / 2.0 + W2 * (A3_10 + A3_11 + A3_5) / 2.5;
-        r = (r - 2.0)*5.0/8.0;
+        r = (r - 2.0) * 5.0 / 8.0;
         logger.debug("R3: {}", r);
         results.put("MARKET", r);
       }
@@ -1462,7 +1462,7 @@ public class SurveyData
 
     logger.debug("Q4_X: {}, {}, {}, {}, {}", Q4_1, Q4_2, Q4_4, Q4_5, Q4_6);
 
-    if (Q4_1 != null && Q4_2 != null && Q4_4 != null && Q4_5 != null && Q4_6 != null && Q2_2 != null && Q3_7 != null)
+    if(Q4_1 != null && Q4_2 != null && Q4_4 != null && Q4_5 != null && Q4_6 != null && Q2_2 != null && Q3_7 != null)
     {
 
       //Market weights from Q2_2 and Q3_7
@@ -1473,14 +1473,14 @@ public class SurveyData
       String keyQ2_2 = "Q2_2_" + Q2_2 + "_3_7_";
       Map<String, Double> m = SCORES.get(keyQ2_2 + "W3");
 
-      if (m != null)
+      if(m != null)
       {
         W3 = m.get(Q3_7);
       }
 
       m = SCORES.get(keyQ2_2 + "W4");
 
-      if (m != null)
+      if(m != null)
       {
         W4 = m.get(Q3_7);
       }
@@ -1491,7 +1491,7 @@ public class SurveyData
       Double A4_5 = SCORES.get("Q4_5").get(Q4_5);
       Double A4_6 = AIUtils.parseDecimal(Q4_6, 0.0);
 
-      if (A4_1 != null && A4_2 != null && A4_4 != null && A4_5 != null && W3 != null && W4 != null)
+      if(A4_1 != null && A4_2 != null && A4_4 != null && A4_5 != null && W3 != null && W4 != null)
       {
         /*Flavio - added additional check for 4.6 ("What is the % required capital you already have ?".
           Should not be > 100%
@@ -1510,8 +1510,8 @@ public class SurveyData
         */
         logger.debug("A4_X: 1: {}, 2: {}, 4: {}, 5: {}, 6: {}, W3: {}, W4: {}", A4_1, A4_2, A4_4, A4_5, A4_6, W3, W4);
 
-        Double r = W3 * (A4_1 + A4_6 / 100.0 * 5.0)/2.0 + W4 * (A4_2 + A4_4 + A4_5) / 3;
-        r = (r - 1.0)*5.0/9.0;
+        Double r = W3 * (A4_1 + A4_6 / 100.0 * 5.0) / 2.0 + W4 * (A4_2 + A4_4 + A4_5) / 3;
+        r = (r - 1.0) * 5.0 / 9.0;
 
         logger.debug("R4: {}", r);
         results.put("FEASIBILITY", r);
@@ -1545,23 +1545,23 @@ public class SurveyData
     String Q3_13 = questions.get("Q3_13");
 
 
-    for (String s : m5A1_Benefits.keySet())
+    for(String s : m5A1_Benefits.keySet())
     {
       String Q5 = questions.get("Q5A_1_" + s);
-      if (Q5 != null && !Q5.equals(""))
+      if(Q5 != null && !Q5.equals(""))
         Q5A1_list.put(s, AIUtils.parseInteger(Q5, 0));
     }
-    for (String s : m5B1_Benefits.keySet())
+    for(String s : m5B1_Benefits.keySet())
     {
       String Q5 = questions.get("Q5B_1_" + s);
-      if (Q5 != null && !Q5.equals(""))
+      if(Q5 != null && !Q5.equals(""))
         Q5B1_list.put(s, AIUtils.parseInteger(Q5, 0));
     }
 
     logger.debug("Q3_3: {} Q3_3a: {} Q5A1 list size {}", Q3_3, Q3_3a, Q5A1_list.size());
     logger.debug("Q3_12: {} Q3_13: {} Q5B1 list size {}", Q3_12, Q3_13, Q5B1_list.size());
 
-    if (((Q3_3 != null || Q3_3a != null)&& Q5A1_list.size() > 0) || ((Q3_12 != null || Q3_13 != null)&& Q5B1_list.size() > 0))
+    if(((Q3_3 != null || Q3_3a != null) && Q5A1_list.size() > 0) || ((Q3_12 != null || Q3_13 != null) && Q5B1_list.size() > 0))
     {
       double maxVerticalScore = 0.0;
 
@@ -1575,17 +1575,17 @@ public class SurveyData
         Collections.addAll(Q3_3_allSelections, arrQ3_3);
       }
 
-      if (Q3_3_allSelections.size() > 0)
+      if(Q3_3_allSelections.size() > 0)
       {
-        for (String vertical : Q3_3_allSelections)
+        for(String vertical : Q3_3_allSelections)
         {
-          if (m5A1_Verticals.containsKey(vertical))
+          if(m5A1_Verticals.containsKey(vertical))
           {
             double verticalScore = 0.0;
-            for (Map.Entry<String, Integer> rowScore : Q5A1_list.entrySet())
+            for(Map.Entry<String, Integer> rowScore : Q5A1_list.entrySet())
             {
               Double weight = m5A1_weights.get(rowScore.getKey() + "_" + vertical);
-              if (weight != null)
+              if(weight != null)
                 verticalScore += weight * rowScore.getValue();
             }
             //Normalisation
@@ -1598,11 +1598,12 @@ public class SurveyData
             logger.debug("Market needs - Business {}: {}", vertical, verticalScore);
             results.put("MARKET_NEEDS_" + vertical, verticalScore);
 
-            if (Q3_3a == null)
+            if(Q3_3a == null)
             {
-              if (verticalScore > maxVerticalScore)
+              if(verticalScore > maxVerticalScore)
                 maxVerticalScore = verticalScore;
-            } else if (vertical.equals(Q3_3a))
+            }
+            else if(vertical.equals(Q3_3a))
             {
               maxVerticalScore = verticalScore;
             }
@@ -1619,18 +1620,18 @@ public class SurveyData
         Collections.addAll(Q3_consumer_allSelections, arrQ3_13);
       }
 
-      if (Q3_consumer_allSelections.size() > 0)
+      if(Q3_consumer_allSelections.size() > 0)
       {
 
-        for (String vertical : Q3_consumer_allSelections)
+        for(String vertical : Q3_consumer_allSelections)
         {
-          if (m5B1_Verticals.containsKey(vertical))
+          if(m5B1_Verticals.containsKey(vertical))
           {
             double verticalScore = 0.0;
-            for (Map.Entry<String, Integer> rowScore : Q5B1_list.entrySet())
+            for(Map.Entry<String, Integer> rowScore : Q5B1_list.entrySet())
             {
               Double weight = m5B1_weights.get(rowScore.getKey() + "_" + vertical);
-              if (weight != null)
+              if(weight != null)
                 verticalScore += weight * rowScore.getValue();
             }
             //Normalisation - not needed
@@ -1641,11 +1642,12 @@ public class SurveyData
             logger.debug("Market needs - Consumer {}: {}", vertical, verticalScore);
             results.put("MARKET_NEEDS_F" + vertical, verticalScore);
 
-            if (Q3_12 == null)
+            if(Q3_12 == null)
             {
-              if (verticalScore > maxVerticalScore)
+              if(verticalScore > maxVerticalScore)
                 maxVerticalScore = verticalScore;
-            } else if (vertical.equals(Q3_12))
+            }
+            else if(vertical.equals(Q3_12))
             {
               maxVerticalScore = verticalScore;
             }
@@ -1661,11 +1663,11 @@ public class SurveyData
     //------------SOCIAL IMPACT 6A, 6B--------------------
     logger.debug("Calc social impact");
 
-    for(String qID: SurveyManager.SOCIAL_IMPACT_QUESTIONS)
+    for(String qID : SurveyManager.SOCIAL_IMPACT_QUESTIONS)
     {
       String qA = questions.get(qID);
       //logger.debug("{}: {}", qID, qA);
-      if (qA != null)
+      if(qA != null)
       {
         //we just copy the given score
         Double r = AIUtils.parseDecimal(qA, 0.0);
@@ -1674,30 +1676,56 @@ public class SurveyData
       }
     }
     logger.debug("Calc social impact done.");
-    //calculate mattermark results - normalise to scale 0.0 - 5.0
-    
-    ProjectManager pm = ProjectManager.getProjectManager();
-    ArrayList<String> mattermarkIndicators = pm.getMattermarkIndicators();
-    for(String indicator: mattermarkIndicators)
-      results.put("MATTERMARK_"+indicator, 0.0);
 
-    ProjectData pd = pm.getProjects().get(id);
-    if(pd!=null)
+    //------------MATTERMARK--------------------
+    //calculate mattermark results - normalise to scale 0.0 - 5.0
+    logger.debug("Calc Mattermark.");
+
+    ProjectManager pm = ProjectManager.getProjectManager();
+    ArrayList<ProjectManager.IOListField> mattermarkIndicators = pm.getMattermarkIndicators();
+    for(ProjectManager.IOListField indicator : mattermarkIndicators)
+      results.put("MATTERMARK_" + indicator.getFieldid(), 0.0);
+
+    String Q1_22 = questions.get("Q1_22");
+    if(Q1_22 == null)
     {
-      for(String indicator: mattermarkIndicators)
+      logger.warn("No FI accelerator project associated with questionnaire {}/{}", externalId, id);
+    }
+    else
+    {
+
+      ProjectData pd = pm.getProjects().get(Q1_22);
+      if(pd == null)
       {
-    	
-        Double dInd = Double.valueOf(pd.getMattermarkFields().get(indicator));
-        if(dInd != null)
+        logger.warn("No project data for {}", Q1_22);
+      }
+      else
+      {
+        for(ProjectManager.IOListField indicator : mattermarkIndicators)
         {
 
-          ProjectManager.MattermarkIndicatorInfo mattermarkIndicatorInfo = projectManager.getMattermarkIndicatorInfo(indicator);
-          // dInd = normalise to 0.0 - 5.0 scale by using ProjectManger.get.... min/max values
-        	double dNormalisedResult=(dInd-mattermarkIndicatorInfo.getMin())/(mattermarkIndicatorInfo.getMax()-mattermarkIndicatorInfo.getMin())*5.0;
-        	results.put("MATTERMARK_"+indicator, dNormalisedResult);
+          logger.info("Get {}", indicator.getFieldid());
+          String sInd = pd.getMattermarkFields().get(indicator.getFieldid());
+          Double dInd = null;
+          if (sInd != null && !sInd.equals(""))
+            dInd = Double.valueOf(sInd);
+          if(dInd != null)
+          {
+            logger.info("Mattermark indicator {}={}", indicator.getFieldid(), dInd);
+
+            ProjectManager.MattermarkIndicatorInfo mattermarkIndicatorInfo = projectManager.getMattermarkIndicatorInfo(indicator.getFieldid());
+            if(mattermarkIndicatorInfo.getIoListField().isTransformLog())
+              dInd = Math.signum(dInd) * Math.log(Math.abs(dInd) + 1.0);
+
+            // dInd = normalise to 0.0 - 5.0 scale by using ProjectManger.get.... min/max values
+            double dNormalisedResult = (dInd - mattermarkIndicatorInfo.getMin()) / (mattermarkIndicatorInfo.getMax() - mattermarkIndicatorInfo.getMin()) * 5.0;
+            results.put("MATTERMARK_" + indicator.getFieldid(), dNormalisedResult);
+            logger.info("Mattermark indicator Normalised {}={}", indicator.getFieldid(), dInd);
+          }
         }
       }
     }
+    logger.debug("Calc Mattermark done.");
   }
 
   public void clear()

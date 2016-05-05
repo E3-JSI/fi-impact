@@ -26,129 +26,136 @@ import si.ijs.ailab.util.AIUtils;
  * Created by flavio on 01/06/2015.
  */
 
-class IOListDefinition
-{
-  private String id;
-  private ArrayList<IOListField> fields;
-  private IOListField usageID;
-  private IOListField usageCleanUrl;
 
-  IOListDefinition(String id)
-  {
-    this.id = id;
-    fields = new ArrayList<>();
-  }
-
-  void addField(IOListField ioListField)
-  {
-    fields.add(ioListField);
-    if(ioListField.getUsage() != null)
-    {
-      switch(ioListField.getUsage())
-      {
-        case "id": usageID = ioListField;
-          break;
-        case "clean-url": usageCleanUrl = ioListField;
-          break;
-      }
-    }
-  }
-
-  public ArrayList<IOListField> getFields()
-  {
-    return fields;
-  }
-
-  public String toString()
-  {
-    StringBuilder str = new StringBuilder();
-    for(IOListField ioListField : fields)
-      str.append("\n").append(ioListField);
-    return str.toString();
-  }
-
-  public String getId()
-  {
-    return id;
-  }
-
-  public IOListField getUsageID()
-  {
-    return usageID;
-  }
-
-  IOListField getUsageCleanUrl()
-  {
-    return usageCleanUrl;
-  }
-}
-
-class IOListField
-{
-  private String column;
-  private String label;
-  private String fieldid;
-  private String usage;
-  private String missing;
-  private String include_record_when;
-
-  IOListField(String column, String label, String fieldid, String usage, String missing,
-              String include_record_when)
-  {
-    this.column = column;
-    this.label = label;
-    this.fieldid = fieldid;
-    this.usage = usage;
-    this.missing = missing;
-    this.include_record_when = include_record_when;
-  }
-
-  String getColumn()
-  {
-    return column;
-  }
-
-  String getFieldid()
-  {
-    return fieldid;
-  }
-
-  String getInclude_record_when()
-  {
-    return include_record_when;
-  }
-
-  String getLabel()
-  {
-    return label;
-  }
-
-  String getMissing()
-  {
-    return missing;
-  }
-
-  String getUsage()
-  {
-    return usage;
-  }
-
-  public String toString()
-  {
-    return "Column: " + column + " Label: " + label + " Fieldid: " + fieldid + " Usage: " + usage + " Missing: "
-            + missing + " Include_record_when: " + include_record_when;
-  }
-
-}
 
 
 public class ProjectManager
 {
+  static class IOListDefinition
+  {
+    private String id;
+    private ArrayList<IOListField> fields;
+    private IOListField usageID;
+    private IOListField usageCleanUrl;
+
+    IOListDefinition(String id)
+    {
+      this.id = id;
+      fields = new ArrayList<>();
+    }
+
+    void addField(IOListField ioListField)
+    {
+      fields.add(ioListField);
+      if(ioListField.getUsage() != null)
+      {
+        switch(ioListField.getUsage())
+        {
+          case "id": usageID = ioListField;
+            break;
+          case "clean-url": usageCleanUrl = ioListField;
+            break;
+        }
+      }
+    }
+
+    public ArrayList<IOListField> getFields()
+    {
+      return fields;
+    }
+
+    public String toString()
+    {
+      StringBuilder str = new StringBuilder();
+      for(IOListField ioListField : fields)
+        str.append("\n").append(ioListField);
+      return str.toString();
+    }
+
+    public String getId()
+    {
+      return id;
+    }
+
+    public IOListField getUsageID()
+    {
+      return usageID;
+    }
+
+    IOListField getUsageCleanUrl()
+    {
+      return usageCleanUrl;
+    }
+  }
+
+  public static class  IOListField
+  {
+    private String column;
+    private String label;
+    private String fieldid;
+    private String usage;
+    private String missing;
+    private String include_record_when;
+    private String transform;
+
+    IOListField(String column, String label, String fieldid, String usage, String missing,
+                String include_record_when, String transform)
+    {
+      this.column = column;
+      this.label = label;
+      this.fieldid = fieldid;
+      this.usage = usage;
+      this.missing = missing;
+      this.include_record_when = include_record_when;
+      this.transform = transform;
+    }
+
+    public String getTransform()
+    {
+      return transform;
+    }
+
+    public String getColumn()
+    {
+      return column;
+    }
+
+    public String getFieldid()
+    {
+      return fieldid;
+    }
+
+    public String getInclude_record_when()
+    {
+      return include_record_when;
+    }
+
+    public String getLabel()
+    {
+      return label;
+    }
+
+    public String getMissing()
+    {
+      return missing;
+    }
+
+    public String getUsage()
+    {
+      return usage;
+    }
+
+    public boolean isTransformLog()
+    {
+      return getTransform() != null && getTransform().equals("log");
+    }
+  }
+
   private final Path projectsList;
   private final Path projectsRoot;
   private final Path webappRoot;
   private Map<String, IOListDefinition> ioDefinitions;
-  ArrayList<String> mattermarkIndicators = new ArrayList<>();
+  ArrayList<IOListField> mattermarkIndicators = new ArrayList<>();
   private Map<String, MattermarkIndicatorInfo> mattermarkIndicatorInfoMap = new HashMap<>();
   private Map<String, OverallResult.ScoreBoundaries> mattermarkSpeedometerSlots = new HashMap<>();
 
@@ -166,27 +173,32 @@ public class ProjectManager
 
   public static class MattermarkIndicatorInfo
   {
-    String id;
-    int min;
-    int max;
+    public IOListField getIoListField()
+    {
+      return ioListField;
+    }
+
+    IOListField ioListField;
+    double min;
+    double max;
     int count = 0;
 
-    public MattermarkIndicatorInfo(String ioListFieldId)
+    public MattermarkIndicatorInfo(IOListField ioListField)
     {
-      id = ioListFieldId;
+      this.ioListField = ioListField;
     }
 
     public String getId()
     {
-      return id;
+      return ioListField.getFieldid();
     }
 
-    public int getMin()
+    public double getMin()
     {
       return min;
     }
 
-    public int getMax()
+    public double getMax()
     {
       return max;
     }
@@ -198,11 +210,11 @@ public class ProjectManager
   }
 
 
-  private ProjectManager(String _webappRoot)
+  private ProjectManager(Path _webappRoot)
   {
-    webappRoot = new File(_webappRoot).toPath();
-    projectsList = new File(_webappRoot).toPath().resolve("WEB-INF").resolve("projects-id-list.txt");
-    projectsRoot = new File(_webappRoot).toPath().resolve("WEB-INF").resolve("projects");
+    webappRoot = _webappRoot;
+    projectsList = webappRoot.resolve("WEB-INF").resolve("projects-id-list.txt");
+    projectsRoot = webappRoot.resolve("WEB-INF").resolve("projects");
     logger.info("Root: {}", _webappRoot);
 
     if(Files.notExists(projectsRoot))
@@ -258,7 +270,7 @@ public class ProjectManager
             IOListField ioListField = new IOListField(eElement.getAttribute("column"),
                     eElement.getAttribute("label"), eElement.getAttribute("fieldid"),
                     eElement.getAttribute("usage"), eElement.getAttribute("missing"),
-                    eElement.getAttribute("include-record-when"));
+                    eElement.getAttribute("include-record-when"), eElement.getAttribute("transform"));
             ioListDefinition.addField(ioListField);
           }
 
@@ -273,7 +285,7 @@ public class ProjectManager
       for(IOListField ioListField : listDefinitionMattermark)
       {
         if(ioListField.getUsage().equals("indicator"))
-          mattermarkIndicators.add(ioListField.getFieldid());
+          mattermarkIndicators.add(ioListField);
       }
 
     }
@@ -284,7 +296,7 @@ public class ProjectManager
 
   }
 
-  public static synchronized ProjectManager getProjectManager(String _webappRoot)
+  public static synchronized ProjectManager getProjectManager(Path _webappRoot)
   {
     if(projectManager == null)
     {
@@ -508,10 +520,9 @@ public class ProjectManager
 
 
   // import according to the definition in the file lists-io-def.xml, <list name="project-list">
-  public void importProjects(ServletOutputStream outputStream, String fileName) throws IOException
+  public void importProjects(ServletOutputStream outputStream, Path p) throws IOException
   {
     projects.clear();
-    Path p = webappRoot.resolve("WEB-INF").resolve(fileName);
     logger.info("Load data from {}", p.toString());
 
     OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
@@ -666,9 +677,8 @@ public class ProjectManager
   }
 
   //import Mattermark data
-  public void importMattermark(ServletOutputStream outputStream, String fileName) throws IOException
+  public void importMattermark(ServletOutputStream outputStream, Path p) throws IOException
   {
-    Path p = webappRoot.resolve("WEB-INF").resolve(fileName);
     logger.info("Load data from {}", p.toString());
 
     OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
@@ -940,7 +950,7 @@ public class ProjectManager
   }
 
   // return the list of "indicator" field identifiers
-  public ArrayList<String> getMattermarkIndicators()
+  public ArrayList<IOListField> getMattermarkIndicators()
   {
     return mattermarkIndicators;
   }
@@ -950,8 +960,8 @@ public class ProjectManager
   private void recalcMattermarkIndicatorsInfo()
   {
     mattermarkIndicatorInfoMap.clear();
-    for(String s: mattermarkIndicators)
-      mattermarkIndicatorInfoMap.put(s, new MattermarkIndicatorInfo(s));
+    for(IOListField ioListField: mattermarkIndicators)
+      mattermarkIndicatorInfoMap.put(ioListField.getFieldid(), new MattermarkIndicatorInfo(ioListField));
 
     for(ProjectData pd: projects.values())
     {
@@ -979,6 +989,17 @@ public class ProjectManager
     }
 
 
+    for(Map.Entry<String, MattermarkIndicatorInfo> miEntry: mattermarkIndicatorInfoMap.entrySet())
+    {
+      MattermarkIndicatorInfo indicatorInfo = miEntry.getValue();
+      if(indicatorInfo.ioListField.isTransformLog())
+      {
+        indicatorInfo.max = Math.signum(indicatorInfo.max)*Math.log(Math.abs(indicatorInfo.max)+1.0);
+        indicatorInfo.min = Math.signum(indicatorInfo.min)*Math.log(Math.abs(indicatorInfo.min)+1.0);
+      }
+    }
+
+
     mattermarkSpeedometerSlots.clear();
     for(MattermarkIndicatorInfo mattermarkIndicatorInfo: mattermarkIndicatorInfoMap.values())
     {
@@ -999,10 +1020,7 @@ public class ProjectManager
   }
 
 
-  // TODO check the implementation of SurveyManager.SPEEDOMETER_SLOTS
 	// Entries are mattemrak "indicator" fields with the "MATTERMARK_" prefix.
-
-
   public Map<String, OverallResult.ScoreBoundaries> getMattemrarkSlots()
   {
     return mattermarkSpeedometerSlots;

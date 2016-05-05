@@ -726,21 +726,16 @@ public class SurveyManager
       addResultKey(json, "FEASIBILITY_GRAPH_PERCENT", surveyData.resultDerivatives);
       addResultKey(json, "MARKET_NEEDS_GRAPH_PERCENT", surveyData.resultDerivatives);
 
-      //TODO add results for all mattermark indicators
-      //1. ProjectManager.getProjectManager()
-      //2. projectManager.getMattermarkIndicators()
-      //3. loop through all indicators:
-      //    addResultKey(json, "MATTERMARK_"+indicator, surveyData.results);
-      //    addResultKey(json, "MATTERMARK_"+indicator+"_GRAPH_PERCENT", surveyData.resultDerivatives);
-
-      ProjectManager projectManager=ProjectManager.getProjectManager();
-      ArrayList<String>ListIndicator=projectManager.getMattermarkIndicators();
-      for(String stringIndicator:ListIndicator){
-          addResultKey(json, "MATTERMARK_"+stringIndicator, surveyData.results);
-          addResultKey(json, "MATTERMARK_"+stringIndicator+"_GRAPH_PERCENT", surveyData.resultDerivatives);    	  
+      //add results for all mattermark indicators
+      ProjectManager projectManager = ProjectManager.getProjectManager();
+      ArrayList<ProjectManager.IOListField> mattermarkIndicators = projectManager.getMattermarkIndicators();
+      for(ProjectManager.IOListField indicator: mattermarkIndicators)
+      {
+          addResultKey(json, "MATTERMARK_"+indicator.getFieldid(), surveyData.results);
+          addResultKey(json, "MATTERMARK_"+indicator.getFieldid()+"_GRAPH_PERCENT", surveyData.resultDerivatives);
       }
     	  
-      
+
       json.endObject();
     }
     json.endArray();

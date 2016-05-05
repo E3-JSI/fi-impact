@@ -173,7 +173,7 @@ public class ProjectData
 
 	}
 
-	public void addFields(ArrayList<IOListField> fieldDefinitions, ArrayList<String> fieldValues)
+	public void addFields(ArrayList<ProjectManager.IOListField> fieldDefinitions, ArrayList<String> fieldValues)
 	{
 		fields.clear();
 		for (int i = 0; i < fieldValues.size(); i++)
@@ -183,7 +183,7 @@ public class ProjectData
 
 	}
 
-  public void addFieldsMattermark(ArrayList<IOListField> fieldDefinitions, ArrayList<String> fieldValues)
+  public void addFieldsMattermark(ArrayList<ProjectManager.IOListField> fieldDefinitions, ArrayList<String> fieldValues)
   {
     mattermarkFields.clear();
     for (int i = 0; i < fieldValues.size(); i++)

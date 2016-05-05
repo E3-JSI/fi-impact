@@ -28,7 +28,7 @@ public class FIImpactRequestHandler extends HttpServlet
   @Override
   public void init(ServletConfig config) throws ServletException
   {
-    projectManager=ProjectManager.getProjectManager(config.getServletContext().getRealPath("/"));
+    projectManager=ProjectManager.getProjectManager(new File(config.getServletContext().getRealPath("/")).toPath());
     surveyManager = SurveyManager.getSurveyManager(config.getServletContext().getRealPath("/"));
     pdfManager = pdfManager.getPDFManager(config.getServletContext().getRealPath("/"));
   }
