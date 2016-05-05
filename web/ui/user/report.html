@@ -47,6 +47,7 @@
                     <li><a class="page-scroll" href="#feasibility">Feasibility</a></li>
                     <li><a class="page-scroll" href="#business">Market Needs</a></li>
 					<li><a class="page-scroll" href="#socialImpact">Social Impact</a></li>
+					<li><a class="page-scroll" href="#mattermark">Mattermark</a></li>
 					<li><a class="page-scroll" href="#overview">Overview</a></li>
 					<li><a id="pdfDownload"><i class="fa fa-download"></i> PDF</a></li>
                 </ul>
@@ -242,6 +243,18 @@
 				<p class="text-muted">{{d.growth.interpretation}}</p>
 			</div>
 			<div class="col-md-6">
+				<h3 class="section-subheading">Momentum Score</h3>
+				<div id="momentumGauge" class="pull-right"></div>
+				<p class="text-muted">{{d.momentum.interpretation}}</p>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<h3 class="section-subheading">Employee Count</h3>
+				<div id="employeesGauge" class="pull-right"></div>
+				<p class="text-muted">{{d.employees.interpretation}}</p>
+			</div>
+			<div class="col-md-6">
 				<h3 class="section-subheading">Est. Monthly Uniques</h3>
 				<div id="uniquesGauge" class="pull-right"></div>
 				<p class="text-muted">{{d.uniques.interpretation}}</p>
@@ -249,14 +262,26 @@
 		</div>
 		<div class="row">
 			<div class="col-md-6">
+				<h3 class="section-subheading">Twitter Followers</h3>
+				<div id="twitterGauge" class="pull-right"></div>
+				<p class="text-muted">{{d.twitter.interpretation}}</p>
+			</div>
+			<div class="col-md-6">
+				<h3 class="section-subheading">Facebook Likes</h3>
+				<div id="facebookGauge" class="pull-right"></div>
+				<p class="text-muted">{{d.facebook.interpretation}}</p>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<h3 class="section-subheading">LinkedIn Follows</h3>
+				<div id="linkedinGauge" class="pull-right"></div>
+				<p class="text-muted">{{d.linkedin.interpretation}}</p>
+			</div>
+			<div class="col-md-6">
 				<h3 class="section-subheading">Total Funding</h3>
 				<div id="fundingGauge" class="pull-right"></div>
 				<p class="text-muted">{{d.funding.interpretation}}</p>
-			</div>
-			<div class="col-md-6">
-				<h3 class="section-subheading">New funding employee growth</h3>
-				<div id="employeesGauge" class="pull-right"></div>
-				<p class="text-muted">{{d.employees.interpretation}}</p>
 			</div>
 		</div>
     </div></section>
@@ -316,9 +341,9 @@
 		$.each(window.radar, function(i, v) { v.draw("#radar" + i) });
 		
 		$("#pdfDownload").click(function() {
-			$.get( "http://aidemo.ijs.si/fi-impact/service?action=pdf&id=" + fi.id, function(data) {
+			$.get( "../fi-impact/service?action=pdf&id=" + fi.id, function(data) {
 				if ($(data).find('status').attr('status') == "OK") {
-					var win = window.open('http://aidemo.ijs.si/fi-impact/pdf/survey-' + fi.id + '.pdf', '_blank');
+					var win = window.open('../fi-impact/pdf/survey-' + fi.id + '.pdf', '_blank');
 					if (win) { win.focus(); }
 				}
 			});
