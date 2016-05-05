@@ -19,6 +19,8 @@ import org.xml.sax.SAXException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import si.ijs.ailab.fiimpact.indicators.OverallResult;
+import si.ijs.ailab.fiimpact.survey.SurveyData;
+import si.ijs.ailab.fiimpact.survey.SurveyManager;
 import si.ijs.ailab.util.AIUtils;
 
 
@@ -812,7 +814,13 @@ public class ProjectManager
     array.object().key("total_after").value(projects.size()).endObject();
     array.endArray();
 
+    logger.info("Recalculate mattermark indicators");
     recalcMattermarkIndicatorsInfo();
+    logger.info("Recalculate survey scores");
+    SurveyManager.getSurveyManager().recalcSurveyResults();
+    logger.info("Recalculate overall results");
+    SurveyManager.getSurveyManager().recalcResults();
+    logger.info("Done");
     w.flush();
     w.close();
 
@@ -1008,7 +1016,7 @@ public class ProjectManager
       boundaries.setLo_med(1.667);
       boundaries.setMed_hi(3.333);
       boundaries.setMax(5.000);
-      mattermarkSpeedometerSlots.put("MATTERMARK_"+mattermarkIndicatorInfo.getId(), boundaries);
+      mattermarkSpeedometerSlots.put(mattermarkIndicatorInfo.getId(), boundaries);
     }
 
 
@@ -1020,7 +1028,7 @@ public class ProjectManager
   }
 
 
-	// Entries are mattemrak "indicator" fields with the "MATTERMARK_" prefix.
+	// Entries are mattemrak "indicator"
   public Map<String, OverallResult.ScoreBoundaries> getMattemrarkSlots()
   {
     return mattermarkSpeedometerSlots;
