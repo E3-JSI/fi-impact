@@ -1,7 +1,7 @@
 var fiData = function (id) { // id is optional
 	
 	this.model = {
-		"speedometers": {"S_2": "innovation", "S_4": "feasibility", "S_3": "market"},
+		"speedometers": {"S_2": "innovation", "S_4": "feasibility", "S_3": "market", "S_7a": "growth", "S_7b": "uniques", "S_7c": "funding", "S_7d": "employees", },
 		"tooltips": ["Low", "Medium", "High"],
 		"radarLevelsSocial": {
 			"1": "No Impact",
@@ -59,8 +59,9 @@ var fiData = function (id) { // id is optional
 		$.each(json.sections, function(i, v) {
 			$.each(v.answers, function(j, w) { if (w.value) { result[j] = w.value; } });
 		});
-		$.each(json.sections.S_5A.answers.Q5A_1, function(i, v) {
-			result.marketNeeds[v.label] = { label: v.label, score: v.result, stars: [], answers: {}, top: {} };
+		var S_5max = json.sections.S_5.result.score_max;
+		$.each(json.sections.S_5.answers.Q5_1, function(i, v) {
+			result.marketNeeds[v.label] = { label: v.label, score: v.result, max: S_5max, stars: [], answers: {}, top: {} };
 			$.each(v.answers, function(j, w) { 
 				result.marketNeeds[v.label].answers[w.id] = { value: w.value, label: w.label, stars: [] };
 				for (i = 0; i < w.value; i++) { result.marketNeeds[v.label].answers[w.id].stars.push(i); }

@@ -12,21 +12,6 @@ var model = {
 	"num": 5
 },
 
-"max": {
-	"feasibility": 5.4,
-	"innovation": 20.8,
-	"market": 37,
-	"business": 10,
-	"social": 5
-},
-
-"lmh": {
-	"feasibility": [.32, .67],
-	"innovation": [.32, .67],
-	"market": [.32, .67],
-	"business": [.4, .75]
-},
-
 "s6A": {
 	"q1": {
 		"A": "Perceived security of communities, neighbourhoods and housing",
