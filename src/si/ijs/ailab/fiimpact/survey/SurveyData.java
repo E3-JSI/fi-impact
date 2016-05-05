@@ -433,6 +433,9 @@ public class SurveyData
     Map<String, OverallResult> typeResults = allResults.get(type);
 
     OverallResult or = typeResults.get(sectionName);
+    if(or==null)
+      logger.error("Overal result null for {}", sectionName);
+
     String averageSlot = SLOT_INTERPRETATION[or.getAverageSlot()];
     logger.debug("Calculating interpretation for {}", sectionName);
     Double dSlot = resultDerivatives.get(sectionName + "_GRAPH_SLOT");
@@ -444,7 +447,16 @@ public class SurveyData
     String mySlot = SLOT_INTERPRETATION[iMySlot];
     logger.debug("My slot interpretation: {}", mySlot);
     String key = mySlot + averageSlot;
-    String response = SurveyManager.fiImpactModel.getJSONObject("interpretation").getString(key);
+
+    String scoreInWordsKey = "score_in_words";
+    String interpretationKey = "interpretation";
+    if(sectionName.startsWith("MATTERMARK_"))
+    {
+      scoreInWordsKey = "score_in_words_mattermark";
+      interpretationKey = "interpretation_mattermark";
+    }
+
+    String response = SurveyManager.fiImpactModel.getJSONObject(interpretationKey).getString(key);
 
     Double dResult = results.get(sectionName);
     double R = 250.0;
@@ -463,7 +475,6 @@ public class SurveyData
     overviewOutLineResult+=svg;
     radarOverviewOut.put("line_result", overviewOutLineResult);
 
-
     jsonResult.put("speedometer_lm", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercentLM()));
     jsonResult.put("speedometer_mh", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercentMH()));
 
@@ -473,7 +484,6 @@ public class SurveyData
     jsonResult.put("average_percent", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercent(or.getAverage())));
     jsonOverviewPoint.put("average_percent", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercent(or.getAverage())));
     jsonResult.put("speedometer_histogram", or.toJSONHistogram());
-
 
     xy = new JSONObject();
     jsonOverviewPoint.put("avg_coord", xy);
@@ -523,7 +533,6 @@ public class SurveyData
       svg = getSVGArc(dR, dr, speedometerBoundaries.get(i), speedometerBoundaries.get(i+1));
 
       jsonSpeedometerSegment.put("histogram", svg);
-
     }
 
     double averagePercent = or.getSpeedometerPercent(or.getAverage());
@@ -533,7 +542,7 @@ public class SurveyData
 
     //"Your ranking for %s based on the data submitted is currently %s.
     // In this section you scored better than %s% of the %s (total) projects and proposals that have answered this survey.";
-    String scoreInWords = SurveyManager.fiImpactModel.getString("score_in_words");
+    String scoreInWords = SurveyManager.fiImpactModel.getString(scoreInWordsKey);
     Double dPercent = resultDerivatives.get(sectionName + "_" + type + "_R");
     if(dPercent == null)
       dPercent = 0.0;
@@ -1684,7 +1693,7 @@ public class SurveyData
     ProjectManager pm = ProjectManager.getProjectManager();
     ArrayList<ProjectManager.IOListField> mattermarkIndicators = pm.getMattermarkIndicators();
     for(ProjectManager.IOListField indicator : mattermarkIndicators)
-      results.put("MATTERMARK_" + indicator.getFieldid(), 0.0);
+      results.put(indicator.getFieldid(), 0.0);
 
     String Q1_22 = questions.get("Q1_22");
     if(Q1_22 == null)
@@ -1719,7 +1728,7 @@ public class SurveyData
 
             // dInd = normalise to 0.0 - 5.0 scale by using ProjectManger.get.... min/max values
             double dNormalisedResult = (dInd - mattermarkIndicatorInfo.getMin()) / (mattermarkIndicatorInfo.getMax() - mattermarkIndicatorInfo.getMin()) * 5.0;
-            results.put("MATTERMARK_" + indicator.getFieldid(), dNormalisedResult);
+            results.put(indicator.getFieldid(), dNormalisedResult);
             logger.info("Mattermark indicator Normalised {}={}", indicator.getFieldid(), dInd);
           }
         }

@@ -198,6 +198,7 @@ public class FIImpactSecureRequestHandler extends HttpServlet
         sType = "full";
 
       String groupQuestion = null;
+      String groupAnswer = null;
       String idList = null;
       String questionsList = null;
       String resultsList = null;
@@ -212,7 +213,6 @@ public class FIImpactSecureRequestHandler extends HttpServlet
         case "accelerator":
         {
           groupQuestion = "Q1_1";
-          idList = "id_external";
           questionsList = "Q1_1;Q1_2;Q1_3;Q1_4;Q1_22";
           resultsList = "FEASIBILITY;INNOVATION;MARKET;MARKET_NEEDS";
           resultsDerList = "";
@@ -220,9 +220,10 @@ public class FIImpactSecureRequestHandler extends HttpServlet
         }
       }
 
-      response.setContentType("application/json");
+      response.setContentType("application/x-unknown");
       response.setCharacterEncoding("utf-8");
-      SurveyManager.getSurveyManager().exportTXT(response.getOutputStream(), exportDir, sType, groupQuestion, idList, questionsList, resultsList, resultsDerList);
+      response.setHeader( "Content-Disposition", "filename=\"fi-impact-export.txt\"" );
+      SurveyManager.getSurveyManager().exportTXT(response.getOutputStream(), groupQuestion, groupAnswer, questionsList, resultsList, resultsDerList, true, true);
     }
   }
 

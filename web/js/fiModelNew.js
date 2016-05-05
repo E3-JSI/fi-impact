@@ -869,25 +869,25 @@
 			]
 		}, {
 			"id" : "7a",
-			"name" : "MATTERMARK_M02",
+			"name" : "MATTERMARK_GROWTH",
 			"label" : "Growth Score",
 			"label_graph" : "Growth Score",
 			"questions" : []
 		}, {
 			"id" : "7b",
-			"name" : "MATTERMARK_M23",
+			"name" : "MATTERMARK_MONTHLY_UNIQUES",
 			"label" : "Est. Monthly Uniques",
 			"label_graph" : "Est. Monthly Uniques",
 			"questions" : []
 		}, {
 			"id" : "7c",
-			"name" : "MATTERMARK_M62",
+			"name" : "MATTERMARK_TOTAL_FUNDING",
 			"label" : "Total Funding",
 			"label_graph" : "Total Funding",
 			"questions" : []
 		}, {
 			"id" : "7d",
-			"name" : "MATTERMARK_M77",
+			"name" : "MATTERMARK_NEW_FUNDING_EMP_GROWTH",
 			"label" : "New funding employee growth",
 			"label_graph" : "New funding employee growth",
 			"questions" : []
@@ -957,5 +957,19 @@
 		"hm" : "Your project is outperforming your peers in terms of %s – congratulations.",
 		"hh" : "The level of %s of your project matches that of your peers and is high – congratulations."
 	},
+
+	"score_in_words_mattermark" : "Your Mattermark ranking for %s is currently %s. For this indicator you scored better than %s%% of the %s (total) projects and proposals that have answered this survey.",
+
+	"interpretation_mattermark" : {
+		"ll" : "The level of %s of your project matches that of your peers. Still, you should consider ways of further strengthening the %s element of your project.",
+		"lm" : "Compared to the average of current completed surveys, you should consider ways of further strengthening the %s element of your project.",
+		"lh" : "Compared to the average of current completed surveys, you should consider ways of further strengthening the %s element of your project.",
+		"ml" : "Your project is outperforming your peers in terms of %s – congratulations. Still, you should consider ways of further strengthening the %s element of your project.",
+		"mm" : "The level of %s of your project matches that of your peers. Still, you should consider ways of further strengthening the %s element of your project.",
+		"mh" : "Compared to the average of current scores of your peers, you should consider ways of further strengthening the %s element of your project.",
+		"hl" : "low	Your project is outperforming your peers in terms of %s – congratulations.",
+		"hm" : "Your project is outperforming your peers in terms of %s – congratulations.",
+		"hh" : "The level of %s of your project matches that of your peers and is high – congratulations."
+	}
 
 }

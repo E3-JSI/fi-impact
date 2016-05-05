@@ -38,7 +38,7 @@
 	</list>
 	<list name="mattermark-export">
 		<filed column="Company Name" label="Company Name" fieldid="M01"/>
-		<filed column="Growth Score" label="Growth Score" fieldid="M02" usage="indicator" transform="log"/>
+		<filed column="Growth Score" label="Growth Score" fieldid="MATTERMARK_GROWTH" usage="indicator" transform="log"/>
 		<filed column="Mindshare Score" label="Mindshare Score" fieldid="M03"/>
 		<filed column="Momentum Score" label="Momentum Score" fieldid="M04"/>
 		<filed column="Mattermark URL" label="Mattermark URL" fieldid="M05" usage="external"/>
@@ -59,7 +59,7 @@
 		<filed column="Employees 6 Months Ago" label="Employees 6 Months Ago" fieldid="M20"/>
 		<filed column="Employees Added In 6 Months" label="Employees Added In 6 Months" fieldid="M21"/>
 		<filed column="Employees 6 Months Growth" label="Employees 6 Months Growth" fieldid="M22"/>
-		<filed column="Est. Monthly Uniques" label="Est. Monthly Uniques" fieldid="M23" usage="indicator" transform="log"/>
+		<filed column="Est. Monthly Uniques" label="Est. Monthly Uniques" fieldid="MATTERMARK_MONTHLY_UNIQUES" usage="indicator" transform="log"/>
 		<filed column="Monthly Uniques Week Ago" label="Monthly Uniques Week Ago" fieldid="M24"/>
 		<filed column="Monthly Uniques WoW" label="Monthly Uniques WoW" fieldid="M25"/>
 		<filed column="Monthly Uniques Month Ago" label="Monthly Uniques Month Ago" fieldid="M26"/>
@@ -98,7 +98,7 @@
 		<filed column="LinkedIn Follows MoM" label="LinkedIn Follows MoM" fieldid="M59"/>
 		<filed column="Est. Founding Date" label="Est. Founding Date" fieldid="M60"/>
 		<filed column="Stage" label="Stage" fieldid="M61"/>
-		<filed column="Total Funding" label="Total Funding" fieldid="M62" usage="indicator" transform="log"/>
+		<filed column="Total Funding" label="Total Funding" fieldid="MATTERMARK_TOTAL_FUNDING" usage="indicator" transform="log"/>
 		<filed column="Last Funding Date" label="Last Funding Date" fieldid="M63"/>
 		<filed column="Last Funding Amount" label="Last Funding Amount" fieldid="M64"/>
 		<filed column="Location" label="Location" fieldid="M65"/>
@@ -113,7 +113,7 @@
 		<filed column="Months since last funding" label="Months since last funding" fieldid="M74"/>
 		<filed column="Employees added since last funding" label="Employees added since last funding" fieldid="M75"/>
 		<filed column="New person months since last funding" label="New person months since last funding" fieldid="M76"/>
-		<filed column="New funding employee growth" label="New funding employee growth" fieldid="M77" usage="indicator" transform="log"/>
+		<filed column="New funding employee growth" label="New funding employee growth" fieldid="MATTERMARK_NEW_FUNDING_EMP_GROWTH" usage="indicator" transform="log"/>
 		<filed column="Date Added" label="Date Added" fieldid="M78"/>
 	</list>
 </lists>
