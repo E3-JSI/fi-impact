@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
 	<display-name>FI-IMPACT Survey Reporting Service</display-name>
+	<listener>
+		<listener-class>org.apache.commons.fileupload.servlet.FileCleanerCleanup</listener-class>
+	</listener>
+	<context-param>
+		<param-name>upload-dir</param-name>
+		<param-value>E:\server\Tomcat7\webapps\fi-impact\WEB-INF\upload</param-value>
+	</context-param>
+	<context-param>
+		<param-name>temp-upload-dir</param-name>
+		<param-value>E:\server\Tomcat7\webapps\fi-impact\WEB-INF\tmp</param-value>
+	</context-param>
 	<context-param>
 		<param-name>import-dir</param-name>
 		<param-value>E:\Dropbox\FI-IMPACT\data\FI-IMPACT_Export_20150624</param-value>
 	</context-param>
 	<context-param>
-		<param-name>export-file</param-name>
-		<param-value>D:\server\Tomcat7\webapps\fi-impact-test\WEB-INF\transfer\export.txt</param-value>
+		<param-name>export-dir</param-name>
+		<param-value>E:\server\Tomcat7\webapps\fi-impact\WEB-INF\transfer</param-value>
 	</context-param>
 	<welcome-file-list>
 		<welcome-file>
@@ -32,8 +43,7 @@
 		<servlet-name>ManagerRequestHandler</servlet-name>
 		<url-pattern>/manager</url-pattern>
 	</servlet-mapping>
-	
-<security-constraint>
+	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>Maangement methods</web-resource-name>
 			<url-pattern>/manager/*</url-pattern>
@@ -42,9 +52,20 @@
 		<auth-constraint>
 			<role-name>fiimpact</role-name>
 		</auth-constraint>
+		<!-- transport-guarantee can be CONFIDENTIAL, INTEGRAL, or NONE -->
+		<!--<user-data-constraint>
+			<transport-guarantee>NONE</transport-guarantee>
+		</user-data-constraint>-->
 	</security-constraint>
-
 	<login-config>
-		<auth-method>BASIC</auth-method>
-	</login-config>	
+		<auth-method>FORM</auth-method>
+		<realm-name>Form autenthication</realm-name>
+		<form-login-config>
+			<form-login-page>/login.jsp</form-login-page>
+			<form-error-page>/error.jsp</form-error-page>
+		</form-login-config>
+	</login-config>
+	<security-role>
+		<role-name>fiimpact</role-name>
+	</security-role>
 </web-app>

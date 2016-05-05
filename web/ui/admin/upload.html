@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+ 
+<html>
+    <head>
+        <title>Mattermark Uploading Form</title>
+    </head>
+    <body>
+        <h3>File Upload:</h3>
+        Select a file to upload: <br />
+        <form action="../../manager" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" size="50" />
+            <input type="text" name="action" value="upload-mattermark" size="50" />
+            <br />
+            <input type="submit" value="Upload File" />
+        </form>
+    </body>
+</html>
