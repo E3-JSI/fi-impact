@@ -255,7 +255,7 @@ public class FIImpactSecureRequestHandler extends HttpServlet
       try
       {
         //action: upload-mattermark
-        String sAction;
+        String sAction=null;
         FileItem postedFile = null;
         boolean bError = false;
         // Parse the request to get file items.
@@ -299,6 +299,16 @@ public class FIImpactSecureRequestHandler extends HttpServlet
             }
 
           }
+        }
+        if(postedFile == null)
+        {
+          bError = true;
+          logger.error("No file sent.");
+        }
+        if(sAction == null)
+        {
+          bError = true;
+          logger.error("No action set.");
         }
         if(!bError)
         {
