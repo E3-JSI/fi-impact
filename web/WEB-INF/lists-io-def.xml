@@ -40,7 +40,7 @@
 		<filed column="Company Name" label="Company Name" fieldid="M01"/>
 		<filed column="Growth Score" label="Growth Score" fieldid="MATTERMARK_GROWTH" usage="indicator" transform="log"/>
 		<filed column="Mindshare Score" label="Mindshare Score" fieldid="M03"/>
-		<filed column="Momentum Score" label="Momentum Score" fieldid="M04"/>
+		<filed column="Momentum Score" label="Momentum Score" fieldid="MATTERMARK_MOMENTUM" usage="indicator" transform="log"/>
 		<filed column="Mattermark URL" label="Mattermark URL" fieldid="M05" usage="external"/>
 		<filed column="Website" label="Website" fieldid="M06" usage="clean-url"/>
 		<filed column="Description" label="Description" fieldid="M07"/>
@@ -52,14 +52,14 @@
 		<filed column="Business Model" label="Business Model" fieldid="M13"/>
 		<filed column="Keywords" label="Keywords" fieldid="M14"/>
 		<filed column="Investors" label="Investors" fieldid="M15"/>
-		<filed column="Employee Count" label="Employee Count" fieldid="M16"/>
+		<filed column="Employee Count" label="Employee Count" fieldid="MATTERMARK_EMPLOYEE_COUNT" usage="indicator" /> <!--transform="log"-->
 		<filed column="Employees Month Ago" label="Employees Month Ago" fieldid="M17"/>
 		<filed column="Employees Added This Month" label="Employees Added This Month" fieldid="M18"/>
 		<filed column="Employees MoM" label="Employees MoM" fieldid="M19"/>
 		<filed column="Employees 6 Months Ago" label="Employees 6 Months Ago" fieldid="M20"/>
 		<filed column="Employees Added In 6 Months" label="Employees Added In 6 Months" fieldid="M21"/>
 		<filed column="Employees 6 Months Growth" label="Employees 6 Months Growth" fieldid="M22"/>
-		<filed column="Est. Monthly Uniques" label="Est. Monthly Uniques" fieldid="MATTERMARK_MONTHLY_UNIQUES" usage="indicator" transform="log"/>
+		<filed column="Est. Monthly Uniques" label="Est. Monthly Uniques" fieldid="MATTERMARK_MONTHLY_UNIQUES" usage="indicator"/> <!--transform="log"-->
 		<filed column="Monthly Uniques Week Ago" label="Monthly Uniques Week Ago" fieldid="M24"/>
 		<filed column="Monthly Uniques WoW" label="Monthly Uniques WoW" fieldid="M25"/>
 		<filed column="Monthly Uniques Month Ago" label="Monthly Uniques Month Ago" fieldid="M26"/>
@@ -69,7 +69,7 @@
 		<filed column="Mobile Downloads WoW" label="Mobile Downloads WoW" fieldid="M30"/>
 		<filed column="Mobile Downloads Month Ago" label="Mobile Downloads Month Ago" fieldid="M31"/>
 		<filed column="Mobile Downloads MoM" label="Mobile Downloads MoM" fieldid="M32"/>
-		<filed column="Twitter Followers" label="Twitter Followers" fieldid="M33"/>
+		<filed column="Twitter Followers" label="Twitter Followers" fieldid="MATTERMARK_TWITTER_FOLLOWERS" usage="indicator" transform="log"/>
 		<filed column="Twitter Followers Week Ago" label="Twitter Followers Week Ago" fieldid="M34"/>
 		<filed column="Twitter Followers WoW" label="Twitter Followers WoW" fieldid="M35"/>
 		<filed column="Twitter Followers Month Ago" label="Twitter Followers Month Ago" fieldid="M36"/>
@@ -80,7 +80,7 @@
 		<filed column="Twitter Mentions Last Month" label="Twitter Mentions Last Month" fieldid="M41"/>
 		<filed column="Twitter Mentions 2 Months Ago" label="Twitter Mentions 2 Months Ago" fieldid="M42"/>
 		<filed column="Twitter Mentions MoM" label="Twitter Mentions MoM" fieldid="M43"/>
-		<filed column="Facebook Likes" label="Facebook Likes" fieldid="M44"/>
+		<filed column="Facebook Likes" label="Facebook Likes" fieldid="MATTERMARK_FACEBOOK_LIKES" usage="indicator" transform="log"/>
 		<filed column="Facebook Likes Week Ago" label="Facebook Likes Week Ago" fieldid="M45"/>
 		<filed column="Facebook Likes Wow" label="Facebook Likes Wow" fieldid="M46"/>
 		<filed column="Facebook Likes Month Ago" label="Facebook Likes Month Ago" fieldid="M47"/>
@@ -91,7 +91,7 @@
 		<filed column="Facebook Talking Month Ago" label="Facebook Talking Month Ago" fieldid="M52"/>
 		<filed column="Facebook Talking 2 Months Ago" label="Facebook Talking 2 Months Ago" fieldid="M53"/>
 		<filed column="Facebook Talking MoM" label="Facebook Talking MoM" fieldid="M54"/>
-		<filed column="LinkedIn Follows" label="LinkedIn Follows" fieldid="M55"/>
+		<filed column="LinkedIn Follows" label="LinkedIn Follows" fieldid="MATTERMARK_LINKEDIN_FOLLOWS" usage="indicator" transform="log"/>
 		<filed column="LinkedIn Follows Week Ago" label="LinkedIn Follows Week Ago" fieldid="M56"/>
 		<filed column="LinkedIn Follows WoW" label="LinkedIn Follows WoW" fieldid="M57"/>
 		<filed column="LinkedIn Follows Month Ago" label="LinkedIn Follows Month Ago" fieldid="M58"/>
@@ -113,7 +113,7 @@
 		<filed column="Months since last funding" label="Months since last funding" fieldid="M74"/>
 		<filed column="Employees added since last funding" label="Employees added since last funding" fieldid="M75"/>
 		<filed column="New person months since last funding" label="New person months since last funding" fieldid="M76"/>
-		<filed column="New funding employee growth" label="New funding employee growth" fieldid="MATTERMARK_NEW_FUNDING_EMP_GROWTH" usage="indicator" transform="log"/>
+		<filed column="New funding employee growth" label="New funding employee growth" fieldid="M77"/>
 		<filed column="Date Added" label="Date Added" fieldid="M78"/>
 	</list>
 </lists>
