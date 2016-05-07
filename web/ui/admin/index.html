@@ -33,7 +33,7 @@
     <![endif]-->
   </head>
   
-  <body role="document" ng-controller="fiCtrl">
+  <body role="document" ng-controller="fiCtrl" ng-cloak>
   
     <div class="container theme-showcase" role="main">
 		
@@ -41,6 +41,14 @@
 		 <!-- background: top left url('css/fi-impact.png') no-repeat; -->
     	<div class="jumbotron">
 			<h1>Projects Overview</h1>
+			<div class="pull-right">
+				<i class="fa fa-user" aria-hidden="true"></i> {{profile.user}}
+				<div class="btn-group" role="group" style="margin-left: 10px">
+				  <button id="btnUpload" data-toggle="modal" data-target="#uploadModal" type="button" class="btn" ng-class="{'btn-primary': profile.upload, 'btn-secondary': !profile.upload}" ng-disabled="!profile.upload">Upload</button>
+				  <a class="btn" ng-class="{'btn-primary': profile.export, 'btn-secondary': !profile.export}" ng-disabled="!profile.export" href="../../manager?action=export">Export</a>
+				</div>
+				<a class="btn btn-primary" href="../../logout.jsp">Logout</a>
+			</div>
 		</div>
 		
         <table id="listing" class="table table-striped">
@@ -69,6 +77,46 @@
 	  
     </div>
 
+	<div id="uploadModal" class="modal fade" role="dialog">
+	  <div class="modal-dialog">
+
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Mattermark Import</h4>
+				<div class="progress">
+					<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="4" style="width: 20%;"></div>
+				</div>
+			</div>
+			<div class="modal-body">
+				<ul class="nav nav-tabs" role="tablist">
+					<li role="presentation" ng-class="{'active': uploadTab == 'tabNotice'}"><a>Notice</a></li>
+					<li role="presentation" ng-class="{'active': uploadTab == 'tabFile'}"><a>Choose file</a></li>
+					<li role="presentation" ng-class="{'active': uploadTab == 'tabUpload'}"><a>Uploading</a></li>
+					<li role="presentation" ng-class="{'active': uploadTab == 'tabReview'}"><a>Review</a></li>
+				</ul>
+
+				  <!-- Tab panes -->
+				  <div class="tab-content">
+					<div role="tabpanel" class="tab-pane active" id="tabNotice">
+						<p style="margin: 20px 0;">Here you can upload Mattermark data files.</p>
+						<a class="btn btn-default" href="#tabFile" aria-controls="tabFile" role="tab" data-toggle="tab" ng-click="toggleTab('tabFile')">Continue</a>
+					</div>
+					<div role="tabpanel" class="tab-pane" id="tabFile">
+						<form name="upload" class="form-control-file">
+							<input id="uploadInput" type="file" name="file" class="file" file-model = "myFile" />	
+						</form>
+						<a class="btn btn-default" href="#tabUpload" aria-controls="tabUpload" role="tab" data-toggle="tab" ng-click="uploadFile()">Upload File</a>
+					</div>
+					<div role="tabpanel" class="tab-pane" id="tabUpload">...</div>
+					<div role="tabpanel" class="tab-pane" id="tabReview">...</div>
+				  </div>
+				
+			</div>	
+		</div>
+
+	  </div>
+	</div>
 
     <!-- Core JavaScript -->
     <script src="../../js/jquery.min.js"></script>
@@ -86,6 +134,24 @@
 	<script src="../../js/fiModel.js"></script>
 	<script src="../../js/fi.js"></script>
 	<script src="../../js/fiCtrlManager.js"></script>
-	<script>$(document).ready( function() { $("#listing").tablesorter(fiTableSorter).tablesorterPager(fiTableSorterPager); });</script>
+	<script>
+		$(document).ready(
+			function() { $("#listing").tablesorter(fiTableSorter).tablesorterPager(fiTableSorterPager);
+
+			$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+			  
+			  //update progress
+			  var step = $(e.target).data('step');
+			  var percent = (parseInt(step) / 5) * 100;
+			  
+			  $('.progress-bar').css({width: percent + '%'});
+			  $('.progress-bar').text("Step " + step + " of 5");
+			  
+			  //e.relatedTarget // previous tab
+			  
+			})
+
+		});
+	</script>
 
 </body></html>

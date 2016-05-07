@@ -27,7 +27,11 @@ var fiData = function (id) { // id is optional
 		this.json = loadJSON('../../service?action=resultsnew&id=' + id, this.model);
 		this.id = id;
 	}
-	else { this.manager =  getJSON('../../manager?action=list'); }
+	else {
+		this.manager =  getJSON('../../manager?action=list');
+		this.profile =  getJSON('../../manager?action=user-profile');
+		// http://localhost:8080/fi-impact/manager?action=export
+	}
 	
 	// * * * * * * * * * *
 	// internal functions

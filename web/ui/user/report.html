@@ -23,7 +23,7 @@
 
 </head>
 
-<body id="page-top" class="index" ng-controller="fiCtrl">
+<body id="page-top" class="index" ng-controller="fiCtrl" ng-cloak>
 
     <!-- Navigation -->
     <nav class="navbar navbar-default navbar-fixed-top">
@@ -341,9 +341,9 @@
 		$.each(window.radar, function(i, v) { v.draw("#radar" + i) });
 		
 		$("#pdfDownload").click(function() {
-			$.get( "../fi-impact/service?action=pdf&id=" + fi.id, function(data) {
+			$.get( "../../service?action=pdf&id=" + fi.id, function(data) {
 				if ($(data).find('status').attr('status') == "OK") {
-					var win = window.open('../fi-impact/pdf/survey-' + fi.id + '.pdf', '_blank');
+					var win = window.open('../../pdf/survey-' + fi.id + '.pdf', '_blank');
 					if (win) { win.focus(); }
 				}
 			});
