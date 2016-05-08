@@ -77,17 +77,12 @@
 	  
     </div>
 
-	<div id="uploadModal" class="modal fade" role="dialog">
+	<div id="uploadModal" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog">
 	  <div class="modal-dialog">
 
 		<!-- Modal content-->
 		<div class="modal-content">
-			<div class="modal-header">
-				<h4 class="modal-title">Mattermark Import</h4>
-				<div class="progress">
-					<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="4" style="width: 20%;"></div>
-				</div>
-			</div>
+			<div class="modal-header"><h4 class="modal-title">Mattermark Import</h4></div>
 			<div class="modal-body">
 				<ul class="nav nav-tabs" role="tablist">
 					<li role="presentation" ng-class="{'active': uploadTab == 'tabNotice'}"><a>Notice</a></li>
@@ -100,16 +95,31 @@
 				  <div class="tab-content">
 					<div role="tabpanel" class="tab-pane active" id="tabNotice">
 						<p style="margin: 20px 0;">Here you can upload Mattermark data files.</p>
-						<a class="btn btn-default" href="#tabFile" aria-controls="tabFile" role="tab" data-toggle="tab" ng-click="toggleTab('tabFile')">Continue</a>
+						<a class="btn btn-default cancel" data-dismiss="modal">Cancel</a>
+						<a class="btn btn-primary" href="#tabFile" aria-controls="tabFile" role="tab" data-toggle="tab" ng-click="toggleTab('tabFile')">Continue</a>
 					</div>
 					<div role="tabpanel" class="tab-pane" id="tabFile">
 						<form name="upload" class="form-control-file">
-							<input id="uploadInput" type="file" name="file" class="file" file-model = "myFile" />	
+							<input id="uploadInput" type="file" name="file" class="file" file-model="dataFile" ng-model-options="{ debounce: 1000 }" />	
 						</form>
-						<a class="btn btn-default" href="#tabUpload" aria-controls="tabUpload" role="tab" data-toggle="tab" ng-click="uploadFile()">Upload File</a>
+						<a class="btn btn-default cancel" href="#tabNotice" aria-controls="tabNotice" role="tab" data-toggle="tab" ng-click="toggleTab('tabNotice')" data-dismiss="modal">Cancel</a>
+						<a class="btn btn-primary" href="#tabUpload" aria-controls="tabUpload" role="tab" data-toggle="tab" ng-click="uploadFile()">Upload File</a>
 					</div>
-					<div role="tabpanel" class="tab-pane" id="tabUpload">...</div>
-					<div role="tabpanel" class="tab-pane" id="tabReview">...</div>
+					<div role="tabpanel" class="tab-pane" id="tabUpload">
+						<div role="tabpanel" class="tab-pane" id="tabUpload">
+							<p class="text-center"><i class="fa fa-spinner fa-pulse fa-5x fa-fw margin-bottom"></i><span class="sr-only">Uploading...</span></p>
+							<a id="autoContinue" style="display: none" href="#tabReview" aria-controls="tabReview" role="tab" data-toggle="tab"></a>
+						</div>
+					</div>
+					<div role="tabpanel" class="tab-pane" id="tabReview">
+						<ul ng-show="uploadResult.success">
+							<li ng-repeat="info in uploadResult.data"><span ng-repeat="(key, value) in info">{{key}}: {{value}}</span></li>
+						</ul>
+						<ul ng-show="!uploadResult.success">
+							<li ng-repeat="info in uploadResult.data"><span ng-repeat="(key, value) in info">{{key}}: {{value}}</span></li>
+						</ul>
+						<a class="btn btn-primary" data-dismiss="modal">Done</a>
+					</div>
 				  </div>
 				
 			</div>	

@@ -7,11 +7,9 @@ fiManagerApp.directive('fileModel', ['$parse', function ($parse) {
 	return {
 		restrict: 'A',
 		link: function(scope, element, attrs) {
-			var model = $parse(attrs.fileModel);
-			var modelSetter = model.assign;                 
-			element.bind('change', function(){
-				scope.$apply(function(){ modelSetter(scope, element[0].files[0]); });
-			});
+			var model = $parse(attrs.fileModel)
+			var modelSetter = model.assign
+			element.bind('change', function() { scope.$apply(function(){ modelSetter(scope, element[0].files[0]) }) })
 		}
 	};
 }]);
@@ -46,7 +44,6 @@ fiManagerApp.controller('fiCtrl', ['$scope', 'fileUpload', function($scope, file
 	$scope.surveys = fi.manager.surveys
 	$scope.profile = fi.profile
 	$scope.uploadTab = 'tabNotice'
-	
 	$scope.toggleTab = function(tabID) { $scope.uploadTab = tabID }
 	
 	var ratioToPercent = function(r) { return Math.round(r*100); console.log("test"); }
@@ -68,9 +65,11 @@ fiManagerApp.controller('fiCtrl', ['$scope', 'fileUpload', function($scope, file
 	$scope.uploadFile = function(){
 		// console.dir(file);       
 		$scope.toggleTab('tabUpload')
-		fileUpload.async($scope.myFile, "../../manager").then(function() {
+		fileUpload.async($scope.dataFile, "../../manager").then(function() {
 			$scope.toggleTab('tabReview')
-			console.log(fileUpload.data())
+			autoContinue = angular.element( document.querySelector( '#autoContinue' ) );
+			autoContinue.trigger('click')
+			$scope.uploadResult = fileUpload.data()
 		})
 	};
 	
