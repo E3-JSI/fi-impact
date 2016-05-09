@@ -43,6 +43,7 @@ fiManagerApp.service('fileUpload', ['$http', '$q', function ($http, $q) {
 fiManagerApp.controller('fiCtrl', ['$scope', 'fileUpload', function($scope, fileUpload) {
 	$scope.surveys = fi.manager.surveys
 	$scope.profile = fi.profile
+	$scope.accelerators = fi.accelerators
 	$scope.uploadTab = 'tabNotice'
 	$scope.toggleTab = function(tabID) { $scope.uploadTab = tabID }
 	
@@ -61,6 +62,10 @@ fiManagerApp.controller('fiCtrl', ['$scope', 'fileUpload', function($scope, file
 		$scope.surveys[i].market = ratioToPercent(v.MARKET_GRAPH_PERCENT);
 		$scope.surveys[i].business = ratioToPercent(v.MARKET_NEEDS_GRAPH_PERCENT);
 	});
+	
+	$scope.clearUnderscores = function(str) {
+		return str.replace(/_/g, " ")
+	}
 	
 	$scope.uploadFile = function(){
 		// console.dir(file);       

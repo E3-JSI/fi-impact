@@ -28,9 +28,9 @@ var fiData = function (id) { // id is optional
 		this.id = id;
 	}
 	else {
-		this.manager =  getJSON('../../manager?action=list');
-		this.profile =  getJSON('../../manager?action=user-profile');
-		// http://localhost:8080/fi-impact/manager?action=export
+		this.manager = getJSON('../../manager?action=list');
+		this.profile = getJSON('../../manager?action=user-profile');
+		this.accelerators = getJSON('../..//manager?action=accelerators');
 	}
 	
 	// * * * * * * * * * *

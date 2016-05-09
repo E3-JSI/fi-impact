@@ -44,8 +44,22 @@
 			<div class="pull-right">
 				<i class="fa fa-user" aria-hidden="true"></i> {{profile.user}}
 				<div class="btn-group" role="group" style="margin-left: 10px">
-				  <button id="btnUpload" data-toggle="modal" data-target="#uploadModal" type="button" class="btn" ng-class="{'btn-primary': profile.upload, 'btn-secondary': !profile.upload}" ng-disabled="!profile.upload">Upload</button>
-				  <a class="btn" ng-class="{'btn-primary': profile.export, 'btn-secondary': !profile.export}" ng-disabled="!profile.export" href="../../manager?action=export">Export</a>
+					<button id="btnUpload" data-toggle="modal" data-target="#uploadModal" type="button" class="btn" ng-class="{'btn-primary': profile.upload, 'btn-secondary': !profile.upload}" ng-disabled="!profile.upload">Upload</button>
+					<div class="btn-group">
+						<a class="btn" ng-class="{'btn-primary': profile.export, 'btn-secondary': !profile.export}" ng-disabled="!profile.export" href="../../manager?action=export">Export</a>
+						<button type="button" class="btn dropdown-toggle" ng-class="{'btn-primary': profile.export, 'btn-secondary': !profile.export}" ng-disabled="!profile.export" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<span class="caret"></span>
+							<span class="sr-only">Toggle Dropdown</span>
+						</button>
+						<ul class="dropdown-menu">
+							<li><a href="../../manager?action=export&type=full" title="Surveys, KPIs, projects info, Mattermark data and indicators">Full</a></li>
+							<li><a href="../../manager?action=export&type=full-no-derived" title="Full with additional calculations">Full extended</a></li>
+							<li><a href="../../manager?action=export&type=short" title="Basic project info with KPIs">Basic</a></li>
+							<li role="separator" class="divider"></li>
+							<li class="disabled">accelerators</li>
+							<li ng-repeat="a in accelerators"><a ng-href="../../manager?action=export&type=accelerator&id={{a}}" title="Filtered by accelerator, basic project info with KPIs">{{a}}</a></li>
+						</ul>
+					</div>
 				</div>
 				<a class="btn btn-primary" href="../../logout.jsp">Logout</a>
 			</div>
@@ -94,11 +108,22 @@
 				  <!-- Tab panes -->
 				  <div class="tab-content">
 					<div role="tabpanel" class="tab-pane active" id="tabNotice">
-						<p style="margin: 20px 0;">Here you can upload Mattermark data files.</p>
+						<p style="margin: 20px 0;">The FI-IMPACT surveys and projects database can be supplemented by company data provided by Mattermark. In order to add Mattermark data you will need a subscription to Mattermark and a pre-created custom list of FI companies already pre-created there.</p>
+						<p>Before continuing, please prepare the Mattermark export file as follows:</p>
+						<ol>
+							<li>Launch Google Chrome, as the Mattermark Export functionality does not work in other browsers</li>
+							<li>Log in to the Mattermark web site: <a href="https://mattermark.com/">mattermark.com</a></li>
+							<li>Go to &quot;Lists&quot;/&quot;All lists&quot;</li>
+							<li>Select &quot;FIIMPACTSANITISED&quot;</li>
+							<li>In the upper right corner select &quot;Export&quot;/&quot;Export All to CSV&quot;</li>
+							<li>Note the place where the file is saved (eg. by using &quot;Show in folder&quot; next to the file name)</li>
+							<li>Click &quot;Continue&quot; in this dialog</li>
+						</ol>     
 						<a class="btn btn-default cancel" data-dismiss="modal">Cancel</a>
 						<a class="btn btn-primary" href="#tabFile" aria-controls="tabFile" role="tab" data-toggle="tab" ng-click="toggleTab('tabFile')">Continue</a>
 					</div>
 					<div role="tabpanel" class="tab-pane" id="tabFile">
+						<p>Select the Mattermark export CSV file and click &quot;Upload File&quot;.</p>
 						<form name="upload" class="form-control-file">
 							<input id="uploadInput" type="file" name="file" class="file" file-model="dataFile" ng-model-options="{ debounce: 1000 }" />	
 						</form>
@@ -107,18 +132,21 @@
 					</div>
 					<div role="tabpanel" class="tab-pane" id="tabUpload">
 						<div role="tabpanel" class="tab-pane" id="tabUpload">
+							<p>Please wait, uploading and importing Mattermark company info.</p>
 							<p class="text-center"><i class="fa fa-spinner fa-pulse fa-5x fa-fw margin-bottom"></i><span class="sr-only">Uploading...</span></p>
 							<a id="autoContinue" style="display: none" href="#tabReview" aria-controls="tabReview" role="tab" data-toggle="tab"></a>
 						</div>
 					</div>
 					<div role="tabpanel" class="tab-pane" id="tabReview">
-						<ul ng-show="uploadResult.success">
-							<li ng-repeat="info in uploadResult.data"><span ng-repeat="(key, value) in info">{{key}}: {{value}}</span></li>
-						</ul>
+						<div ng-show="uploadResult.success">
+							<p>Done! Company info successfully loaded.</p>
+							<p>Click &quot;Done&quot; to close this dialog.</p>
+							<ul><li ng-repeat="info in uploadResult.data"><span ng-repeat="(key, value) in info">{{clearUnderscores(key)}}: {{value}}</span></li></ul>
+						</div>
 						<ul ng-show="!uploadResult.success">
-							<li ng-repeat="info in uploadResult.data"><span ng-repeat="(key, value) in info">{{key}}: {{value}}</span></li>
+							<li ng-repeat="info in uploadResult.data"><span ng-repeat="(key, value) in info">{{clearUnderscores(key)}}: {{value}}</span></li>
 						</ul>
-						<a class="btn btn-primary" data-dismiss="modal">Done</a>
+						<a class="btn btn-primary" href="#tabNotice" aria-controls="tabNotice" role="tab" data-toggle="tab" ng-click="toggleTab('tabNotice')" data-dismiss="modal">Done</a>
 					</div>
 				  </div>
 				
@@ -145,22 +173,8 @@
 	<script src="../../js/fi.js"></script>
 	<script src="../../js/fiCtrlManager.js"></script>
 	<script>
-		$(document).ready(
-			function() { $("#listing").tablesorter(fiTableSorter).tablesorterPager(fiTableSorterPager);
-
-			$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-			  
-			  //update progress
-			  var step = $(e.target).data('step');
-			  var percent = (parseInt(step) / 5) * 100;
-			  
-			  $('.progress-bar').css({width: percent + '%'});
-			  $('.progress-bar').text("Step " + step + " of 5");
-			  
-			  //e.relatedTarget // previous tab
-			  
-			})
-
+		$(document).ready( function() {
+			$("#listing").tablesorter(fiTableSorter).tablesorterPager(fiTableSorterPager);
 		});
 	</script>
 

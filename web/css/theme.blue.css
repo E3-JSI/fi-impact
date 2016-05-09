@@ -1,3 +1,20 @@
+#uploadModal .modal-body { height: 500px; }
+#uploadModal .fa-spinner { color: #1F71AB }
+#uploadModal form { margin: 20px 0; }
+#uploadModal #tabUpload p { margin: 50px; }
+#uploadModal .cancel { margin-right: 10px; }
+#uploadModal ul { margin: 20px 0; }
+
+.btn-group .dropdown-menu .disabled {
+	font-variant: small-caps;
+	font-weight: bold;
+	font-size: 1em;
+	margin-top: -10px;
+	margin-bottom: 5px;
+	padding-left: 20px;
+	color: #666;
+}
+
 .tablesorter-blue {
 	text-align: left;
 }
@@ -215,3 +232,4 @@ caption {
 	cursor: pointer;
 	background-color: #e6bf99;
 }
+
