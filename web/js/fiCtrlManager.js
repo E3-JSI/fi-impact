@@ -63,6 +63,8 @@ fiManagerApp.controller('fiCtrl', ['$scope', 'fileUpload', function($scope, file
 		$scope.surveys[i].business = ratioToPercent(v.MARKET_NEEDS_GRAPH_PERCENT);
 	});
 	
+	$scope.access = function(access) { return ($scope.profile.access).indexOf(access) > -1 }
+	
 	$scope.clearUnderscores = function(str) {
 		return str.replace(/_/g, " ")
 	}
@@ -71,10 +73,10 @@ fiManagerApp.controller('fiCtrl', ['$scope', 'fileUpload', function($scope, file
 		// console.dir(file);       
 		$scope.toggleTab('tabUpload')
 		fileUpload.async($scope.dataFile, "../../manager").then(function() {
-			$scope.toggleTab('tabReview')
+			$scope.uploadResult = fileUpload.data()
 			autoContinue = angular.element( document.querySelector( '#autoContinue' ) );
 			autoContinue.trigger('click')
-			$scope.uploadResult = fileUpload.data()
+			$scope.toggleTab('tabReview')
 		})
 	};
 	

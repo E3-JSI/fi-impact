@@ -1,39 +1,38 @@
 <!DOCTYPE html>
  
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		
-		<meta name="description" content="">
-		<meta name="author" content="JSI">
-		<link rel="shortcut icon" href="../../img/favicon.ico" type="image/x-icon">
-		<link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
-
-		<title>Mattermark Uploading Form</title>
-			
-		<!-- Bootstrap Core CSS -->
-		<link href="../../css/bootstrap.min.css" rel="stylesheet">
-		<!-- Custom Fonts -->
-		<link rel="stylesheet" href="../../css/font-awesome.min.css">
-		<link href="../../css/googlefonts.css" rel="stylesheet" type="text/css">
-		
-		<style>.container input { margin: 10px 0; }</style>
-
-	</head>
-	
+    <head>
+        <title>Mattermark Uploading Form</title>
+    </head>
     <body>
-		
-		<div class="container" style="width: 300px; margin-top: 100px;">
-		
-			<form class="form-control-file" action="../../manager" method="post" enctype="multipart/form-data">
-				<h2 class="form-heading">File Upload</h2>
-				<input id="input-1" type="file" name="file" class="file">
-				<input type="hidden" name="action" value="upload-mattermark" />
-				<input class="btn btn-lg btn-primary btn-block" type="submit" value="Upload File" />
-			</form>
-			
-		</div>
+    <h3>Perform action</h3>
+    <form action="../../manager" method="get"  target="output_frame">
+        <select name="action">
+            <option value="load">load</option>
+            <option value="list">list</option>
+            <option value="clear">clear</option>
+            <option value="export">export</option>
+            <option value="refresh-projects">refresh projects</option>
+            <option value="refresh-mattermark">refresh mattermark</option>
+            <option value="user-profile">user profile</option>
+            <option value="accelerators">accelerators</option>
+        </select>
+        <br />
+        <input type="submit" value="Go" />
+    </form>
+    <h3>File Upload:</h3>
+        Select a file to upload: <br />
+        <form action="../../manager" method="post" enctype="multipart/form-data" target="output_frame">
+            <input type="file" name="file" size="50" />
+            <select name="action">
+                <option value="upload-mattermark">mattermark</option>
+                <option value="upload-mapping">mapping</option>
+                <option value="upload-projects">projects</option>
+            </select>
+                <br />
+            <input type="submit" value="Upload File" />
+        </form>
+        <iframe name="output_frame" src="" id="output_frame" width="800" height="500">
+        </iframe>
     </body>
 </html>
