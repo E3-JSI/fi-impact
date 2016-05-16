@@ -5,13 +5,34 @@
         <title>Mattermark Uploading Form</title>
     </head>
     <body>
-        <h3>File Upload:</h3>
+    <h3>Perform action</h3>
+    <form action="../../manager" method="get"  target="output_frame">
+        <select name="action">
+            <option value="load">load</option>
+            <option value="list">list</option>
+            <option value="clear">clear</option>
+            <option value="export">export</option>
+            <option value="refresh-projects">refresh projects</option>
+            <option value="refresh-mattermark">refresh mattermark</option>
+            <option value="user-profile">user profile</option>
+            <option value="accelerators">accelerators</option>
+        </select>
+        <br />
+        <input type="submit" value="Go" />
+    </form>
+    <h3>File Upload:</h3>
         Select a file to upload: <br />
-        <form action="../../manager" method="post" enctype="multipart/form-data">
+        <form action="../../manager" method="post" enctype="multipart/form-data" target="output_frame">
             <input type="file" name="file" size="50" />
-            <input type="text" name="action" value="upload-mattermark" size="50" />
-            <br />
+            <select name="action">
+                <option value="upload-mattermark">mattermaek</option>
+                <option value="upload-mapping">mapping</option>
+                <option value="upload-projects">projects</option>
+            </select>
+                <br />
             <input type="submit" value="Upload File" />
         </form>
+        <iframe name="output_frame" src="" id="output_frame" width="800" height="500">
+        </iframe>
     </body>
 </html>

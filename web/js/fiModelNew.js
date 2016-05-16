@@ -876,48 +876,41 @@
 		},
         {
 			"id" : "7b",
-			"name" : "MATTERMARK_MOMENTUM",
-			"label" : "Momentum Score",
-			"label_graph" : "Momentum Score",
-			"questions" : []
-		},
-        {
-			"id" : "7c",
 			"name" : "MATTERMARK_EMPLOYEE_COUNT",
 			"label" : "Employee Count",
 			"label_graph" : "Employee Count",
 			"questions" : []
 		},
 		{
-			"id" : "7d",
+			"id" : "7c",
 			"name" : "MATTERMARK_MONTHLY_UNIQUES",
 			"label" : "Est. Monthly Uniques",
 			"label_graph" : "Est. Monthly Uniques",
 			"questions" : []
 		},
 		{
-			"id" : "7e",
+			"id" : "7d",
 			"name" : "MATTERMARK_TWITTER_FOLLOWERS",
 			"label" : "Twitter Followers",
 			"label_graph" : "Twitter Followers",
 			"questions" : []
 		},
 		{
-			"id" : "7f",
+			"id" : "7e",
 			"name" : "MATTERMARK_FACEBOOK_LIKES",
 			"label" : "Facebook Likes",
 			"label_graph" : "Facebook Likes",
 			"questions" : []
 		},
          {
-			"id" : "7g",
+			"id" : "7f",
 			"name" : "MATTERMARK_LINKEDIN_FOLLOWS",
 			"label" : "LinkedIn Follows",
 			"label_graph" : "LinkedIn Follows",
 			"questions" : []
 		},
 		{
-			"id" : "7h",
+			"id" : "7g",
 			"name" : "MATTERMARK_TOTAL_FUNDING",
 			"label" : "Total Funding",
 			"label_graph" : "Total Funding",

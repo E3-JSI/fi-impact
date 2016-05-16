@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<users>
+    <user name="fiadmine" accelerator="FABulous">
+        <access id="admin"/>
+        <access id="export"/>
+    </user>
+    <user name="fiadminue">
+        <access id="admin"/>
+        <access id="export"/>
+        <access id="upload"/>
+    </user>
+    <user name="fiadmin">
+        <access id="admin"/>
+        <access id="export"/>
+        <access id="upload"/>
+        <access id="upload-extended"/>
+    </user>
+
+</users>

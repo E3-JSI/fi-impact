@@ -5,6 +5,8 @@ import org.apache.logging.log4j.Logger;
 
 import org.json.JSONWriter;
 import si.ijs.ailab.fiimpact.project.ProjectManager;
+import si.ijs.ailab.fiimpact.users.UserInfo;
+import si.ijs.ailab.fiimpact.users.UsersManager;
 import si.ijs.ailab.fiimpact.survey.SurveyManager;
 
 import javax.servlet.ServletConfig;
@@ -45,7 +47,8 @@ public class FIImpactSecureRequestHandler extends HttpServlet
   private Path webappRoot;
 
   private ProjectManager projectManager;
-	
+  private UsersManager usersManager;
+
   @Override
   public void init(ServletConfig config) throws ServletException
   {
@@ -87,31 +90,31 @@ public class FIImpactSecureRequestHandler extends HttpServlet
 
     webappRoot = new File (config.getServletContext().getRealPath("/")).toPath();
     projectManager=ProjectManager.getProjectManager(webappRoot);
+    usersManager=UsersManager.getUsersManager(webappRoot);
   }
 
 
-  private static final Map<String, String> ACTION_ROLES = new HashMap<>();
+  private static final Map<String, String> GET_ACTION_ROLES = new HashMap<>();
+  private static final Map<String, String> POST_ACTION_ROLES = new HashMap<>();
 
   {
-    ACTION_ROLES.put("load", "fiimpact-upload");
-    ACTION_ROLES.put("list", "fiimpact");
-    ACTION_ROLES.put("clear", "fiimpact-upload");
-    ACTION_ROLES.put("export", "fiimpact-export");
-    ACTION_ROLES.put("refresh-projects", "fiimpact-upload");
-    ACTION_ROLES.put("refresh-mattermark", "fiimpact-upload");
-    ACTION_ROLES.put("user-profile", "fiimpact");
+    GET_ACTION_ROLES.put("load", "upload");
+    GET_ACTION_ROLES.put("list", "admin");
+    GET_ACTION_ROLES.put("clear", "upload");
+    GET_ACTION_ROLES.put("export", "export");
+    GET_ACTION_ROLES.put("user-profile", "admin");
+    GET_ACTION_ROLES.put("accelerators", "admin");
+
+    POST_ACTION_ROLES.put("upload-mattermark", "upload");
+    POST_ACTION_ROLES.put("upload-mapping", "upload-extended");
+    POST_ACTION_ROLES.put("upload-projects", "upload-extended");
   }
 
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
   {
 
-    /**
-     action:
-      load
-      list
-     clear
-     */
+    //action: see GET_ACTION_ROLES
     String sAction = request.getParameter("action");
     //TODO later - export to csv - specification still in progress
     /*
@@ -133,13 +136,15 @@ public class FIImpactSecureRequestHandler extends HttpServlet
 
      */
 
-   
+    String userName = request.getUserPrincipal().getName();
+    UserInfo userInfo = usersManager.getUserInfo(userName);
+
     logger.info("Received request: action={}.", sAction);
     if (sAction == null || sAction.equals(""))
       setBadRequest(response, "Parameter 'action' not defined.");
-    else if (!(sAction.equals("load") || sAction.equals("list") || sAction.equals("clear") || sAction.equals("export")|| sAction.equals("refresh-projects")||sAction.equals("refresh-mattermark") || sAction.equals("user-profile")))
+    else if (!GET_ACTION_ROLES.containsKey(sAction))
       setBadRequest(response, "Parameter 'action' not valid: "+sAction);
-    else if(!request.isUserInRole(ACTION_ROLES.get(sAction)))
+    else if(!userInfo.getAccessRights().contains(GET_ACTION_ROLES.get(sAction)))
     {
       setBadRequest(response, "User not authorised for "+sAction);
     }
@@ -149,10 +154,21 @@ public class FIImpactSecureRequestHandler extends HttpServlet
       response.setCharacterEncoding("utf-8");
       OutputStreamWriter w = new OutputStreamWriter(response.getOutputStream(), "utf-8");
       JSONWriter json = new JSONWriter(w);
-      json.object().key("user").value(request.getUserPrincipal().getName());
-      json.key("admin").value(request.isUserInRole("fiimpact"));
+      json.object().key("user").value(userName);
+
+
+      json.key("accelerator").value(userInfo.getAccelerator());
+
+      json.key("access").array();
+      for(String s: userInfo.getAccessRights())
+      {
+        json.value(s);
+      }
+      json.endArray();
+      /*json.key("admin").value(request.isUserInRole("fiimpact"));
       json.key("upload").value(request.isUserInRole("fiimpact-upload"));
-      json.key("export").value(request.isUserInRole("fiimpact-export"));
+      json.key("export").value(request.isUserInRole("fiimpact-export"));*/
+
       json.endObject();
       w.flush();
       w.close();
@@ -161,7 +177,18 @@ public class FIImpactSecureRequestHandler extends HttpServlet
     {
       response.setContentType("application/json");
       response.setCharacterEncoding("utf-8");
-      SurveyManager.getSurveyManager().list(response.getOutputStream());
+
+      String groupQuestion = null;
+      String groupAnswer = null;
+
+
+      if(!userInfo.getAccelerator().equals(""))
+      {
+        groupQuestion = "Q1_1";
+        groupAnswer = userInfo.getAccelerator();
+
+      }
+      SurveyManager.getSurveyManager().list(response.getOutputStream(), groupQuestion, groupAnswer);
     }
     else if (sAction.equals("load"))
     {
@@ -171,22 +198,18 @@ public class FIImpactSecureRequestHandler extends HttpServlet
       //surveyManager.loadAll(response.getOutputStream(), "list.csv");
       SurveyManager.getSurveyManager().loadAllTest(response.getOutputStream(), importDir);
     }
-    else if(sAction.equals("refresh-projects"))
-    {
-      Path p = webappRoot.resolve("WEB-INF").resolve("import/project-list.csv");
-      projectManager.importProjects(response.getOutputStream(), p);
-    }
-    else if(sAction.equals("refresh-mattermark"))
-    {
-      Path p = webappRoot.resolve("WEB-INF").resolve("import/mattermark-export.csv");
-      projectManager.importMattermark(response.getOutputStream(), p);
-    }
     else if(sAction.equals("clear"))
     {
       response.setContentType("application/json");
       response.setCharacterEncoding("utf-8");
       SurveyManager.getSurveyManager().clearAll(response.getOutputStream());
 
+    }
+    else if(sAction.equals("accelerators"))
+    {
+      response.setContentType("application/json");
+      response.setCharacterEncoding("utf-8");
+      SurveyManager.getSurveyManager().getJSONAccelerators(response.getOutputStream(), userInfo.getAccelerator());
     }
     else if (sAction.equals("export"))
     {
@@ -199,31 +222,56 @@ public class FIImpactSecureRequestHandler extends HttpServlet
 
       String groupQuestion = null;
       String groupAnswer = null;
-      String idList = null;
-      String questionsList = null;
-      String resultsList = null;
-      String resultsDerList = null;
+
+      int exportAction = 0;
+
       switch (sType)
       {
         case "full":
         {
+          exportAction = SurveyManager.EXPORT_FI_IMPACT_QUESTIONS | SurveyManager.EXPORT_FI_IMPACT_INDICATORS |
+                  SurveyManager.EXPORT_MATTERMARK_FIELDS | SurveyManager.EXPORT_MATTERMARK_INDICATORS |
+                  SurveyManager.EXPORT_DERIVED_INDICATORS | SurveyManager.EXPORT_PROJECT_DATA;
 
+          break;
+        }
+        case "full-no-derived":
+        {
+          exportAction = SurveyManager.EXPORT_FI_IMPACT_QUESTIONS | SurveyManager.EXPORT_FI_IMPACT_INDICATORS |
+                  SurveyManager.EXPORT_MATTERMARK_FIELDS | SurveyManager.EXPORT_MATTERMARK_INDICATORS |
+                  SurveyManager.EXPORT_PROJECT_DATA;
+          break;
+        }
+        case "short":
+        {
+          exportAction = SurveyManager.EXPORT_SHORT_LIST;
           break;
         }
         case "accelerator":
         {
           groupQuestion = "Q1_1";
-          questionsList = "Q1_1;Q1_2;Q1_3;Q1_4;Q1_22";
-          resultsList = "FEASIBILITY;INNOVATION;MARKET;MARKET_NEEDS";
-          resultsDerList = "";
+          exportAction = SurveyManager.EXPORT_SHORT_LIST;
+          groupAnswer = request.getParameter("id");
+          if(groupAnswer != null)
+            groupAnswer = new String(groupAnswer.getBytes("iso-8859-1"), "UTF-8");
+
           break;
         }
+      }
+
+
+      //in case user has the accelerator role set, override the group filter
+      if(!userInfo.getAccelerator().equals(""))
+      {
+        groupQuestion = "Q1_1";
+        groupAnswer = userInfo.getAccelerator();
       }
 
       response.setContentType("application/x-unknown");
       response.setCharacterEncoding("utf-8");
       response.setHeader( "Content-Disposition", "filename=\"fi-impact-export.txt\"" );
-      SurveyManager.getSurveyManager().exportTXT(response.getOutputStream(), groupQuestion, groupAnswer, questionsList, resultsList, resultsDerList, true, true);
+
+      SurveyManager.getSurveyManager().exportTXT(response.getOutputStream(), groupQuestion, groupAnswer, exportAction);
     }
   }
 
@@ -231,11 +279,14 @@ public class FIImpactSecureRequestHandler extends HttpServlet
   {
     // Check that we have a file upload request
     boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+    String userName = request.getUserPrincipal().getName();
+    UserInfo userInfo = usersManager.getUserInfo(userName);
+
     if(!isMultipart)
     {
       setBadRequest(response, "Not a file upload request!");
     }
-    else if(!(request.isUserInRole("fiimpact") && request.isUserInRole("fiimpact-upload")))
+    else if(!(userInfo.getAccessRights().contains("admin") && userInfo.getAccessRights().contains("upload")))
     {
       setBadRequest(response, "User not authorised for uploading");
     }
@@ -276,10 +327,18 @@ public class FIImpactSecureRequestHandler extends HttpServlet
               sAction = value;
               logger.info("Received POST action={}.", sAction);
               if(sAction == null)
+              {
                 setBadRequest(response, "Parameter 'action' not defined.");
-              else if(!(sAction.equals("upload-mattermark")))
+                bError = true;
+              }
+              else if(!POST_ACTION_ROLES.containsKey(sAction))
               {
                 setBadRequest(response, "Parameter 'action' not valid: " + sAction);
+                bError = true;
+              }
+              else if(!userInfo.getAccessRights().contains(POST_ACTION_ROLES.get(sAction)))
+              {
+                setBadRequest(response, "User not authorised: " + sAction);
                 bError = true;
               }
             }
@@ -318,13 +377,25 @@ public class FIImpactSecureRequestHandler extends HttpServlet
           boolean isInMemory = postedFile.isInMemory();
           long sizeInBytes = postedFile.getSize();
 
-          String sNameMattermark = "mattermark_"+ AIUtils.getTimestampDateFormat().format(new Date())+".csv";
-          Path mattermarkFile = uploadDir.resolve(sNameMattermark);
-          logger.info("Uploading Mattermark to: {}", mattermarkFile.toString());
-          postedFile.write(mattermarkFile.toFile());
-          logger.info("Importing Mattermark");
-          projectManager.importMattermark(response.getOutputStream(), mattermarkFile);
-          logger.info("Importing Mattermark - done");
+          String sFileName = sAction+"_"+ AIUtils.getTimestampDateFormat().format(new Date())+".csv";
+          Path pFile = uploadDir.resolve(sFileName);
+          logger.info("Uploading {}  to: {}", sAction, pFile.toString());
+          postedFile.write(pFile.toFile());
+          logger.info("Importing {}", sAction);
+          switch(sAction)
+          {
+            case "upload-mattermark":
+              projectManager.importMattermark(response.getOutputStream(), pFile);
+              break;
+            case "upload-mapping":
+              projectManager.importMappings(response.getOutputStream(), pFile);
+            break;
+            case "upload-projects":
+              projectManager.importProjects(response.getOutputStream(), pFile);
+            break;
+          }
+
+          logger.info("Importing {} - done", sAction);
         }
       }
       catch (Exception e)

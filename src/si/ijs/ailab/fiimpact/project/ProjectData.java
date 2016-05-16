@@ -156,7 +156,7 @@ public class ProjectData
       }
     }
 
-    logger.info("Loaded project {} with {} project fields and {} Mattermark fields.", id, mattermarkFields.size());
+    logger.info("Loaded project {} with {} project fields and {} Mattermark fields.", id, fields.size(), mattermarkFields.size());
 	}
 
 	public void addFields(String[] arrFields)
@@ -173,22 +173,26 @@ public class ProjectData
 
 	}
 
-	public void addFields(ArrayList<ProjectManager.IOListField> fieldDefinitions, ArrayList<String> fieldValues)
+	public void addFields(ArrayList<ProjectManager.IOListField> fieldDefinitions, String[] fieldValues)
 	{
 		fields.clear();
-		for (int i = 0; i < fieldValues.size(); i++)
+		for (int i = 0; i < fieldValues.length; i++)
 		{
-			fields.put(fieldDefinitions.get(i).getFieldid(), fieldValues.get(i));
+			ProjectManager.IOListField ioListField = fieldDefinitions.get(i);
+			if(ioListField!=null)
+				fields.put(ioListField.getFieldid(), fieldValues[i]);
 		}
 
 	}
 
-  public void addFieldsMattermark(ArrayList<ProjectManager.IOListField> fieldDefinitions, ArrayList<String> fieldValues)
+  public void addFieldsMattermark(ArrayList<ProjectManager.IOListField> fieldDefinitions, String[] fieldValues)
   {
     mattermarkFields.clear();
-    for (int i = 0; i < fieldValues.size(); i++)
+    for (int i = 0; i < fieldValues.length; i++)
     {
-      mattermarkFields.put(fieldDefinitions.get(i).getFieldid(), fieldValues.get(i));
+			ProjectManager.IOListField ioListField = fieldDefinitions.get(i);
+			if(ioListField != null)
+      	mattermarkFields.put(ioListField.getFieldid(), fieldValues[i]);
     }
 
   }
@@ -220,6 +224,10 @@ public class ProjectData
     return fields.get(fieldid);
   }
 
+	public void setValue(String fieldid, String val)
+	{
+		fields.put(fieldid, val);
+	}
   public boolean isMattermarkValueSet(String fieldid)
   {
     return mattermarkFields.get(fieldid) != null && !mattermarkFields.get(fieldid).equals("");

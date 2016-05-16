@@ -1,14 +1,17 @@
 package si.ijs.ailab.fiimpact.project;
 
+
 import javax.servlet.ServletOutputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.nio.file.*;
-import java.util.*;
 
+//import org.apache.xpath.operations.String;
+import com.opencsv.CSVReader;
 import org.json.JSONWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -19,10 +22,9 @@ import org.xml.sax.SAXException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import si.ijs.ailab.fiimpact.indicators.OverallResult;
-import si.ijs.ailab.fiimpact.survey.SurveyData;
 import si.ijs.ailab.fiimpact.survey.SurveyManager;
 import si.ijs.ailab.util.AIUtils;
-
+import java.util.*;
 
 /**
  * Created by flavio on 01/06/2015.
@@ -33,10 +35,16 @@ import si.ijs.ailab.util.AIUtils;
 
 public class ProjectManager
 {
-  static class IOListDefinition
+  public final static String LIST_PROJECTS = "project-list";
+  public final static String LIST_MATTERMARK = "mattermark-export";
+  public final static String LIST_MAPPING = "fi-impact-url-mapping";
+
+  public static class IOListDefinition
   {
     private String id;
+    private int startAtRow = 0;
     private ArrayList<IOListField> fields;
+    private Map<String, IOListField> fieldsByColumn;
     private IOListField usageID;
     private IOListField usageCleanUrl;
 
@@ -44,11 +52,14 @@ public class ProjectManager
     {
       this.id = id;
       fields = new ArrayList<>();
+      fieldsByColumn = new HashMap<>();
     }
 
     void addField(IOListField ioListField)
     {
       fields.add(ioListField);
+      fieldsByColumn.put(ioListField.getColumn(), ioListField);
+
       if(ioListField.getUsage() != null)
       {
         switch(ioListField.getUsage())
@@ -64,6 +75,11 @@ public class ProjectManager
     public ArrayList<IOListField> getFields()
     {
       return fields;
+    }
+
+    public Map<String, IOListField> getFieldsByColumn()
+    {
+      return fieldsByColumn;
     }
 
     public String toString()
@@ -88,6 +104,7 @@ public class ProjectManager
     {
       return usageCleanUrl;
     }
+
   }
 
   public static class  IOListField
@@ -254,14 +271,21 @@ public class ProjectManager
       for(int i = 0; i < nList.getLength(); i++)
       {
         String id = null;
+        int iStart=0;
         Node nNode = nList.item(i);
         NodeList nodeList = nNode.getChildNodes();
         if(nNode.getNodeType() == Node.ELEMENT_NODE)
         {
           Element eElement = (Element) nNode;
           id = eElement.getAttribute("name");
+          if(eElement.hasAttribute("header_row"))
+            iStart = AIUtils.parseInteger(eElement.getAttribute("header_row"), 0);
+          if(iStart > 0)
+            iStart--;
         }
+
         IOListDefinition ioListDefinition = new IOListDefinition(id);
+        ioListDefinition.startAtRow = iStart;
 
         for(int j = 0; j < nodeList.getLength(); j++)
         {
@@ -281,7 +305,7 @@ public class ProjectManager
         ioDefinitions.put(id, ioListDefinition);
       }
 
-      IOListDefinition ioListDefinition = ioDefinitions.get("mattermark-export");
+      IOListDefinition ioListDefinition = ioDefinitions.get(LIST_MATTERMARK);
       ArrayList<IOListField> listDefinitionMattermark = ioListDefinition.getFields();
 
       for(IOListField ioListField : listDefinitionMattermark)
@@ -461,32 +485,34 @@ public class ProjectManager
   private static final int ADD_STATUS_SKIP = 2;
 
   //returns the status defined above
-  private int addProject(int idIndex, ArrayList<IOListField> orderListDefinition, ArrayList<String> fields)
+  private int addProject(int idIndex, ArrayList<IOListField> orderListDefinition, String[] fields)
   {
     int ret = ADD_STATUS_UPDATE;
     boolean skipProject = false;// false=save project;true=skip project
     // clean missing, and include record if yes
-    for(int i = 0; i < fields.size(); i++)
+    for(int i = 0; i < fields.length; i++)
     {
       IOListField ioListField = orderListDefinition.get(i);
-      if(ioListField.getMissing().length() != 0)
+      if(ioListField!=null)
       {
-        for(String missing : ioListField.getMissing().split(";"))
-          if(missing.equals(fields.get(i)))
+        if(ioListField.getMissing().length() != 0)
+        {
+          for(String missing : ioListField.getMissing().split(";"))
+            if(missing.equals(fields[i]))
+            {
+              fields[i] = "";
+              break;
+            }
+        }
+
+        if(ioListField.getInclude_record_when().length() != 0)
+          if(!ioListField.getInclude_record_when().toLowerCase().equals(fields[i].toLowerCase()))
           {
-            fields.set(i, "");
+            skipProject = true;
             break;
           }
       }
-
-      if(ioListField.getInclude_record_when().length() != 0)
-        if(!ioListField.getInclude_record_when().toLowerCase().equals(fields.get(i).toLowerCase()))
-        {
-          skipProject = true;
-          break;
-        }
     }
-
 
     if(skipProject)
     {
@@ -494,7 +520,7 @@ public class ProjectManager
     }
     else
     {
-      String id = fields.get(idIndex);
+      String id = fields[idIndex];
       ProjectData pd = projects.get(id);
       if(pd == null)
       {
@@ -511,15 +537,38 @@ public class ProjectManager
     return ret;
   }
 
-  private String cleanURL(String rawURL)
+  //returns the status defined above
+  private int addMapping(int idIndex, int urlIndex, String[] fields)
   {
-    if(rawURL.length() > 0)
-      if(rawURL.lastIndexOf("/") == rawURL.length() - 1)
-        rawURL = rawURL.substring(0, rawURL.length() - 1);
+    int ret = ADD_STATUS_UPDATE;
+    boolean skipProject = false;// false=save project;true=skip project
+    String id = fields[idIndex];
+    String url = fields[urlIndex];
+    if(id==null || id.equals(""))
+          skipProject = true;
 
-    return rawURL.replaceFirst("^(https://www.|http://www.|http://|https://|www.|)", "");
+    if(skipProject)
+    {
+      ret = ADD_STATUS_SKIP;
+      logger.error("Project id empty: {}", id);
+    }
+    else
+    {
+      ProjectData pd = projects.get(id);
+      if(pd == null)
+      {
+        logger.error("Project {} not found", id);
+        ret = ADD_STATUS_SKIP;
+      }
+      else
+      {
+        //logger.debug("{}={}", getListDefinition(LIST_PROJECTS).usageCleanUrl.getFieldid(), url);
+        pd.setValue(getListDefinition(LIST_PROJECTS).usageCleanUrl.getFieldid(), url);
+        pd.save(projectsRoot);
+      }
+    }
+    return ret;
   }
-
 
   // import according to the definition in the file lists-io-def.xml, <list name="project-list">
   public void importProjects(ServletOutputStream outputStream, Path p) throws IOException
@@ -532,95 +581,79 @@ public class ProjectManager
     JSONWriter array = json.array();
     array.object().key("total_before").value(projects.size()).endObject();
 
-    IOListDefinition ioListDefinition = ioDefinitions.get("project-list");
-    ArrayList<IOListField> ioListDefinitionFields = ioListDefinition.getFields();
+    IOListDefinition ioListDefinition = ioDefinitions.get(LIST_PROJECTS);
+    Map<String, IOListField> ioListDefinitionFields = ioListDefinition.getFieldsByColumn();
 
-    String data = AIUtils.readFile(p);
-    int pos = 0;
-    String state = "OUT";
-    ArrayList<String> fields = new ArrayList<>();
-    StringBuilder buffer = new StringBuilder();
-    ArrayList<IOListField> importOrderListDefinitionFields = null;
+    StringBuilder sbErrorColumnsNotDefined = new StringBuilder();
+    StringBuilder sbErrorColumnsNotImported = new StringBuilder();
+    int idIndex = -1;
+    boolean bImportCanceled = false;
     int[] projectCounters = new int[3];
 
-    int idIndex = -1;
-    while(pos < data.length())
+    CSVReader reader = new CSVReader(new FileReader(p.toFile()), ';', '"');
+    List<String[]> csvLines = reader.readAll();
+    logger.info("Loaded {} rows. Start at {}", csvLines.size(), ioListDefinition.startAtRow);
+    if(csvLines.size() > ioListDefinition.startAtRow)
     {
-      String c = data.substring(pos, pos + 1);
-      switch(state)
+      for(int iLine = 0; iLine < ioListDefinition.startAtRow; iLine++)
       {
-        case "OUT":
-          switch(c)
-          {
-            case "\n":
-              fields.add(buffer.toString().trim());
-              buffer.setLength(0);
+        logger.debug(Arrays.toString(csvLines.get(iLine)));
+      }
+      ArrayList<IOListField> importOrderListDefinitionFields;
+      String[] header = csvLines.get(ioListDefinition.startAtRow);
+      logger.debug(Arrays.toString(header));
+      // mapping header and definition
+      importOrderListDefinitionFields = new ArrayList<>();
+      Set<String> importedFieldsIds = new TreeSet<>();
+      for(int i = 0; i < header.length; i++)
+      {
+        String attribute = header[i];
+        IOListField ioListField = ioListDefinitionFields.get(attribute);
+        importOrderListDefinitionFields.add(ioListField);
+        if(ioListField == null)
+        {
+          logger.error("Projects import - column header {} not defined", attribute);
+          if(sbErrorColumnsNotDefined.length() > 0)
+            sbErrorColumnsNotDefined.append(", ");
+          sbErrorColumnsNotDefined.append(attribute);
+        }
+        else
+        {
+          importedFieldsIds.add(ioListField.getFieldid());
+          if(ioListField.getUsage().equals("id"))
+            idIndex = i;
 
-              if(importOrderListDefinitionFields == null)
-              {
-                // mapping header and definition
-                importOrderListDefinitionFields = new ArrayList<>();
-                //TODO it may be better to have a map of ioListDefinitionFields
-                for(int i = 0; i < fields.size(); i++)
-                {
-                  String columnName = fields.get(i);
-                  for(IOListField ioListField : ioListDefinitionFields)
-                  {
-                    if(columnName.equals(ioListField.getColumn()))
-                    {
-                      importOrderListDefinitionFields.add(ioListField);
-                      if(ioListField.getUsage().equals("id"))
-                        idIndex = i;
-                      break;
-                    }
-                  }
-                }
-
-
-              }
-              else
-              {
-                projectCounters[addProject(idIndex,importOrderListDefinitionFields, fields)]++;
-              }
-              fields.clear();
-              break;
-            case ",":
-              fields.add(buffer.toString().trim());
-              buffer.setLength(0);
-              break;
-            case "\"":
-              buffer.setLength(0);
-              state = "IN_STRING";
-            default:
-              buffer.append(c);
-              break;
-          }
-          break;
-        case "IN_STRING":
-          switch(c)
-          {
-            case "\"":
-              state = "OUT";
-              break;
-            default:
-              buffer.append(c);
-              break;
-          }
-          break;
+        }
       }
 
-      pos++;
+      for(IOListField ioListField : ioListDefinitionFields.values())
+      {
+        if(!importedFieldsIds.contains(ioListField.getFieldid()))
+        {
+          if(sbErrorColumnsNotImported.length() > 0)
+            sbErrorColumnsNotImported.append(", ");
+
+          String usage = ioListField.getUsage();
+          if(usage != null && usage.equals("id"))
+          {
+            bImportCanceled = true;
+            logger.error("Cancel import - {} not defined.", ioListField.getColumn());
+            sbErrorColumnsNotImported.append(ioListField.getColumn()).append(" (").append(usage).append(")");
+          }
+          else
+            sbErrorColumnsNotImported.append(ioListField.getColumn());
+        }
+      }
+      if(!bImportCanceled)
+      {
+        for(int iLine = ioListDefinition.startAtRow + 1; iLine < csvLines.size(); iLine++)
+        {
+
+          projectCounters[addProject(idIndex, importOrderListDefinitionFields, csvLines.get(iLine))]++;
+
+        }
+      }
     }
-
-    if(buffer.length() > 0)
-      fields.add(buffer.toString().trim());
-
-    if(fields.size() > 0)
-    {
-      projectCounters[addProject(idIndex,importOrderListDefinitionFields, fields)]++;
-      fields.clear();
-    }
-
     logger.info("Projects: added={}; updated={}; total={}.", projectCounters[ADD_STATUS_NEW], projectCounters[ADD_STATUS_UPDATE], projects.size());
     logger.info("Skipped {} projects", projectCounters[ADD_STATUS_SKIP]);
     array.object().key("total_added").value(projectCounters[ADD_STATUS_NEW]).endObject();
@@ -636,33 +669,112 @@ public class ProjectManager
     w.close();
 
   }
+  // import according to the definition in the file lists-io-def.xml, <list name="project-list">
+  public void importMappings(ServletOutputStream outputStream, Path p) throws IOException
+  {
+    logger.info("Load data from {}", p.toString());
 
-  private boolean addProjectMattermark(Map<String, ProjectData> projectDataByURL, ArrayList<IOListField> importOrderListDefinitionFields, ArrayList<String> fields)
+    OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
+    JSONWriter json = new JSONWriter(w);
+    JSONWriter array = json.array();
+    array.object().key("total_before").value(projects.size()).endObject();
+
+    IOListDefinition ioListDefinition = ioDefinitions.get(LIST_MAPPING);
+    Map<String, IOListField> ioListDefinitionFields = ioListDefinition.getFieldsByColumn();
+
+    StringBuilder sbErrorColumnsNotImported = new StringBuilder();
+    boolean bImportCanceled = false;
+    int[] projectCounters = new int[3];
+    int idIndex = -1;
+    int urlIndex = -1;
+
+    CSVReader reader = new CSVReader(new FileReader(p.toFile()), ';', '"');
+    List<String[]> csvLines = reader.readAll();
+    if(csvLines.size() > ioListDefinition.startAtRow)
+    {
+      ArrayList<IOListField> importOrderListDefinitionFields;
+      String[] header = csvLines.get(ioListDefinition.startAtRow);
+      // mapping header and definition
+      importOrderListDefinitionFields = new ArrayList<>();
+      Set<String> importedFieldsIds = new TreeSet<>();
+      for(int i = 0; i < header.length; i++)
+      {
+        String attribute = header[i];
+        IOListField ioListField = ioListDefinitionFields.get(attribute);
+        importOrderListDefinitionFields.add(ioListField);
+        if(ioListField != null)
+        {
+          importedFieldsIds.add(ioListField.getFieldid());
+          if(ioListField.getUsage().equals("id"))
+            idIndex = i;
+          else if(ioListField.getUsage().equals("clean-url"))
+          {
+            urlIndex = i;
+          }
+        }
+      }
+      if(urlIndex == -1 || idIndex == -1)
+      {
+        sbErrorColumnsNotImported.append("FI-IMPACT id and clean URL required.");
+        logger.error("FI-IMPACT id and clean URL required.");
+        bImportCanceled = true;
+      }
+      logger.info("Parsed header with {} fileds, canceled={}, lines_total={}. url index={}, idIndex={}", importOrderListDefinitionFields.size(), bImportCanceled, csvLines.size(), urlIndex, idIndex);
+
+      if(!bImportCanceled)
+      {
+        for(int iLine = ioListDefinition.startAtRow + 1; iLine < csvLines.size(); iLine++)
+        {
+          //logger.debug("Line: {}", Arrays.toString(csvLines.get(iLine)));
+          projectCounters[addMapping(idIndex, urlIndex, csvLines.get(iLine))]++;
+
+        }
+      }
+    }
+    logger.info("URLs: set={}; total projects={}.", projectCounters[ADD_STATUS_NEW], projects.size());
+    logger.info("Skipped {} projects", projectCounters[ADD_STATUS_SKIP]);
+    array.object().key("total_set").value(projectCounters[ADD_STATUS_NEW]).endObject();
+    array.object().key("total_updated").value(projectCounters[ADD_STATUS_UPDATE]).endObject();
+    array.object().key("total_skipped").value(projectCounters[ADD_STATUS_SKIP]).endObject();
+    array.object().key("total_after").value(projects.size()).endObject();
+
+    array.endArray();
+
+    recalcMattermarkIndicatorsInfo();
+
+    w.flush();
+    w.close();
+
+  }
+
+  private boolean addProjectMattermark(Map<String, ProjectData> projectDataByURL, ArrayList<IOListField> importOrderListDefinitionFields, String[] fields)
   {
 
     String cleanProjectUrlFromMattermark = null;
     boolean ret = false;
     // clean missing
-    for(int i = 0; i < fields.size(); i++)
+    for(int i = 0; i < fields.length; i++)
     {
       IOListField ioListField = importOrderListDefinitionFields.get(i);
-      if(ioListField.getMissing().length() != 0)
+      if(ioListField != null)
       {
-        for(String missing : ioListField.getMissing().split(";"))
-          if(missing.equals(fields.get(i)))
-          {
-            fields.set(i, "");
-            break;
-          }
-      }
-
-
-      if(ioListField.getUsage().length() != 0)
-        if(ioListField.getUsage().equals("clean-url"))
+        if(ioListField.getMissing().length() != 0)
         {
-          cleanProjectUrlFromMattermark = cleanURL(fields.get(i));
+          for(String missing : ioListField.getMissing().split(";"))
+            if(missing.equals(fields[i]))
+            {
+              fields[i] = "";
+              break;
+            }
         }
 
+
+        if(ioListField.getUsage().length() != 0)
+          if(ioListField.getUsage().equals("clean-url"))
+          {
+            cleanProjectUrlFromMattermark = fields[i];
+          }
+      }
     }
 
     if(cleanProjectUrlFromMattermark != null)
@@ -686,132 +798,117 @@ public class ProjectManager
     OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
     JSONWriter json = new JSONWriter(w);
     JSONWriter array = json.array();
-    array.object().key("total_before").value(projects.size()).endObject();
+    array.object().key("Total_number_of_projects").value(projects.size()).endObject();
 
-    IOListDefinition ioListDefinition = ioDefinitions.get("mattermark-export");
-    ArrayList<IOListField> ioListDefinitionFields = ioListDefinition.getFields();
+    IOListDefinition ioListDefinition = ioDefinitions.get(LIST_MATTERMARK);
+    Map<String, IOListField> ioListDefinitionFields = ioListDefinition.getFieldsByColumn();
 
-    String data = AIUtils.readFile(p);
-    int pos = 0;
-    String state = "OUT";
-    ArrayList<String> fields = new ArrayList<>();
-    StringBuilder buffer = new StringBuilder();
-    ArrayList<IOListField> importOrderListDefinitionFields;
-    int mattermarkCounter = 0;// number addded mattermark projects
+    StringBuilder sbErrorColumnsNotDefined = new StringBuilder();
+    StringBuilder sbErrorColumnsNotImported = new StringBuilder();
+    boolean bImportCanceled = false;
 
-		// 1. go through all ProjectData instances and clear mattermark information
-    for(String key : projects.keySet())
+     CSVReader reader = new CSVReader(new FileReader(p.toFile()), ',', '"');
+    List<String[]> csvLines = reader.readAll();
+    if(csvLines.size() > ioListDefinition.startAtRow)
     {
-      ProjectData projectData = projects.get(key);
-      projectData.getMattermarkFields().clear();
-    }
+      ArrayList<IOListField> importOrderListDefinitionFields;
+      int mattermarkCounter = 0;// number addded mattermark projects
 
-		/*
-		 * 2.load the file - use the clean-url usage information to match it
-		 * with the correct ProjectData instance You may create a temporary map,
-		 * where you have the clean-url as key in order to find the correct
-		 * project. Save each ProjectData instance and the list.
-		 */
-    // clean-url
-    IOListDefinition  ioListDefinitionProjects = ioDefinitions.get("project-list");
-    Map<String, ProjectData> projectDataByURL = new HashMap<>();
-    IOListField projectURLField = ioListDefinitionProjects.getUsageCleanUrl();
 
-    for(ProjectData projectData: projects.values())
-    {
-      String projectURL = projectData.getValue(projectURLField.getFieldid());
-      if(projectURL != null)
+      /*
+       * 2.load the file - use the clean-url usage information to match it
+       * with the correct ProjectData instance You may create a temporary map,
+       * where you have the clean-url as key in order to find the correct
+       * project. Save each ProjectData instance and the list.
+       */
+      // clean-url
+      IOListDefinition ioListDefinitionProjects = ioDefinitions.get(LIST_PROJECTS);
+      Map<String, ProjectData> projectDataByURL = new HashMap<>();
+      IOListField projectURLField = ioListDefinitionProjects.getUsageCleanUrl();
+
+      for(ProjectData projectData : projects.values())
       {
-        projectDataByURL.put(cleanURL(projectURL), projectData);
-      }
-    }
-
-    importOrderListDefinitionFields = null;
-    while(pos < data.length())
-    {
-
-      String c = data.substring(pos, pos + 1);
-      switch(state)
-      {
-        case "OUT":
-          switch(c)
-          {
-            case "\n":
-              fields.add(buffer.toString().trim());
-              buffer.setLength(0);
-
-              if(importOrderListDefinitionFields == null)
-              {
-                // mapping header and definition
-                importOrderListDefinitionFields = new ArrayList<>();
-                //TODO it may be better to have a map of ioListDefinitionFields
-                for(String attributes : fields)
-                {
-                  for(IOListField ioListField : ioListDefinitionFields)
-                  {
-                    if(attributes.equals(ioListField.getColumn()))
-                    {
-                      importOrderListDefinitionFields.add(ioListField);
-                      break;
-                    }
-                  }
-                }
-              }
-              else
-              {
-                if(addProjectMattermark(projectDataByURL, importOrderListDefinitionFields, fields))
-                  mattermarkCounter++;
-              }
-              fields.clear();
-
-              break;
-            case ",":
-              fields.add(buffer.toString().trim());
-              buffer.setLength(0);
-
-              break;
-            case "\"":
-              buffer.setLength(0);
-              state = "IN_STRING";
-
-            default:
-              buffer.append(c);
-              break;
-
-          }
-
-          break;
-        case "IN_STRING":
-          switch(c)
-          {
-            case "\"":
-              state = "OUT";
-              break;
-
-            default:
-              buffer.append(c);
-              break;
-          }
-
-          break;
+        String projectURL = projectData.getValue(projectURLField.getFieldid());
+        if(projectURL != null)
+        {
+          projectDataByURL.put(projectURL, projectData);
+        }
       }
 
-      pos++;
+
+      String[] header = csvLines.get(ioListDefinition.startAtRow);
+      // mapping header and definition
+      importOrderListDefinitionFields = new ArrayList<>();
+      Set<String> importedFieldsIds = new TreeSet<>();
+      for(String attribute : header)
+      {
+        IOListField ioListField = ioListDefinitionFields.get(attribute);
+        importOrderListDefinitionFields.add(ioListField);
+        if(ioListField == null)
+        {
+          logger.error("Mattemrark import - column header %s not defined", attribute);
+          if(sbErrorColumnsNotDefined.length() > 0)
+            sbErrorColumnsNotDefined.append(", ");
+          sbErrorColumnsNotDefined.append(attribute);
+        }
+        else
+          importedFieldsIds.add(ioListField.getFieldid());
+      }
+
+      for(IOListField ioListField : ioListDefinitionFields.values())
+      {
+        if(!importedFieldsIds.contains(ioListField.getFieldid()))
+        {
+          if(sbErrorColumnsNotImported.length() > 0)
+            sbErrorColumnsNotImported.append(", ");
+
+          String usage = ioListField.getUsage();
+          if(usage != null && !usage.equals(""))
+          {
+            bImportCanceled = true;
+            sbErrorColumnsNotImported.append(ioListField.getColumn()).append(" (").append(usage).append(")");
+          }
+          else
+            sbErrorColumnsNotImported.append(ioListField.getColumn());
+        }
+      }
+      if(!bImportCanceled)
+      {
+        // 1. go through all ProjectData instances and clear mattermark information
+        for(String key : projects.keySet())
+        {
+          ProjectData projectData = projects.get(key);
+          projectData.getMattermarkFields().clear();
+        }
+
+      }
+      else
+        logger.error("Mattermark import canceled due to corrupted import file - check UI info");
+
+      if(!bImportCanceled)
+      {
+        for(int iLine = ioListDefinition.startAtRow+1; iLine < csvLines.size(); iLine++)
+        {
+
+          if(addProjectMattermark(projectDataByURL, importOrderListDefinitionFields, csvLines.get(iLine)))
+            mattermarkCounter++;
+        }
+      }
+
+      logger.info("Added mattermark {} projects, total {}.", mattermarkCounter, projects.size());
+      array.object().key("Added_mattermark_company_information").value(mattermarkCounter).endObject();
+      if(sbErrorColumnsNotDefined.length() > 0)
+        array.object().key("Warning").value("The following Mattermark columns are unknown to FI-Impact - they are ignored: " + sbErrorColumnsNotDefined.toString()).endObject();
+
+      if(bImportCanceled)
+        array.object().key("Error").value("The following columns are not provided by Mattermark: " + sbErrorColumnsNotImported.toString()).endObject();
+      else if(sbErrorColumnsNotImported.length() > 0)
+        array.object().key("Warning").value("The following columns are not provided by Mattermark: " + sbErrorColumnsNotImported.toString()).endObject();
+
+
+      if(bImportCanceled)
+        array.object().key("Import canceled").value("The import was canceled due to a fatal error and previous Mattermark data has been retained").endObject();
     }
-
-    if(buffer.length() > 0)
-      fields.add(buffer.toString().trim());
-
-    if(fields.size() > 0)
-    {
-      if(addProjectMattermark(projectDataByURL, importOrderListDefinitionFields, fields))
-        mattermarkCounter++;
-      fields.clear();
-    }
-
-    logger.info("Added mattermark {} projects, total {}.", mattermarkCounter, projects.size());
-    array.object().key("added mattermark").value(mattermarkCounter).endObject();
-    array.object().key("total_after").value(projects.size()).endObject();
     array.endArray();
 
     logger.info("Recalculate mattermark indicators");
@@ -878,7 +975,7 @@ public class ProjectManager
     {
       if(columnsDef.size() == 0)
       {
-        IOListDefinition ioListDefinition = ioDefinitions.get("project-list");
+        IOListDefinition ioListDefinition = ioDefinitions.get(LIST_PROJECTS);
         ArrayList<IOListField> ioListDefinitionFields = ioListDefinition.getFields();
         for(IOListField ioListField : ioListDefinitionFields)
             columnsDef.add(ioListField.getFieldid());
@@ -1034,9 +1131,15 @@ public class ProjectManager
     return mattermarkSpeedometerSlots;
   }
 
+  public IOListDefinition getListDefinition(String sList)
+  {
+    return ioDefinitions.get(sList);
+  }
+
   public static void main(String[] args) throws Exception
   {
   }
+
 
 
 }

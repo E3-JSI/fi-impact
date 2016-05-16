@@ -1,46 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lists>
-	<list name="project-list">
-		<filed column="PROGRESSIVE NUMBER" label="PROGRESSIVE NUMBER" fieldid="P01"/>
-		<filed column="FI-IMPACT IDENTIFIER" label="FI-IMPACT IDENTIFIER" fieldid="P02" usage="id"/>
-		<filed column="Help" label="Help" fieldid="P03" usage="ignore"/>
-		<filed column="ACCELERATOR" label="ACCELERATOR" fieldid="P04"/>
-		<filed column="COUNTRY" label="COUNTRY" fieldid="P05"/>
-		<filed column="ORGANIZATION NAME" label="ORGANIZATION NAME" fieldid="P06" missing="0;-"/>
-		<filed column="PROJECT NAME" label="PROJECT NAME" fieldid="P07" missing="0"/>
-		<filed column="ADDRESS" label="ADDRESS" fieldid="P08" missing="0;-"/>
-		<filed column="VERTICAL MARKET (IDC ANALYSIS)" label="VERTICAL MARKET" fieldid="P09" missing="0"/>
-		<filed column="B2B/B2C" label="B2B/B2C" fieldid="P10" missing="0"/>
-		<filed column="N. OF TEAM MEMBERS" label="N. OF TEAM MEMBERS" fieldid="P11" missing="#N/A;N/A;Not available"/>
-		<filed column="N. OF YEARS OF EXPERIENCE" label="YEARS OF EXPERIENCE" fieldid="P12" missing="#N/A;N/A;Not available;-"/>
-		<filed column="SELECTED (YES/NO)" label="SELECTED" fieldid="P13" include-record-when="YES"/>
-		<filed column="STATUS" label="STATUS" fieldid="P14" missing="0"/>
-		<filed column="NAME OF PROJECT COORDINATOR" label="PROJECT COORDINATOR" fieldid="P15" missing="0;#N/A"/>
-		<filed column="ABSTRACT" label="ABSTRACT" fieldid="P16" missing="0"/>
-		<filed column="TECH PROVIDER OR SERVICE PROVIDER (NON-IT) IDC" label="PROVIDER TYPE" fieldid="P17" missing="0"/>
-		<filed column="SMART CITY" label="SMART CITY" fieldid="P18"/>
-		<filed column="CLOUD" label="CLOUD" fieldid="P19"/>
-		<filed column="SOCIAL MEDIA" label="SOCIAL MEDIA" fieldid="P20"/>
-		<filed column="MOBILE" label="MOBILE" fieldid="P21"/>
-		<filed column="BIG DATA/ANALYTICS" label="BIG DATA/ANALYTICS" fieldid="P22"/>
-		<filed column="IOT" label="IOT" fieldid="P23"/>
-		<filed column="3D PRINTING" label="3D PRINTING" fieldid="P24"/>
-		<filed column="SOFTWARE OR HARDWARE (ONLY FOR TECH PROVIDERS) IDC" label="SOFTWARE/HARDWARE " fieldid="P25" missing="0;#N/A;?"/>
-		<filed column="SOFTWARE INDIVIDUAL MARKET (ONLY SOFTWARE) IDC" label="SOFTWARE INDIVIDUAL MARKET" fieldid="P26" missing="0;#N/A;?"/>
-		<filed column="SOFTWARE PRIMARY MARKET" label="SOFTWARE PRIMARY MARKET" fieldid="P27" missing="0;#N/A;?"/>
-		<filed column="SOFTWARE SECONDARY MARKET" label="SOFTWARE SECONDARY MARKET" fieldid="P28" missing="0;#N/A;?"/>
+	<list name="project-list" header_row="3">
+		<filed column="PROGRESSIVE NUMBER" label="PROGRESSIVE NUMBER" fieldid="PROGRESSIVE_NUMBER"/>
+		<filed column="FI-IMPACT IDENTIFIER" label="FI-IMPACT IDENTIFIER" fieldid="FI-IMPACT_ID" usage="id"/>
+		<filed column="Help" label="Help" fieldid="P_IGNORE_01" usage="ignore"/>
+		<filed column="ACCELERATOR" label="ACCELERATOR" fieldid="ACCELERATOR"/>
+		<filed column="COUNTRY" label="COUNTRY" fieldid="COUNTRY"/>
+		<filed column="ORGANIZATION NAME" label="ORGANIZATION NAME" fieldid="ORGANIZATION_NAME" missing="0;-"/>
+		<filed column="PROJECT NAME" label="PROJECT NAME" fieldid="PROJECT_NAME" missing="0"/>
+		<filed column="ADDRESS" label="ADDRESS" fieldid="ADDRESS" missing="0;-"/>
+		<filed column="VERTICAL MARKET (IDC ANALYSIS)" label="VERTICAL MARKET" fieldid="VERTICAL_MARKET" missing="0"/>
+		<filed column="B2B/B2C" label="B2B/B2C" fieldid="B2B_B2C" missing="0"/>
+		<filed column="N. OF TEAM MEMBERS" label="N. OF TEAM MEMBERS" fieldid="TEAM_MEMBERS" missing="#N/A;N/A;Not available"/>
+		<filed column="N. OF YEARS OF EXPERIENCE" label="YEARS OF EXPERIENCE" fieldid="YEARS_OF_EXPERIENCE" missing="#N/A;N/A;Not available;-"/>
+		<filed column="SELECTED (YES/NO)" label="SELECTED" fieldid="SELECTED" include-record-when="YES"/>
+		<filed column="STATUS" label="STATUS" fieldid="STATUS" missing="0"/>
+		<filed column="NAME OF PROJECT COORDINATOR" label="PROJECT COORDINATOR" fieldid="PROJECT_COORDINATOR" missing="0;#N/A"/>
+		<filed column="ABSTRACT" label="ABSTRACT" fieldid="ABSTRACT" missing="0"/>
+		<filed column="TECH PROVIDER OR SERVICE PROVIDER (NON-IT) IDC" label="PROVIDER TYPE" fieldid="PROVIDER_TYPE" missing="0"/>
+		<filed column="SMART CITY" label="SMART CITY" fieldid="ICT_TOOLS_SMART_CITY"/>
+		<filed column="CLOUD" label="CLOUD" fieldid="ICT_TOOLS_CLOUD"/>
+		<filed column="SOCIAL MEDIA" label="SOCIAL MEDIA" fieldid="ICT_TOOLS_SOCIAL_MEDIA"/>
+		<filed column="MOBILE" label="MOBILE" fieldid="ICT_TOOLS_MOBILE"/>
+		<filed column="BIG DATA/ANALYTICS" label="BIG DATA/ANALYTICS" fieldid="ICT_TOOLS_BIG_DATA"/>
+		<filed column="IOT" label="IOT" fieldid="ICT_TOOLS_IOT"/>
+		<filed column="3D PRINTING" label="3D PRINTING" fieldid="ICT_TOOLS_3D_PRINTING"/>
+		<filed column="WEARABLES" label="WEARABLES" fieldid="ICT_TOOLS_WEARABLES"/>
+		<filed column="ROBOTICS" label="ROBOTICS" fieldid="ICT_TOOLS_ROBOTICS"/>
+		<filed column="DRONES" label="DRONES" fieldid="ICT_TOOLS_DRONES"/>
+		<filed column="SOFTWARE OR HARDWARE (ONLY FOR TECH PROVIDERS) IDC" label="SOFTWARE/HARDWARE" fieldid="SW_HW" missing="0;#N/A;?"/>
+		<filed column="SOFTWARE INDIVIDUAL MARKET (ONLY SOFTWARE) IDC" label="SOFTWARE INDIVIDUAL MARKET" fieldid="SW_INDIVIDUAL_MARKET" missing="0;#N/A;?"/>
+		<filed column="SOFTWARE PRIMARY MARKET" label="SOFTWARE PRIMARY MARKET" fieldid="SW_PRIMARY_MARKET" missing="0;#N/A;?"/>
+		<filed column="SOFTWARE SECONDARY MARKET" label="SOFTWARE SECONDARY MARKET" fieldid="SW_SECONDARY_MARKET" missing="0;#N/A;?"/>
 		<filed column="CALL" label="CALL" fieldid="P29"/>
-		<filed column="RESPONDENT TO FIMPACT ASSESSMENT?" label="RESPONDED TO FIMPACT ASSESSMENT" fieldid="P30" usage="ignore"/>
-		<filed column="WEBSITE URL" label="WEBSITE URL" fieldid="P31" missing="0;#N/A;?"/>
-		<filed column="SME/STARTUP" label="SME/STARTUP" fieldid="P32" missing="0;#N/A;?"/>
-		<filed column="ACCELERATOR FUNDING" label="ACCELERATOR FUNDING" fieldid="P33" missing="#N/A;?"/>
-		<filed column="CLEAN WEBSITE URL" label="CLEAN WEBSITE URL" fieldid="P34" usage="clean-url" missing="0;#N/A"/>
+		<filed column="RESPONDENT TO FIMPACT ASSESSMENT?" label="RESPONDED TO FIMPACT ASSESSMENT" fieldid="P_IGNORE_02" usage="ignore"/>
+		<filed column="WEBSITE URL" label="WEBSITE URL" fieldid="WEBSITE_URL" missing="0;#N/A;?"/>
+		<filed column="SME/STARTUP" label="SME/STARTUP" fieldid="SME_STARTUP" missing="0;#N/A;?"/>
+
+		<filed column="SUCCESS HPI" label="SUCCESS HPI" fieldid="SUCCESS_HPI" />
+		<filed column="SUCCESS VIP" label="SUCCESS VIP" fieldid="SUCCESS_VIP" />
+		<filed column="SUCCESS IDG" label="SUCCESS IDG" fieldid="SUCCESS_IDG" />
+		<filed column="SUCCESS Shortlist" label="SUCCESS Shortlist" fieldid="SUCCESS_Shortlist" />
+		<filed column="Website MAP" label="Website - clean" fieldid="MAP_WEBSITE" usage="clean-url"/> <!--This one is imported from the mapping file!!!-->
 	</list>
+
+	<list name="fi-impact-url-mapping">
+		<filed column="Website" label="Website" fieldid="MAP_WEBSITE" usage="clean-url"/>
+		<filed column="Identifier" label="FI-IMPACT IDENTIFIER" fieldid="MAP_FI-IMPACT_ID" usage="id"/>
+	</list>
+
 	<list name="mattermark-export">
 		<filed column="Company Name" label="Company Name" fieldid="M01"/>
 		<filed column="Growth Score" label="Growth Score" fieldid="MATTERMARK_GROWTH" usage="indicator" transform="log"/>
 		<filed column="Mindshare Score" label="Mindshare Score" fieldid="M03"/>
-		<filed column="Momentum Score" label="Momentum Score" fieldid="MATTERMARK_MOMENTUM" usage="indicator" transform="log"/>
+		<!--<filed column="Momentum Score" label="Momentum Score" fieldid="MATTERMARK_MOMENTUM" usage="indicator" transform="log"/>-->
+		<filed column="Momentum Score" label="Momentum Score" fieldid="M04"/>
 		<filed column="Mattermark URL" label="Mattermark URL" fieldid="M05" usage="external"/>
 		<filed column="Website" label="Website" fieldid="M06" usage="clean-url"/>
 		<filed column="Description" label="Description" fieldid="M07"/>
