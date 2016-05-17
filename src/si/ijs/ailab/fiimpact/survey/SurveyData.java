@@ -582,7 +582,11 @@ public class SurveyData
       Element q = doc.createElement("q");
       root.appendChild(q);
       q.setAttribute("id", qe.getKey());
-      q.setAttribute("answer", qe.getValue());
+      //!!hotfix - #11 causes read problems, so replace it!
+      String answer = qe.getValue();
+      if(answer != null)
+        answer = answer.replace('\u000B', ' ');
+      q.setAttribute("answer", answer);
     }
 
     if (writeResults)

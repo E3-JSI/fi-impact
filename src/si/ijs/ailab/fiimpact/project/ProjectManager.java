@@ -786,7 +786,12 @@ public class ProjectManager
         projectData.addFieldsMattermark(importOrderListDefinitionFields, fields);
         projectData.save(projectsRoot);
       }
+      else
+        logger.warn("Cant find project data for {}", cleanProjectUrlFromMattermark);
+
     }
+    else
+      logger.warn("clean project URL from Mattermark is null");
     return ret;
   }
 

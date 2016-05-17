@@ -56,7 +56,11 @@ public class ProjectData
 			Element f = doc.createElement("field");
 			idc.appendChild(f);
 			f.setAttribute("id", fe.getKey());
-			f.setAttribute("val", fe.getValue());
+      //!!hotfix - #11 causes read problems, so replace it!
+      String answer = fe.getValue();
+      if(answer != null)
+        answer = answer.replace('\u000B', ' ');
+      f.setAttribute("answer", answer);
 		}
 
 		Element mattermark = doc.createElement("mattermark");
@@ -67,7 +71,11 @@ public class ProjectData
 			Element f = doc.createElement("field");
 			mattermark.appendChild(f);
 			f.setAttribute("id", fe.getKey());
-			f.setAttribute("val", fe.getValue());
+      //!!hotfix - #11 causes read problems, so replace it!
+      String answer = fe.getValue();
+      if(answer != null)
+        answer = answer.replace('\u000B', ' ');
+      f.setAttribute("answer", answer);
 		}
 
 		AIUtils.save(doc, os);

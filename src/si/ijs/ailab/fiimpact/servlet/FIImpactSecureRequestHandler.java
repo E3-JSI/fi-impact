@@ -104,10 +104,23 @@ public class FIImpactSecureRequestHandler extends HttpServlet
     GET_ACTION_ROLES.put("export", "export");
     GET_ACTION_ROLES.put("user-profile", "admin");
     GET_ACTION_ROLES.put("accelerators", "admin");
+    GET_ACTION_ROLES.put("roles", "user-management");
+
+    GET_ACTION_ROLES.put("user-list", "user-management");
+    GET_ACTION_ROLES.put("user-get", "user-management");
 
     POST_ACTION_ROLES.put("upload-mattermark", "upload");
     POST_ACTION_ROLES.put("upload-mapping", "upload-extended");
     POST_ACTION_ROLES.put("upload-projects", "upload-extended");
+
+    //user management
+    POST_ACTION_ROLES.put("user-create", "user-management");
+    POST_ACTION_ROLES.put("user-delete", "user-management");
+    POST_ACTION_ROLES.put("user-password", "user-management");
+    POST_ACTION_ROLES.put("user-accelerator", "user-management");
+    POST_ACTION_ROLES.put("user-roles", "user-management");
+    POST_ACTION_ROLES.put("user-my-password", "admin");
+
   }
 
   @Override
@@ -152,26 +165,30 @@ public class FIImpactSecureRequestHandler extends HttpServlet
     {
       response.setContentType("application/json");
       response.setCharacterEncoding("utf-8");
-      OutputStreamWriter w = new OutputStreamWriter(response.getOutputStream(), "utf-8");
-      JSONWriter json = new JSONWriter(w);
-      json.object().key("user").value(userName);
+      userInfo.getProfile(response.getOutputStream());
+    }
+    else if (sAction.equals("user-list"))
+    {
+      response.setContentType("application/json");
+      response.setCharacterEncoding("utf-8");
+      usersManager.getUsersList(response.getOutputStream());
+    }
+    else if (sAction.equals("user-get"))
+    {
+      response.setContentType("application/json");
+      response.setCharacterEncoding("utf-8");
+      String sUserNameParam = request.getParameter("user");
+      if(sUserNameParam != null)
+        sUserNameParam = new String(sUserNameParam.getBytes("iso-8859-1"), "UTF-8");
 
+      usersManager.getUserProfile(response.getOutputStream(), sUserNameParam);
 
-      json.key("accelerator").value(userInfo.getAccelerator());
-
-      json.key("access").array();
-      for(String s: userInfo.getAccessRights())
-      {
-        json.value(s);
-      }
-      json.endArray();
-      /*json.key("admin").value(request.isUserInRole("fiimpact"));
-      json.key("upload").value(request.isUserInRole("fiimpact-upload"));
-      json.key("export").value(request.isUserInRole("fiimpact-export"));*/
-
-      json.endObject();
-      w.flush();
-      w.close();
+    }
+    else if (sAction.equals("roles"))
+    {
+      response.setContentType("application/json");
+      response.setCharacterEncoding("utf-8");
+      usersManager.getRoles(response.getOutputStream());
     }
     else if(sAction.equals("list"))
     {
@@ -284,7 +301,85 @@ public class FIImpactSecureRequestHandler extends HttpServlet
 
     if(!isMultipart)
     {
-      setBadRequest(response, "Not a file upload request!");
+      String sAction = request.getParameter("action");
+      logger.info("Received POST request: action={}.", sAction);
+      if (sAction == null || sAction.equals(""))
+        setBadRequest(response, "Parameter 'action' not defined.");
+      else if (!POST_ACTION_ROLES.containsKey(sAction))
+        setBadRequest(response, "Post parameter 'action' not valid: "+sAction);
+      else if(!userInfo.getAccessRights().contains(POST_ACTION_ROLES.get(sAction)))
+      {
+        setBadRequest(response, "User not authorised for "+sAction);
+      }
+      else if (sAction.equals("user-create"))
+      {
+        String user = request.getParameter("user");
+        String password = request.getParameter("password");
+        String accelerator = request.getParameter("accelerator");
+        String description = request.getParameter("description");
+        if(user==null || user.equals("") || password == null || password.equals("") || description==null || description.equals(""))
+        {
+          setBadRequest(response, "Plase provide user/password/description parameters for "+sAction);
+        }
+        else
+          usersManager.addUser(response.getOutputStream(), user, password, accelerator, description);
+      }
+      else if (sAction.equals("user-delete"))
+      {
+        String user = request.getParameter("user");
+        if(user==null || user.equals(""))
+        {
+          setBadRequest(response, "Plase provide user parameter for "+sAction);
+        }
+        else
+          usersManager.deleteUser(response.getOutputStream(), user, userInfo);
+      }
+      else if (sAction.equals("user-password"))
+      {
+        String user = request.getParameter("user");
+        String password = request.getParameter("password");
+        if(user==null || user.equals("") || password == null || password.equals("") )
+        {
+          setBadRequest(response, "Plase provide user/password parameters for "+sAction);
+        }
+        else
+          usersManager.changeUserPassword(response.getOutputStream(), user, password);
+      }
+      else if (sAction.equals("user-accelerator"))
+      {
+        String user = request.getParameter("user");
+        String accelerator = request.getParameter("accelerator");
+
+        if(user==null || user.equals("") || accelerator == null || accelerator.equals("") )
+        {
+          setBadRequest(response, "Plase provide user/accelerator parameters for "+sAction);
+        }
+        else
+          usersManager.setUserAccelerator(response.getOutputStream(), user, accelerator);
+      }
+      else if (sAction.equals("user-roles"))
+      {
+        String user = request.getParameter("user");
+        String[] roles = request.getParameterValues("role");
+        if(user==null || user.equals(""))
+        {
+          setBadRequest(response, "Plase provide user parameter for "+sAction);
+        }
+        else
+          usersManager.replaceUserRoles(response.getOutputStream(), user, roles);
+      }
+      else if (sAction.equals("user-my-password"))
+      {
+        String oldPassword = request.getParameter("password-old");
+        String newPassword = request.getParameter("password-new");
+        if(oldPassword == null || oldPassword.equals("") || newPassword == null || newPassword.equals(""))
+        {
+          setBadRequest(response, "Plase provide user/password-old/password-new parameters for "+sAction);
+        }
+        else
+          usersManager.changeMyPassword(response.getOutputStream(), userInfo, oldPassword, newPassword );
+      }
+
     }
     else if(!(userInfo.getAccessRights().contains("admin") && userInfo.getAccessRights().contains("upload")))
     {
