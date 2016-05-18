@@ -21,6 +21,7 @@ public class UserInfo
   private String accelerator;
   Set<String> accessRights = new TreeSet<>();
   private boolean isDeniedUser=false;
+  private boolean isFirstLogin = true;
 
   UserInfo(String _name, String _accelerator)
   {
@@ -70,12 +71,12 @@ public class UserInfo
     return accessRights;
   }
 
-  public void getProfile(ServletOutputStream outputStream) throws IOException
+  public void getProfile(ServletOutputStream outputStream, String action) throws IOException
   {
     OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
     JSONWriter json = new JSONWriter(w);
     json.object().key("user").value(getName());
-    json.key("action").value("get");
+    json.key("action").value(action);
     if(isDeniedUser)
       json.key("success").value("false");
     else
@@ -83,6 +84,12 @@ public class UserInfo
 
     json.key("description").value(getDescription());
     json.key("accelerator").value(getAccelerator());
+
+    if(isFirstLogin)
+      json.key("first_login").value("true");
+    else
+      json.key("first_login").value("false");
+
     json.key("access").array();
     for(String s: getAccessRights())
     {
@@ -93,6 +100,7 @@ public class UserInfo
     w.flush();
     w.close();
   }
+
 
   public void setAccelerator(String _accelerator)
   {
@@ -114,4 +122,13 @@ public class UserInfo
     }
   }
 
+  public boolean isFirstLogin()
+  {
+    return isFirstLogin;
+  }
+
+  public void setFirstLogin(boolean firstLogin)
+  {
+    isFirstLogin = firstLogin;
+  }
 }

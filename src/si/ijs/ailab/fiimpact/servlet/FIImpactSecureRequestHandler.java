@@ -104,6 +104,8 @@ public class FIImpactSecureRequestHandler extends HttpServlet
     GET_ACTION_ROLES.put("export", "export");
     GET_ACTION_ROLES.put("user-profile", "admin");
     GET_ACTION_ROLES.put("accelerators", "admin");
+    GET_ACTION_ROLES.put("legend", "export");
+
     GET_ACTION_ROLES.put("roles", "user-management");
 
     GET_ACTION_ROLES.put("user-list", "user-management");
@@ -129,25 +131,6 @@ public class FIImpactSecureRequestHandler extends HttpServlet
 
     //action: see GET_ACTION_ROLES
     String sAction = request.getParameter("action");
-    //TODO later - export to csv - specification still in progress
-    /*
-      Adapt the exportTXT method to take into account addtional parameters and also to be able to export to either stream or file.
-      action=csv
-      response.setContentType("application/json"); - should be set to csv or text - check how should this be done.
-      export to CSV parameters
-      assesment=self/impact/all
-      master=survey/project/merge
-      data=survey;project;mattermark;survey-additional;project-aditional;mattermark-additional;
-
-      scope=all,accelerator.
-
-      scope has to be checked aginst the role of the current logged in user.
-      we should have roles:
-        accelerator (sees only accelerator filtered data),
-        fiimpact (sees everything),
-        fiware (sees all projects, but limited number of columns)
-
-     */
 
     String userName = request.getUserPrincipal().getName();
     UserInfo userInfo = usersManager.getUserInfo(userName);
@@ -165,13 +148,13 @@ public class FIImpactSecureRequestHandler extends HttpServlet
     {
       response.setContentType("application/json");
       response.setCharacterEncoding("utf-8");
-      userInfo.getProfile(response.getOutputStream());
+      userInfo.getProfile(response.getOutputStream(), "user-profile");
     }
     else if (sAction.equals("user-list"))
     {
       response.setContentType("application/json");
       response.setCharacterEncoding("utf-8");
-      usersManager.getUsersList(response.getOutputStream());
+      usersManager.getUsersList(response.getOutputStream(), userInfo);
     }
     else if (sAction.equals("user-get"))
     {
@@ -181,14 +164,14 @@ public class FIImpactSecureRequestHandler extends HttpServlet
       if(sUserNameParam != null)
         sUserNameParam = new String(sUserNameParam.getBytes("iso-8859-1"), "UTF-8");
 
-      usersManager.getUserProfile(response.getOutputStream(), sUserNameParam);
+      usersManager.getUserProfile(response.getOutputStream(), sUserNameParam, userInfo);
 
     }
     else if (sAction.equals("roles"))
     {
       response.setContentType("application/json");
       response.setCharacterEncoding("utf-8");
-      usersManager.getRoles(response.getOutputStream());
+      usersManager.getRoles(response.getOutputStream(), userInfo);
     }
     else if(sAction.equals("list"))
     {
@@ -230,6 +213,8 @@ public class FIImpactSecureRequestHandler extends HttpServlet
     }
     else if (sAction.equals("export"))
     {
+      //Export to csv - specification still in progress
+
       String sType = request.getParameter("type");
       if(sType != null)
         sType = new String(sType.getBytes("iso-8859-1"), "UTF-8");
@@ -276,7 +261,6 @@ public class FIImpactSecureRequestHandler extends HttpServlet
         }
       }
 
-
       //in case user has the accelerator role set, override the group filter
       if(!userInfo.getAccelerator().equals(""))
       {
@@ -289,6 +273,18 @@ public class FIImpactSecureRequestHandler extends HttpServlet
       response.setHeader( "Content-Disposition", "filename=\"fi-impact-export.txt\"" );
 
       SurveyManager.getSurveyManager().exportTXT(response.getOutputStream(), groupQuestion, groupAnswer, exportAction);
+
+    }
+    else if (sAction.equals("legend"))
+    {
+      //Export legend to csv
+
+      response.setContentType("application/x-unknown");
+      response.setCharacterEncoding("utf-8");
+      response.setHeader( "Content-Disposition", "filename=\"fi-impact-legend.txt\"" );
+
+      SurveyManager.getSurveyManager().exportLegendTxt(response.getOutputStream());
+
     }
   }
 
@@ -322,7 +318,7 @@ public class FIImpactSecureRequestHandler extends HttpServlet
           setBadRequest(response, "Plase provide user/password/description parameters for "+sAction);
         }
         else
-          usersManager.addUser(response.getOutputStream(), user, password, accelerator, description);
+          usersManager.addUser(response.getOutputStream(), user, password, accelerator, description, userInfo);
       }
       else if (sAction.equals("user-delete"))
       {
@@ -343,7 +339,7 @@ public class FIImpactSecureRequestHandler extends HttpServlet
           setBadRequest(response, "Plase provide user/password parameters for "+sAction);
         }
         else
-          usersManager.changeUserPassword(response.getOutputStream(), user, password);
+          usersManager.changeUserPassword(response.getOutputStream(), user, password, userInfo);
       }
       else if (sAction.equals("user-accelerator"))
       {
@@ -355,7 +351,7 @@ public class FIImpactSecureRequestHandler extends HttpServlet
           setBadRequest(response, "Plase provide user/accelerator parameters for "+sAction);
         }
         else
-          usersManager.setUserAccelerator(response.getOutputStream(), user, accelerator);
+          usersManager.setUserAccelerator(response.getOutputStream(), user, accelerator, userInfo);
       }
       else if (sAction.equals("user-roles"))
       {
@@ -366,7 +362,7 @@ public class FIImpactSecureRequestHandler extends HttpServlet
           setBadRequest(response, "Plase provide user parameter for "+sAction);
         }
         else
-          usersManager.replaceUserRoles(response.getOutputStream(), user, roles);
+          usersManager.replaceUserRoles(response.getOutputStream(), user, roles, userInfo);
       }
       else if (sAction.equals("user-my-password"))
       {
