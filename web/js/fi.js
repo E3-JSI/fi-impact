@@ -27,9 +27,11 @@ var fiData = function (id) { // id is optional
 		this.id = id;
 	}
 	else {
-		this.manager = getJSON('../../manager?action=list');
-		this.profile = getJSON('../../manager?action=user-profile');
-		this.accelerators = getJSON('../..//manager?action=accelerators');
+		this.manager = getJSON('../../manager?action=list')
+		this.profile = getJSON('../../manager?action=user-profile')
+		this.accelerators = getJSON('../..//manager?action=accelerators')
+		this.roles = getJSON('../../manager?action=roles')
+		this.users = getJSON('../../manager?action=user-list')
 	}
 	
 	// * * * * * * * * * *
@@ -108,3 +110,4 @@ var fiData = function (id) { // id is optional
 window.fi = new fiData(location.search.split('id=')[1]);
 var fiReportApp = angular.module('fiReportApp', []);
 fiReportApp.controller('fiCtrl', function ($scope) { $scope.d = fi.json; });
+

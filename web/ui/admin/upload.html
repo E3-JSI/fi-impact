@@ -2,20 +2,22 @@
  
 <html>
     <head>
-        <title>Mattermark Uploading Form</title>
+        <title>FI-IMPACT test form</title>
     </head>
     <body>
     <h3>Perform action</h3>
     <form action="../../manager" method="get"  target="output_frame">
+        User: <input type="text" name="user" size="50" />
+        <br />
         <select name="action">
-            <option value="load">load</option>
             <option value="list">list</option>
             <option value="clear">clear</option>
             <option value="export">export</option>
-            <option value="refresh-projects">refresh projects</option>
-            <option value="refresh-mattermark">refresh mattermark</option>
             <option value="user-profile">user profile</option>
             <option value="accelerators">accelerators</option>
+            <option value="roles">roles</option>
+            <option value="user-list">user-list</option>
+            <option value="user-get">user-get</option>
         </select>
         <br />
         <input type="submit" value="Go" />
@@ -25,13 +27,38 @@
         <form action="../../manager" method="post" enctype="multipart/form-data" target="output_frame">
             <input type="file" name="file" size="50" />
             <select name="action">
-                <option value="upload-mattermark">mattermark</option>
+                <option value="upload-mattermark">mattermaek</option>
                 <option value="upload-mapping">mapping</option>
                 <option value="upload-projects">projects</option>
             </select>
                 <br />
             <input type="submit" value="Upload File" />
         </form>
+
+    <h3>User management:</h3>
+    <form action="../../manager" method="post" enctype="application/x-www-form-urlencoded" target="output_frame">
+        User: <input type="text" name="user" size="50" />
+        <br />
+        Password: <input type="text" name="password" size="50" />
+        <br />
+        Desc: <input type="text" name="description" size="50" />
+        <br />
+        Old / new passwords: <input type="text" name="password-old" size="50" /><input type="text" name="password-new" size="50" />
+        <br />
+        Acc: <input type="text" name="accelerator" size="50" />
+        <br />
+        roles: <input type="text" name="role" size="50" /><input type="text" name="role" size="50" /><input type="text" name="role" size="50" /><input type="text" name="role" size="50" />
+        <br />
+        Action: <select name="action">
+            <option value="user-create">user-create</option>
+            <option value="user-delete">user-delete</option>
+            <option value="user-password">user-edit</option>
+            <option value="user-my-password">user-my-password</option>
+        </select>
+        <br />
+        <input type="submit" value="Go!" />
+    </form>
+
         <iframe name="output_frame" src="" id="output_frame" width="800" height="500">
         </iframe>
     </body>

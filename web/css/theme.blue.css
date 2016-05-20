@@ -3,7 +3,12 @@
 #uploadModal form { margin: 20px 0; }
 #uploadModal #tabUpload p { margin: 50px; }
 #uploadModal .cancel { margin-right: 10px; }
+#editModal .cancel { margin-right: 10px; }
 #uploadModal ul { margin: 20px 0; }
+
+.fa-building-o { margin-left: 10px }
+.fa-trash-o { color: red }
+.fa-pencil-square-o { color: green }
 
 .btn-group .dropdown-menu .disabled {
 	font-variant: small-caps;

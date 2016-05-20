@@ -40,11 +40,12 @@ fiManagerApp.service('fileUpload', ['$http', '$q', function ($http, $q) {
 	return uploadService;
 }]);
 
-fiManagerApp.controller('fiCtrl', ['$scope', 'fileUpload', function($scope, fileUpload) {
+fiManagerApp.controller('fiProjects', ['$scope', 'fileUpload', function($scope, fileUpload) {
 	$scope.surveys = fi.manager.surveys
 	$scope.profile = fi.profile
 	$scope.accelerators = fi.accelerators
 	$scope.uploadTab = 'tabNotice'
+	
 	$scope.toggleTab = function(tabID) { $scope.uploadTab = tabID }
 	
 	var ratioToPercent = function(r) { return Math.round(r*100); console.log("test"); }
@@ -63,13 +64,11 @@ fiManagerApp.controller('fiCtrl', ['$scope', 'fileUpload', function($scope, file
 		$scope.surveys[i].business = ratioToPercent(v.MARKET_NEEDS_GRAPH_PERCENT);
 	});
 	
-	$scope.access = function(access) { return ($scope.profile.access).indexOf(access) > -1 }
-	
 	$scope.clearUnderscores = function(str) {
 		return str.replace(/_/g, " ")
 	}
 	
-	$scope.uploadFile = function(){
+	$scope.uploadFile = function() {
 		// console.dir(file);       
 		$scope.toggleTab('tabUpload')
 		fileUpload.async($scope.dataFile, "../../manager").then(function() {
@@ -79,5 +78,54 @@ fiManagerApp.controller('fiCtrl', ['$scope', 'fileUpload', function($scope, file
 			$scope.toggleTab('tabReview')
 		})
 	};
+	
+}]);
+
+fiManagerApp.controller('fiUsers', ['$scope', function($scope) {
+	$scope.profile = fi.profile
+	$scope.accelerators = fi.accelerators
+	$scope.users = fi.users.users
+	$scope.roles = fi.roles
+	$scope.editing = { password: '', roles: {} }
+	
+	// prepare headers for the table
+	var usersHeaders = {
+		0: { sorter: "text" }, // user
+		1: { sorter: "text" }, // description
+		2: { sorter: "text" } // accelerator
+	}
+	$.each($scope.roles, function(r, description) {
+		usersHeaders[Object.keys(usersHeaders).length] = { sorter: false }
+		$scope.editing.roles[r] = false
+	})
+	usersHeaders[Object.keys(usersHeaders).length] = { sorter: false }
+	usersHeaders[Object.keys(usersHeaders).length] = { sorter: false }
+	fiTableSorter.headers = usersHeaders
+	
+	// functions
+	$scope.editModal = function(user) {
+		$.each($scope.users, function(i, u) { if (u.user == user) { $.each(u, function(k, v) { $scope.editing[k] = u[k] }) } })
+		$.each($scope.editing.access, function(i, role) { $scope.editing.roles[role] = true })
+	}
+	
+	$scope.hasAccess = function(user, role) {
+		access = false
+		$.each($scope.users, function(i, u) {
+			if (u.user == user) {
+				$.each($scope.roles, function(r, description) {
+					if (r == role  && (u.access).indexOf(role) >= 0) access = true
+				})
+			}
+		})
+		return access
+	}
+	
+	$scope.editUser = function() {
+		roleArray = []
+		$.each($scope.editing.roles, function(r, value) { if (value) roleArray.push(r) })
+		$scope.editing.access = roleArray
+		console.log($scope.editing)
+	}
+
 	
 }]);
