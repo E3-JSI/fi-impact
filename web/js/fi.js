@@ -32,6 +32,7 @@ var fiData = function (id) { // id is optional
 		this.accelerators = getJSON('../..//manager?action=accelerators')
 		this.roles = getJSON('../../manager?action=roles')
 		this.users = getJSON('../../manager?action=user-list')
+		this.updateUsers = function() { return getJSON('../../manager?action=user-list') }
 	}
 	
 	// * * * * * * * * * *

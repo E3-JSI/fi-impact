@@ -40,6 +40,34 @@ fiManagerApp.service('fileUpload', ['$http', '$q', function ($http, $q) {
 	return uploadService;
 }]);
 
+fiManagerApp.service('formSubmit', ['$http', '$q', '$httpParamSerializerJQLike',  function ($http, $q, $httpParamSerializerJQLike) {
+	var deffered = $q.defer()
+	var data = [];
+	var fixSerializedArray = function(serialized) { return serialized.replace(/%5B%5D/g, '') }
+	var formService = {
+		async: function(action, url, data) {
+			data.action = action
+			var promise = $http.post(url, fixSerializedArray($httpParamSerializerJQLike(data)), {
+				transformRequest: angular.identity,
+				headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+			})
+			.success(function(d) {
+				data = { 'success': true, 'data': d }
+				deffered.resolve()
+			})
+			.error(function(msg, code) {
+				deffered.reject(msg);
+				console.log(msg, code);
+			})
+
+			// Return the promise to the controller
+			return deffered.promise;
+		},
+		data: function() { return data; }
+	}
+	return formService;
+}]);
+
 fiManagerApp.controller('fiProjects', ['$scope', 'fileUpload', function($scope, fileUpload) {
 	$scope.surveys = fi.manager.surveys
 	$scope.profile = fi.profile
@@ -81,12 +109,17 @@ fiManagerApp.controller('fiProjects', ['$scope', 'fileUpload', function($scope, 
 	
 }]);
 
-fiManagerApp.controller('fiUsers', ['$scope', function($scope) {
+fiManagerApp.controller('fiUsers', ['$scope', 'formSubmit', function($scope, formSubmit) {
+	var vanilla = { password: '', roles: {}, pristine: {} }
+	var newEmpty = { user: '', password: '', description: '' }
 	$scope.profile = fi.profile
 	$scope.accelerators = fi.accelerators
 	$scope.users = fi.users.users
 	$scope.roles = fi.roles
-	$scope.editing = { password: '', roles: {} }
+	$scope.editing = vanilla
+	$scope.properties = ['description', 'accelerator', 'access']
+	$scope.create = newEmpty
+	$scope.delete = ''
 	
 	// prepare headers for the table
 	var usersHeaders = {
@@ -104,9 +137,19 @@ fiManagerApp.controller('fiUsers', ['$scope', function($scope) {
 	
 	// functions
 	$scope.editModal = function(user) {
-		$.each($scope.users, function(i, u) { if (u.user == user) { $.each(u, function(k, v) { $scope.editing[k] = u[k] }) } })
+		$.each($scope.users, function(i, u) {
+			if (u.user == user) {
+				$scope.editing.user = user
+				$.each($scope.properties, function(i, p) {
+					$scope.editing[p] = u[p]
+					$scope.editing.pristine[p] = u[p]
+				})
+			}
+		})
 		$.each($scope.editing.access, function(i, role) { $scope.editing.roles[role] = true })
 	}
+	
+	$scope.deleteModal = function(user) { $scope.delete = user }
 	
 	$scope.hasAccess = function(user, role) {
 		access = false
@@ -121,10 +164,42 @@ fiManagerApp.controller('fiUsers', ['$scope', function($scope) {
 	}
 	
 	$scope.editUser = function() {
-		roleArray = []
+		var roleArray = []
+		var data = { user: $scope.editing.user }
 		$.each($scope.editing.roles, function(r, value) { if (value) roleArray.push(r) })
 		$scope.editing.access = roleArray
-		console.log($scope.editing)
+		if ($scope.editing.password != '') data.password = $scope.editing.password
+		$.each($scope.properties, function(i, p) { if ($scope.editing.pristine[p] != $scope.editing[p]) data[p] = $scope.editing[p] })
+		if ('access' in data) {
+			data.role = data.access
+			delete data.access
+		}
+		console.log(data)
+		formSubmit.async("user-edit", "../../manager", data).then(function() {
+			$scope.editing = vanilla
+			console.log(formSubmit.data())
+		})
+		setTimeout(function() {
+			var upd = fi.updateUsers()
+			$scope.users = upd.users
+		}, 1000)
+	}
+	
+	$scope.createUser = function() {
+		if ($scope.create.user != '' && $scope.create.password != '' && $scope.create.description != '') {
+			formSubmit.async("user-create", "../../manager", $scope.create).then(function() {
+				$scope.create = newEmpty
+				var upd = fi.updateUsers()
+				$scope.users = upd.users
+			})
+		}
+	}
+	
+	$scope.deleteUser = function(user) {
+		formSubmit.async("user-delete", "../../manager", { user: $scope.delete }).then(function() {
+			var upd = fi.updateUsers()
+			$scope.users = upd.users
+		})
 	}
 
 	

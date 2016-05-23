@@ -4,6 +4,8 @@
 #uploadModal #tabUpload p { margin: 50px; }
 #uploadModal .cancel { margin-right: 10px; }
 #editModal .cancel { margin-right: 10px; }
+#createModal .cancel { margin-right: 10px; }
+#deleteModal .cancel { margin-right: 10px; }
 #uploadModal ul { margin: 20px 0; }
 
 .fa-building-o { margin-left: 10px }

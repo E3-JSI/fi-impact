@@ -42,7 +42,7 @@
     	<div class="jumbotron">
 			<h1>User management</h1>
 			<div class="pull-right">
-				<a class="btn btn-primary" href="">Create user</a>
+				<a class="btn btn-primary" id="btnCreate" data-toggle="modal" data-target="#createModal" type="button" ref="">Create user</a>
 				<a class="btn btn-primary" href="../../logout.jsp">Logout</a>
 			</div>
 		</div>
@@ -53,7 +53,7 @@
 				<td>{{u.user}}</a></td><td>{{u.description}}</td><td>{{u.accelerator}}</td>
 				<td ng-repeat="(role, description) in roles"><i class="fa" ng-class="( hasAccess(u.user, role) ? 'fa-check' : 'fa-times')" aria-hidden="true"></i></td>
 				<td class="text-center"><a id="btnEdit" data-toggle="modal" data-target="#editModal" type="button" ng-click="editModal(u.user)" href=""><i class="fa fa-lg fa-pencil-square-o" aria-hidden="true"></i></a></td>
-				<td class="text-center"><i class="fa fa-lg fa-trash-o" aria-hidden="true"></i></td>
+				<td class="text-center"><a id="btnDelete" data-toggle="modal" data-target="#deleteModal" type="button" ng-click="deleteModal(u.user)" href=""><i class="fa fa-lg fa-trash-o" aria-hidden="true"></i></a></td>
 			</tr></tbody>
         </table>
 		
@@ -64,7 +64,7 @@
 		<div class="modal-content">
 			<div class="modal-header"><h4 class="modal-title">Edit user: {{editing.user}}</h4></div>
 			<div class="modal-body">
-				<form ng-submit="editUser()" class="form-horizontal" enctype="application/x-www-form-urlencoded">
+				<form class="form-horizontal" enctype="application/x-www-form-urlencoded">
 					<div class="form-group">
 						<label for="userPassword" class="col-sm-3 control-label">Password</label>
 						<div class="col-sm-9"><input type="password" ng-model="editing.password" class="form-control" id="userPassword" name="password"></div>
@@ -87,7 +87,48 @@
 							</div>
 						</div>
 					</div>
-					<div class="text-center"><button class="cancel" data-dismiss="modal">Cancel</button><button type="submit" />Save</button></div>
+					<div class="text-center"><button class="cancel" data-dismiss="modal">Cancel</button><button type="submit" ng-click="editUser()" data-dismiss="modal" />Save</button></div>
+				</form>
+			</div>
+		</div>
+
+	  </div>
+	</div>
+	
+	<div id="createModal" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog">
+	  <div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header"><h4 class="modal-title">Create user</h4></div>
+			<div class="modal-body">
+				<form class="form-horizontal" enctype="application/x-www-form-urlencoded">
+					<div class="form-group">
+						<label for="userName" class="col-sm-3 control-label">User name</label>
+						<div class="col-sm-9"><input type="text" ng-model="create.user" class="form-control" id="userName" name="user"></div>
+					</div>
+					<div class="form-group">
+						<label for="userPassword" class="col-sm-3 control-label">Password</label>
+						<div class="col-sm-9"><input type="password" ng-model="create.password" class="form-control" id="userPassword" name="password"></div>
+					</div>
+					<div class="form-group">
+						<label for="userDescription" class="col-sm-3 control-label">Description</label>
+						<div class="col-sm-9"><input type="text" ng-model="create.description" class="form-control" id="userDescription" name="description"></div>
+					</div>
+					<div class="text-center"><button class="cancel" data-dismiss="modal">Cancel</button><button type="submit" ng-click="createUser()" data-dismiss="modal" />Create</button></div>
+				</form>
+			</div>
+		</div>
+
+	  </div>
+	</div>
+	
+	<div id="deleteModal" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog">
+	  <div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header"><h4 class="modal-title">Delete user</h4></div>
+			<div class="modal-body">
+				<p>Are you sure you want to delete user <strong>{{delete}}</strong>?</p>
+				<form class="form-horizontal" enctype="application/x-www-form-urlencoded">
+					<div class="text-center"><button class="cancel" data-dismiss="modal">Cancel</button><button type="submit" ng-click="deleteUser()" data-dismiss="modal" />Delete</button></div>
 				</form>
 			</div>
 		</div>
