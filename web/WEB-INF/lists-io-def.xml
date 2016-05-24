@@ -36,10 +36,9 @@
 		<filed column="RESPONDENT TO FIMPACT ASSESSMENT?" label="RESPONDED TO FIMPACT ASSESSMENT" fieldid="P_IGNORE_02" usage="ignore" type="lookup"/>
 		<filed column="WEBSITE URL" label="WEBSITE URL" fieldid="WEBSITE_URL" missing="0;#N/A;?" type="text"/>
 		<filed column="SME/STARTUP" label="SME/STARTUP" fieldid="SME_STARTUP" missing="0;#N/A;?" type="lookup"/>
-		<filed column="SUCCESS HPI" label="SUCCESS HPI" fieldid="SUCCESS_HPI" type="lookup"/>
-		<filed column="SUCCESS VIP" label="SUCCESS VIP" fieldid="SUCCESS_VIP" type="lookup"/>
-		<filed column="SUCCESS IDG" label="SUCCESS IDG" fieldid="SUCCESS_IDG" type="lookup"/>
-		<filed column="SUCCESS Shortlist" label="SUCCESS Shortlist" fieldid="SUCCESS_Shortlist" type="lookup"/>
+		<filed column="HPI" label="SUCCESS HPI" fieldid="SUCCESS_HPI" type="lookup"/>
+		<filed column="VIP" label="SUCCESS VIP" fieldid="SUCCESS_VIP" type="lookup"/>
+		<filed column="IDG Shortlist" label="SUCCESS IDG" fieldid="SUCCESS_IDG" type="lookup"/>
 		<filed column="Website MAP" label="Website - clean" fieldid="MAP_WEBSITE" usage="clean-url" type="text"/>
 		<!--This one is imported from the mapping file!!!-->
 	</list>
