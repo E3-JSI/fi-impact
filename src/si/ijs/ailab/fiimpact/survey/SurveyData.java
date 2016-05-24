@@ -1354,7 +1354,7 @@ public class SurveyData
       }
     }
     */
-    logger.info("Loaded survey {}/{} with {} questions results", externalId, id, questions.size());
+    //logger.info("Loaded survey {}/{} with {} questions results", externalId, id, questions.size());
   }
 
 
@@ -1362,7 +1362,7 @@ public class SurveyData
   {
     results.clear();
     resultDerivatives.clear();
-    logger.debug("Calculate results for {}", id);
+    //logger.debug("Calculate results for {}", id);
 
     //------------INNOVATION--------------------
     String Q2_1 = questions.get("Q2_1");
@@ -1725,7 +1725,7 @@ public class SurveyData
             dInd = Double.valueOf(sInd);
           if(dInd != null)
           {
-            //logger.info("Mattermark indicator {}={}", indicator.getFieldid(), dInd);
+              //logger.info("Mattermark indicator {}={}", indicator.getFieldid(), dInd);
 
             ProjectManager.MattermarkIndicatorInfo mattermarkIndicatorInfo = projectManager.getMattermarkIndicatorInfo(indicator.getFieldid());
             if(mattermarkIndicatorInfo.getIoListField().isTransformLog())
@@ -1740,7 +1740,7 @@ public class SurveyData
       }
     }
     //logger.debug("Calc Mattermark done.");
-    logger.debug("Calc results: {}", results.toString());
+    //logger.debug("Calc results: {}", results.toString());
   }
 
   public void clear()

@@ -147,7 +147,7 @@ public class ProjectData
       for(int i = 0; i < nl.getLength(); i++)
       {
         Element e = (Element) nl.item(i);
-        fields.put(e.getAttribute("id"), e.getAttribute("val"));
+        fields.put(e.getAttribute("id"), e.getAttribute("answer"));
 
       }
     }
@@ -159,12 +159,12 @@ public class ProjectData
       for(int i = 0; i < nl.getLength(); i++)
       {
         Element e = (Element) nl.item(i);
-        mattermarkFields.put(e.getAttribute("id"), e.getAttribute("val"));
+        mattermarkFields.put(e.getAttribute("id"), e.getAttribute("answer"));
 
       }
     }
 
-    logger.info("Loaded project {} with {} project fields and {} Mattermark fields.", id, fields.size(), mattermarkFields.size());
+    //logger.info("Loaded project {} with {} project fields and {} Mattermark fields.", id, fields.size(), mattermarkFields.size());
 	}
 
 	public void addFields(String[] arrFields)

@@ -34,8 +34,8 @@ public class UsersManager
   {
     logger.info("Root: {}", _webappRoot);
 
-    users = Collections.synchronizedMap(new HashMap<String , UserInfo>());
-    roles = Collections.synchronizedMap(new HashMap<String , String>());
+    users = Collections.synchronizedMap(new TreeMap<String , UserInfo>());
+    roles = Collections.synchronizedMap(new TreeMap<String , String>());
 
     usersDefFile = _webappRoot.resolve("WEB-INF").resolve("user-roles.xml").toFile();
     loadUsersDef();
@@ -373,62 +373,6 @@ public class UsersManager
     w.close();
   }
 
-  synchronized public void changeUserPassword(ServletOutputStream outputStream, String userName, String password, UserInfo adminUserInfo) throws IOException
-  {
-    try
-    {
-      logger.info("Change password {}", userName);
-      UserInfo userInfo = users.get(userName);
-      if(userInfo == null)
-      {
-        writeUserErrorResult(outputStream, userName, "user-password", "User not defined");
-        logger.error("Error changing password - FI user does not exist");
-
-      }
-      else if(!adminUserInfo.getAccelerator().equals("") && !adminUserInfo.getAccelerator().equals(userInfo.getAccelerator()))
-      {
-        writeUserErrorResult(outputStream, userName, "user-password", "User does not exist");
-        logger.error("Administrator {} ({}) has no privileges to manage users for accelerator {}", adminUserInfo.getName(), adminUserInfo.getAccelerator(), userInfo.getAccelerator());
-      }
-      else
-      {
-
-        ArrayList list = MBeanServerFactory.findMBeanServer(null);
-        MBeanServer mbeanServer = (MBeanServer) list.get(0);
-        ObjectName onUserDatabase = new ObjectName("Users:type=UserDatabase,database=UserDatabase");
-
-        String userIDString = (String) mbeanServer.invoke(onUserDatabase, "findUser", new String[]{userName}, new String[]{String.class.getName()});
-        if(userIDString == null)
-        {
-          writeUserErrorResult(outputStream, userName, "user-password", "User not defined");
-          logger.error("Error changing password - Tomcat user does not exist");
-        }
-        else
-        {
-          logger.info("Change password for {}", userIDString);
-          ObjectName onUser = new ObjectName(userIDString);
-          MBeanInfo info = mbeanServer.getMBeanInfo(onUser);
-          //logMbeanInfo(info);
-          mbeanServer.setAttribute(onUser, new Attribute("password", password));
-
-          mbeanServer.invoke(onUserDatabase, "save", new Object[0], new String[0]);
-          logger.info("Tomcat user password changed: {}", userName);
-          if(!userInfo.isFirstLogin())
-          {
-            userInfo.setFirstLogin(true);
-            saveUsersDef();
-          }
-          userInfo.getProfile(outputStream, "user-password");
-        }
-      }
-    }
-    catch (InvalidAttributeValueException|AttributeNotFoundException|IntrospectionException|MalformedObjectNameException|ReflectionException|InstanceNotFoundException|MBeanException e)
-    {
-      writeUserErrorResult(outputStream, userName, "user-password", e.getMessage());
-      logger.error("Error adding user", e);
-    }
-
-  }
 
   synchronized public void changeMyPassword(ServletOutputStream outputStream, UserInfo userInfo, String oldPassword, String newPassword) throws IOException
   {
@@ -489,67 +433,114 @@ public class UsersManager
 
   }
 
-  synchronized public void setUserAccelerator(ServletOutputStream outputStream, String userName, String accelerator, UserInfo adminUserInfo) throws IOException
+  synchronized public void editUser(ServletOutputStream outputStream, String userName, String password, String accelerator, String[] roles, UserInfo adminUserInfo) throws IOException
   {
-    logger.info("set accelerator{}/{}", userName, accelerator);
-    UserInfo userInfo = users.get(userName);
-    if(userInfo == null)
+    try
     {
-      writeUserErrorResult(outputStream, userInfo.getName(), "user-accelerator", "User not defined");
-      logger.error("Error getting user - FI user does not exist");
-
-    }
-    else if(!adminUserInfo.getAccelerator().equals("") && !adminUserInfo.getAccelerator().equals(userInfo.getAccelerator()))
-    {
-      writeUserErrorResult(outputStream, userName, "user-accelerator", "User does not exist");
-      logger.error("Administrator {} ({}) has no privileges to manage users for accelerator {}", adminUserInfo.getName(), adminUserInfo.getAccelerator(), userInfo.getAccelerator());
-    }
-    else
-    {
-      userInfo.setAccelerator(accelerator);
-      saveUsersDef();
-      userInfo.getProfile(outputStream, "user-accelerator");
-      logger.info("FI-IMPACT user accelerator set: {}/{}", userName, accelerator);
-    }
-  }
-
-  synchronized public void replaceUserRoles(ServletOutputStream outputStream, String userName, String[] roles, UserInfo adminUserInfo) throws IOException
-  {
-    //user-roles
-    logger.info("set roles for {}", userName);
-    UserInfo userInfo = users.get(userName);
-    if(userInfo == null)
-    {
-      writeUserErrorResult(outputStream, userInfo.getName(), "user-roles", "User not defined");
-      logger.error("Error getting user - FI user does not exist");
-    }
-    else if(!adminUserInfo.getAccelerator().equals("") && !adminUserInfo.getAccelerator().equals(userInfo.getAccelerator()))
-    {
-      writeUserErrorResult(outputStream, userName, "user-roles", "User does not exist");
-      logger.error("Administrator {} ({}) has no privileges to manage users for accelerator {}", adminUserInfo.getName(), adminUserInfo.getAccelerator(), userInfo.getAccelerator());
-    }
-    else
-    {
-      boolean bCanSetRoles = true;
-      for(String newRole: roles)
+      logger.info("Edit user {}", userName);
+      UserInfo userInfo = users.get(userName);
+      if(userInfo == null)
       {
-        bCanSetRoles = adminUserInfo.getAccessRights().contains(newRole);
-        if(!bCanSetRoles)
-          break;
+        writeUserErrorResult(outputStream, userName, "user-edit", "User not defined");
+        logger.error("Error edit user - FI user does not exist");
+
       }
-      if(!bCanSetRoles)
+      else if(!adminUserInfo.getAccelerator().equals("") && !adminUserInfo.getAccelerator().equals(userInfo.getAccelerator()))
       {
-        writeUserErrorResult(outputStream, userName, "user-roles", "Cant set superset of own roles");
-        logger.error("Administrator {} ({}) has no privileges to manage roles for {}", adminUserInfo.getName(), adminUserInfo.getAccelerator(), userInfo.getName());
+        writeUserErrorResult(outputStream, userName, "user-edit", "User does not exist");
+        logger.error("Administrator {} ({}) has no privileges to manage users for accelerator {}", adminUserInfo.getName(), adminUserInfo.getAccelerator(), userInfo.getAccelerator());
       }
       else
       {
-        userInfo.setAccessRights(roles);
-        saveUsersDef();
-        logger.info("FI-IMPACT user roles set: {}/{}", userName, userInfo.getAccessRights().toString());
-        userInfo.getProfile(outputStream, "user-roles");
+
+        ArrayList list = MBeanServerFactory.findMBeanServer(null);
+        MBeanServer mbeanServer = (MBeanServer) list.get(0);
+        ObjectName onUserDatabase = new ObjectName("Users:type=UserDatabase,database=UserDatabase");
+
+        String userIDString = (String) mbeanServer.invoke(onUserDatabase, "findUser", new String[]{userName}, new String[]{String.class.getName()});
+        if(userIDString == null)
+        {
+          writeUserErrorResult(outputStream, userName, "user-edit", "User not defined");
+          logger.error("Error edit user - Tomcat user does not exist");
+        }
+        else
+        {
+          logger.info("Edit user {}", userIDString);
+          ObjectName onUser = new ObjectName(userIDString);
+          MBeanInfo info = mbeanServer.getMBeanInfo(onUser);
+          boolean bSaveTomcat = false;
+          boolean bSaveFI = false;
+          if(password != null)
+          {
+            mbeanServer.setAttribute(onUser, new Attribute("password", password));
+            logger.info("User password reset: {}", userName);
+            bSaveTomcat = true;
+            if(!userInfo.isFirstLogin())
+            {
+              userInfo.setFirstLogin(true);
+              bSaveFI = true;
+            }
+          }
+
+          if(accelerator != null)
+          {
+            userInfo.setAccelerator(accelerator);
+            logger.info("FI-IMPACT user accelerator set: {}/{}", userName, accelerator);
+            bSaveFI = true;
+          }
+
+
+          if(roles != null && roles.length > 0)
+          {
+            ArrayList<String> cleanRoles = new ArrayList();
+            for(String newRole : roles)
+            {
+              if (newRole != null && !newRole.equals(""))
+                cleanRoles.add(newRole);
+
+            }
+
+            if(cleanRoles.size() > 0)
+            {
+              boolean bCanSetRoles = !userInfo.getName().equals(adminUserInfo.getName());
+              for(String newRole : cleanRoles)
+              {
+                bCanSetRoles = adminUserInfo.getAccessRights().contains(newRole);
+                if(!bCanSetRoles)
+                  break;
+              }
+              if(!bCanSetRoles)
+              {
+                writeUserErrorResult(outputStream, userName, "user-edit", "Cant set superset of own roles");
+                logger.error("Administrator {} ({}) has no privileges to manage roles for {}", adminUserInfo.getName(), adminUserInfo.getAccelerator(), userInfo.getName());
+              }
+              else
+              {
+                userInfo.setAccessRights(cleanRoles);
+                bSaveFI = true;
+                logger.info("FI-IMPACT user roles set: {}/{}", userName, userInfo.getAccessRights().toString());
+              }
+            }
+          }
+
+
+          if(bSaveTomcat)
+            mbeanServer.invoke(onUserDatabase, "save", new Object[0], new String[0]);
+          if(bSaveFI)
+            saveUsersDef();
+
+          userInfo.getProfile(outputStream, "user-edit");
+
+          logger.info("User edit done: {}", userName);
+        }
       }
     }
+    catch (InvalidAttributeValueException|AttributeNotFoundException|IntrospectionException|MalformedObjectNameException|ReflectionException|InstanceNotFoundException|MBeanException e)
+    {
+      writeUserErrorResult(outputStream, userName, "user-edit", e.getMessage());
+      logger.error("Error editing user", e);
+    }
+
   }
 
   synchronized public void getRoles(ServletOutputStream outputStream, UserInfo adminUserInfo) throws IOException
@@ -581,11 +572,14 @@ public class UsersManager
       if(!userInfo.isDeniedUser() && (adminUserInfo.getAccelerator().equals("") || adminUserInfo.getAccelerator().equals(userInfo.getAccelerator())))
       {
         cnt++;
+        /*
         json.object();
         json.key("user").value(userInfo.getName());
         json.key("description").value(userInfo.getDescription());
         json.key("accelerator").value(userInfo.getAccelerator());
         json.endObject();
+        */
+        userInfo.getProfile(json, "user-list");
       }
     }
     json.endArray();
@@ -593,7 +587,6 @@ public class UsersManager
     w.flush();
     w.close();
     logger.info("Returned {} users", cnt);
-
   }
 
   public void getUserProfile(ServletOutputStream outputStream, String userName, UserInfo adminUserInfo) throws IOException

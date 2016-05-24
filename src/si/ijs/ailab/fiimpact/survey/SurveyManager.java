@@ -1,32 +1,23 @@
 package si.ijs.ailab.fiimpact.survey;
-import javax.servlet.ServletOutputStream;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.*;
 
 import com.opencsv.CSVWriter;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONWriter;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import si.ijs.ailab.fiimpact.indicators.OverallResult;
-import si.ijs.ailab.fiimpact.indicators.OverallResult.ScoreBoundaries;
-import si.ijs.ailab.fiimpact.project.ProjectData;
-import si.ijs.ailab.fiimpact.project.ProjectManager;
-import si.ijs.ailab.util.AIUtils;
+
+import org.json.*;
+import org.w3c.dom.*;
+import org.xml.sax.*;
+import si.ijs.ailab.fiimpact.indicators.*;
+import si.ijs.ailab.fiimpact.project.*;
+import si.ijs.ailab.util.*;
+
+import javax.servlet.ServletOutputStream;
+import javax.xml.parsers.*;
+import java.io.*;
+import java.nio.charset.*;
+import java.nio.file.*;
+import java.text.*;
+import java.util.*;
 
 
 /**
@@ -132,6 +123,7 @@ public class SurveyManager
     {
       resultType = _resultType;
     }
+
     public int compare(SurveyData sd1, SurveyData sd2)
     {
       Double r1 = sd1.results.get(resultType);
@@ -152,6 +144,7 @@ public class SurveyManager
     byte[] encoded = Files.readAllBytes(file);
     return new String(encoded, encoding);
   }
+
   private ProjectManager projectManager;
 
   //private SurveyManager(String _webappRoot, Map<String, Integer> _slots)
@@ -207,14 +200,14 @@ public class SurveyManager
 
   private void load()
   {
-    logger.info("Load id mappings from: {}", mapFile.toString());
+    logger.info("Load surveys, id mappings from: {}", mapFile.toString());
     externalIDMap.clear();
     surveys.clear();
     try
     {
       BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(mapFile.toFile()), "utf-8"));
       String line = br.readLine();
-      while(line!=null)
+      while(line != null)
       {
         int ind1 = line.indexOf("\t");
         if(ind1 <= 0)
@@ -243,12 +236,15 @@ public class SurveyManager
     }
     catch (IOException ioe)
     {
-      logger.error("could not read text file "+mapFile.toString());
+      logger.error("could not read text file " + mapFile.toString());
     }
+    logger.info("Loaded {} surveys", surveys.size());
 
   }
+
   public void recalcSurveyResults()
   {
+    logger.info("Recalc Surveys Results");
     synchronized(surveys)
     {
       for(SurveyData surveyData : surveys.values())
@@ -257,6 +253,7 @@ public class SurveyManager
       }
 
     }
+    logger.info("Recalc Surveys Results done");
   }
 
 
@@ -268,37 +265,37 @@ public class SurveyManager
     SortedSet<String> acceleratorsNew = Collections.synchronizedSortedSet(new TreeSet<String>());
     SortedSet<String> sortedQuestionsSet = Collections.synchronizedSortedSet(new TreeSet<String>());
 
-    for(String type: QUESTIONNAIRE_TYPE)
+    for(String type : QUESTIONNAIRE_TYPE)
     {
       Map<String, OverallResult> typeResults = new TreeMap<>();
       resultsNew.put(type, typeResults);
-      for(Map.Entry<String, OverallResult.ScoreBoundaries> entry: SPEEDOMETER_SLOTS.entrySet())
+      for(Map.Entry<String, OverallResult.ScoreBoundaries> entry : SPEEDOMETER_SLOTS.entrySet())
       {
         typeResults.put(entry.getKey(), new OverallResult(type, entry.getKey(), entry.getValue()));
       }
       //Same loop for mattermark slots  -  ProjectManager.getMattemrarkSlots()
-     for(Map.Entry<String, ScoreBoundaries> entry:projectManager.getMattemrarkSlots().entrySet())
-     {
-    	 typeResults.put(entry.getKey(), new OverallResult(type, entry.getKey(), entry.getValue()));
-     }
+      for(Map.Entry<String, OverallResult.ScoreBoundaries> entry : projectManager.getMattemrarkSlots().entrySet())
+      {
+        typeResults.put(entry.getKey(), new OverallResult(type, entry.getKey(), entry.getValue()));
+      }
     }
 
     logger.info("Recalc results for {} surveys.", surveys.size());
-    synchronized (surveys)
+    synchronized(surveys)
     {
-      for (SurveyData sd : surveys.values())
+      for(SurveyData sd : surveys.values())
       {
         String sdType = sd.getType();
-        for (String type : QUESTIONNAIRE_TYPE)
+        for(String type : QUESTIONNAIRE_TYPE)
         {
-          if (type.contains(sdType))
+          if(type.contains(sdType))
           {
             Map<String, OverallResult> typeResults = resultsNew.get(type);
 
-            for (Map.Entry<String, Double> r : sd.results.entrySet())
+            for(Map.Entry<String, Double> r : sd.results.entrySet())
             {
               OverallResult or = typeResults.get(r.getKey());
-              if (or != null)
+              if(or != null)
               {
                 or.add(sd);
               }
@@ -309,21 +306,21 @@ public class SurveyManager
         if(Q1_1 != null && !Q1_1.equals(""))
           acceleratorsNew.add(Q1_1);
 
-        for(String questionID: sd.questions.keySet())
+        for(String questionID : sd.questions.keySet())
           sortedQuestionsSet.add(getQuestionSortKey(questionID));
       }
     }
 
-    for(Map<String, OverallResult> typeResults: resultsNew.values())
-      for(OverallResult overallResult: typeResults.values())
+    for(Map<String, OverallResult> typeResults : resultsNew.values())
+      for(OverallResult overallResult : typeResults.values())
       {
-        logger.info("Recalc: {}", overallResult.getId());
+        //logger.info("Recalc: {}", overallResult.getId());
         overallResult.calculate();
       }
     synchronized(surveys)
     {
       sortedQuestions.clear();
-      for(String s: sortedQuestionsSet)
+      for(String s : sortedQuestionsSet)
       {
         sortedQuestions.add(s.split("#")[1]);
       }
@@ -340,17 +337,17 @@ public class SurveyManager
 
     try
     {
-      synchronized (externalIDMap)
+      synchronized(externalIDMap)
       {
         OutputStreamWriter w = new OutputStreamWriter(new FileOutputStream(mapFile.toFile()), "utf-8");
-        for (Map.Entry<String, String> entry : externalIDMap.entrySet())
+        for(Map.Entry<String, String> entry : externalIDMap.entrySet())
         {
           w.write(entry.getKey() + "\t" + entry.getValue() + "\n");
         }
         w.close();
       }
     }
-    catch(java.io.IOException ioe)
+    catch (java.io.IOException ioe)
     {
       logger.error("error writing file", ioe);
     }
@@ -420,10 +417,10 @@ public class SurveyManager
     Element root = doc.createElement("survey");
     doc.appendChild(root);
     root.setAttribute("external", externalId);
-    if(id!=null)
+    if(id != null)
       root.setAttribute("id", id);
 
-    if(id==null)
+    if(id == null)
     {
       root.setTextContent("Survey not foud, can't delete");
       logger.error("Survey not foud, can't delete: {}", externalId);
@@ -448,17 +445,17 @@ public class SurveyManager
   {
     synchronized(accelerators)
     {
-        OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
-        JSONWriter jsonSurvey = new JSONWriter(w);
-        jsonSurvey.array();
-        for(String s: accelerators)
-        {
-          if(userAccelerator.equals("") || userAccelerator.equals(s))
-            jsonSurvey.value(s);
-        }
-        jsonSurvey.endArray();
-        w.flush();
-        w.close();
+      OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
+      JSONWriter jsonSurvey = new JSONWriter(w);
+      jsonSurvey.array();
+      for(String s : accelerators)
+      {
+        if(userAccelerator.equals("") || userAccelerator.equals(s))
+          jsonSurvey.value(s);
+      }
+      jsonSurvey.endArray();
+      w.flush();
+      w.close();
     }
   }
 
@@ -478,6 +475,7 @@ public class SurveyManager
       surveyData.writeUIJSON(outputStream);
     }
   }
+
   public void getXMLSurvey(OutputStream outputStream, String id) throws IOException
   {
     SurveyData surveyData = surveys.get(id);
@@ -502,7 +500,7 @@ public class SurveyManager
     averages.put("type", type);
     JSONArray jsonResults = new JSONArray();
     averages.put("results", jsonResults);
-    for (OverallResult re : results.get(type).values())
+    for(OverallResult re : results.get(type).values())
     {
       jsonResults.put(re.toJSON());
     }
@@ -550,23 +548,23 @@ public class SurveyManager
 
     if(Files.isDirectory(rootDir))
     {
-      try(DirectoryStream<Path> stream = Files.newDirectoryStream(rootDir))
+      try (DirectoryStream<Path> stream = Files.newDirectoryStream(rootDir))
       {
         for(Path p : stream)
         {
 
           String fileName = p.getFileName().toString();
-          if (fileName.endsWith(".txt"))
+          if(fileName.endsWith(".txt"))
           {
             logger.info("Load data from file {}", p.toString());
-            fileName = fileName.substring(0, fileName.length()-4);
+            fileName = fileName.substring(0, fileName.length() - 4);
             BufferedReader brData = new BufferedReader(new InputStreamReader(new FileInputStream(p.toFile()), "Cp1252"));
             ArrayList<ArrayList<String>> lines = new ArrayList<>();
             String line = brData.readLine();
             StringBuilder sb = null;
             boolean bMulti = false;
             ArrayList<String> lineList = null;
-            while (line != null)
+            while(line != null)
             {
               //logger.debug("Line {}", line);
               String[] lineArr = line.split("\t");
@@ -576,11 +574,11 @@ public class SurveyManager
                 lines.add(lineList);
               }
 
-              for (String s : lineArr)
+              for(String s : lineArr)
               {
-                if (bMulti)
+                if(bMulti)
                 {
-                  if (s.endsWith("\"")) //multi-line or multi-tab end
+                  if(s.endsWith("\"")) //multi-line or multi-tab end
                   {
                     sb.append(" ").append(s.substring(0, s.length() - 1));
                     lineList.add(sb.toString());
@@ -596,12 +594,12 @@ public class SurveyManager
                 }
                 else
                 {
-                  if (s.startsWith("\"") && s.endsWith("\""))
+                  if(s.startsWith("\"") && s.endsWith("\""))
                   {
                     lineList.add(s.substring(1, s.length() - 1));
 
                   }
-                  else if (s.startsWith("\"")) //multi-line or multi-tab
+                  else if(s.startsWith("\"")) //multi-line or multi-tab
                   {
                     sb = new StringBuilder();
                     sb.append(s.substring(1));
@@ -620,12 +618,12 @@ public class SurveyManager
             ArrayList<String> headerList = lines.get(0);
             ArrayList<String> identifiers = new ArrayList<>();
             logger.debug("header: {} items", headerList.size());
-            for (int i = 2; i < headerList.size(); i++)
+            for(int i = 2; i < headerList.size(); i++)
             {
               String externalId = fileName + "_" + headerList.get(i);
               String id = externalIDMap.get(externalId);
               SurveyData surveyData;
-              if (id == null)
+              if(id == null)
               {
                 surveyData = new SurveyData();
                 id = java.util.UUID.randomUUID().toString();
@@ -643,16 +641,16 @@ public class SurveyManager
               identifiers.add(id);
             }
 
-            for (int i = 1; i < lines.size(); i++)
+            for(int i = 1; i < lines.size(); i++)
             {
               logger.debug("Extracting answer: {}", i);
               ArrayList<String> answersLine = lines.get(i);
               String questionID = answersLine.get(0);
               logger.debug("Question {}", questionID);
 
-              if (questionID != null && !questionID.equals(""))
+              if(questionID != null && !questionID.equals(""))
               {
-                for (int j = 2; j < answersLine.size(); j++)
+                for(int j = 2; j < answersLine.size(); j++)
                 {
                   String id = identifiers.get(j - 2);
                   String answer = answersLine.get(j);
@@ -674,9 +672,9 @@ public class SurveyManager
 
 
     saveMap();
-    synchronized (surveys)
+    synchronized(surveys)
     {
-      for (SurveyData surveyData : surveys.values())
+      for(SurveyData surveyData : surveys.values())
       {
         surveyData.calculateResults();
         surveyData.saveSurvey(surveyRoot);
@@ -700,7 +698,7 @@ public class SurveyManager
     JSONWriter json = new JSONWriter(w);
     json.object().key("total").value(surveys.size());
     json.key("surveys").array();
-    for (SurveyData surveyData: surveys.values())
+    for(SurveyData surveyData : surveys.values())
     {
 
       boolean bInclude = groupQuestion == null;
@@ -755,7 +753,8 @@ public class SurveyManager
   }
 
   private static final char newline = '\n';
-  private static void  writeLine(Writer w, String s) throws IOException
+
+  private static void writeLine(Writer w, String s) throws IOException
   {
     w.write(s, 0, s.length());
     w.write(newline);
@@ -764,21 +763,22 @@ public class SurveyManager
   private String getQuestionSortKey(String s)
   {
     String result;
-    if (s.contains("_"))
+    if(s.contains("_"))
     {
       //this is a hack to sort questions in the export correctly - Q1_1 --> Q1_01, Q1_10 --> Q1_10, Q1_2a --> Q1_02a, ...
       String[] sArr = s.split("\\_");
-      if (sArr[1].length() == 2 && !AIUtils.isInteger(sArr[1]))
+      if(sArr[1].length() == 2 && !AIUtils.isInteger(sArr[1]))
       {
         sArr[1] = "0" + sArr[1];
-      } else if (sArr[1].length() == 1)
+      }
+      else if(sArr[1].length() == 1)
       {
         sArr[1] = "0" + sArr[1];
       }
       result = sArr[0] + "_" + sArr[1] + "#" + s;
     }
     else
-      result =  s + "#" + s;
+      result = s + "#" + s;
 
     return result;
   }
@@ -792,8 +792,8 @@ public class SurveyManager
   public static final int EXPORT_DERIVED_INDICATORS = 32;
   public static final int EXPORT_PROJECT_DATA = 64;
 
-  private static final String  SHORT_QUESTIONS_LIST = "Q1_1;Q1_2;Q1_3;Q1_4;Q1_22";
-  static final String  SHORT_INDICATORS_LIST = "FEASIBILITY;INNOVATION;MARKET;MARKET_NEEDS";
+  private static final String SHORT_QUESTIONS_LIST = "Q1_1;Q1_2;Q1_3;Q1_4;Q1_22";
+  private static final String SHORT_INDICATORS_LIST = "FEASIBILITY;INNOVATION;MARKET;MARKET_NEEDS";
 
   private boolean isFlagSet(int mask, int flag)
   {
@@ -809,14 +809,205 @@ public class SurveyManager
     if(s.contains("\""))
     {
       s = s.replace("\"", "\"\"");
-      s = "\""+s+"\"";
+      s = "\"" + s + "\"";
     }
     return s;
   }
-  public void exportTXT(ServletOutputStream outputStream, String groupQuestion, String groupAnswer, int exportSettings) throws IOException
+
+  public void exportJson(ServletOutputStream outputStream) throws IOException
+  {
+    logger.info("Export {} surveys to JSON", surveys.size());
+    OutputStreamWriter writer = new OutputStreamWriter(outputStream, "utf-8");
+    JSONWriter json = new JSONWriter(writer);
+    json.object();
+    json.key("surveys").array();
+
+    SortedSet<String> indicatorsDef = new TreeSet<>();
+
+
+    ProjectManager.IOListDefinition listMattermarkDef = ProjectManager.getProjectManager().getListDefinition(ProjectManager.LIST_MATTERMARK);;
+    ProjectManager.IOListDefinition listProjectsDef = ProjectManager.getProjectManager().getListDefinition(ProjectManager.LIST_PROJECTS);
+    ProjectManager.IOListDefinition listSurveysDef = ProjectManager.getProjectManager().getListDefinition(ProjectManager.LIST_SURVEYS);
+
+    synchronized(surveys)
+    {
+      for(SurveyData sd : surveys.values())
+      {
+        for(String s : sd.results.keySet())
+        {
+          indicatorsDef.add(s);
+        }
+      }
+
+      for(SurveyData surveyData : surveys.values())
+      {
+        json.object();
+        json.key("id_external").value(surveyData.getExternalId());
+        json.key("id_internal").value(surveyData.getId());
+        for(ProjectManager.IOListField ioListField : listSurveysDef.getFields())
+        {
+          String answer = surveyData.questions.get(ioListField.getFieldid());
+          if(answer != null && !ioListField.getType().equals(ProjectManager.FIELD_TYPE_IGNORE))
+          {
+            answer = normaliseCSVString(answer);
+            json.key(ioListField.getFieldid()).value(answer);
+          }
+        }
+
+        String Q1_22 = surveyData.questions.get("Q1_22");
+        ProjectData projectData = null;
+        if(Q1_22 == null)
+        {
+          logger.warn("No FI accelerator project associated with questionnaire {}/{}", surveyData.getExternalId(), surveyData.getId());
+        }
+        else
+        {
+          projectData = ProjectManager.getProjectManager().getProjects().get(Q1_22);
+          if(projectData == null)
+          {
+            logger.warn("No project data for {}", Q1_22);
+          }
+        }
+
+        for(ProjectManager.IOListField ioListField : listMattermarkDef.getFields())
+        {
+          if(projectData != null)
+          {
+            String answer = projectData.getMattermarkValue(ioListField.getFieldid());
+            if(answer != null  && !ioListField.getType().equals(ProjectManager.FIELD_TYPE_IGNORE))
+            {
+              answer = normaliseCSVString(answer);
+              json.key(ioListField.getLabel()).value(answer);
+            }
+          }
+        }
+
+        for(ProjectManager.IOListField ioListField : listProjectsDef.getFields())
+        {
+          if(projectData != null)
+          {
+            String answer = projectData.getValue(ioListField.getFieldid());
+            if(answer != null  && !ioListField.getType().equals(ProjectManager.FIELD_TYPE_IGNORE))
+            {
+              answer = normaliseCSVString(answer);
+              json.key(ioListField.getLabel()).value(answer);
+            }
+          }
+        }
+
+        for(String s : indicatorsDef)
+        {
+          Double r = surveyData.results.get(s);
+          if(r != null)
+          {
+            json.key("INDICATOR_"+s).value(getDecimalFormatter4().format(r));
+          }
+        }
+        json.endObject();
+      }
+      json.endArray();
+      json.key("filter_and_text").array();
+
+      ///////////////////////////////////////
+      for(SurveyData surveyData : surveys.values())
+      {
+        json.object();
+        json.key("id_external").value(surveyData.getExternalId());
+        json.key("id_internal").value(surveyData.getId());
+        StringBuilder fullText = new StringBuilder();
+
+        for(ProjectManager.IOListField ioListField : listSurveysDef.getFields())
+        {
+          String answer = surveyData.questions.get(ioListField.getFieldid());
+          if(answer != null)
+          {
+            answer = normaliseCSVString(answer);
+            if(ioListField.getType().equals(ProjectManager.FIELD_TYPE_FILTER))
+            {
+              json.key(ioListField.getFieldid()).value(answer);
+            }
+            else if(ioListField.getType().equals(ProjectManager.FIELD_TYPE_DESCRIPTION))
+            {
+              fullText.append(answer).append(" ");
+            }
+          }
+        }
+
+        String Q1_22 = surveyData.questions.get("Q1_22");
+        ProjectData projectData = null;
+        if(Q1_22 == null)
+        {
+          logger.warn("No FI accelerator project associated with questionnaire {}/{}", surveyData.getExternalId(), surveyData.getId());
+        }
+        else
+        {
+          projectData = ProjectManager.getProjectManager().getProjects().get(Q1_22);
+          if(projectData == null)
+          {
+            logger.warn("No project data for {}", Q1_22);
+          }
+        }
+
+        for(ProjectManager.IOListField ioListField : listMattermarkDef.getFields())
+        {
+          if(projectData != null)
+          {
+            String answer = projectData.getMattermarkValue(ioListField.getFieldid());
+            if(answer != null)
+            {
+              answer = normaliseCSVString(answer);
+              if(ioListField.getType().equals(ProjectManager.FIELD_TYPE_FILTER))
+              {
+                json.key(ioListField.getLabel()).value(answer);
+              }
+              else if(ioListField.getType().equals(ProjectManager.FIELD_TYPE_DESCRIPTION))
+              {
+                fullText.append(answer).append(" ");
+              }
+            }
+          }
+        }
+
+        for(ProjectManager.IOListField ioListField : listProjectsDef.getFields())
+        {
+          if(projectData != null)
+          {
+            String answer = projectData.getValue(ioListField.getFieldid());
+            if(answer != null)
+            {
+              answer = normaliseCSVString(answer);
+              if(ioListField.getType().equals(ProjectManager.FIELD_TYPE_FILTER))
+              {
+                json.key(ioListField.getLabel()).value(answer);
+              }
+              else if(ioListField.getType().equals(ProjectManager.FIELD_TYPE_DESCRIPTION))
+              {
+                fullText.append(answer).append(" ");
+              }
+            }
+          }
+        }
+        json.key("full_text").value(fullText.toString());
+
+        json.endObject();
+      }
+
+      json.endArray();
+    }
+    json.endObject();
+
+    writer.flush();
+    writer.close();
+
+    logger.info("Saved {} surveys", surveys.size());
+  }
+
+  public void exportText(ServletOutputStream outputStream, String groupQuestion, String groupAnswer, int exportSettings) throws IOException
   {
     OutputStreamWriter writer = new OutputStreamWriter(outputStream, "utf-8");
-    logger.info("Save {} surveys", surveys.size());
+    logger.info("Export {} surveys", surveys.size());
+
+    logger.info("Export {} surveys", surveys.size());
 
     String questionsList = null;
     String indicatorsList = null;
@@ -839,7 +1030,7 @@ public class SurveyManager
     else
     {
       if(isFlagSet(exportSettings, EXPORT_FI_IMPACT_QUESTIONS))
-        for (String s : sortedQuestions)
+        for(String s : sortedQuestions)
           questionsDef.add(s);
     }
 
@@ -866,11 +1057,11 @@ public class SurveyManager
     }
 
 
-    synchronized (surveys)
+    synchronized(surveys)
     {
       if(!isFlagSet(exportSettings, EXPORT_SHORT_LIST))
       {
-        for (SurveyData sd : surveys.values())
+        for(SurveyData sd : surveys.values())
         {
 
           if(isFlagSet(exportSettings, EXPORT_FI_IMPACT_INDICATORS) || isFlagSet(exportSettings, EXPORT_MATTERMARK_INDICATORS))
@@ -914,7 +1105,7 @@ public class SurveyManager
     StringBuilder sb = new StringBuilder();
     sb.append("id_external").append("\t").append("id_internal");
     logger.debug("Export {} questions", questionsDef.size());
-    for (String s: questionsDef)
+    for(String s : questionsDef)
     {
       sb.append("\t").append(s);
     }
@@ -938,32 +1129,33 @@ public class SurveyManager
     }
 
     logger.debug("Export {} indicators", indicatorsDef.size());
-    for (String s: indicatorsDef)
+    for(String s : indicatorsDef)
     {
-      sb.append("\t").append(s);
+      //!!FF Hack!!!!!
+      sb.append("\t").append("INDICATOR_").append(s);
     }
 
     logger.debug("Export derived {} indicators", indicatorsDerivedDef.size());
-    for (String s: indicatorsDerivedDef)
+    for(String s : indicatorsDerivedDef)
     {
       sb.append("\t").append(s.split("#")[1]);
     }
 
-    String sHeader =  sb.toString();
+    String sHeader = sb.toString();
     writeLine(writer, sHeader);
 
     sb.setLength(0);
 
-    synchronized (surveys)
+    synchronized(surveys)
     {
-      for (SurveyData surveyData: surveys.values())
+      for(SurveyData surveyData : surveys.values())
       {
         sb.append(surveyData.getExternalId()).append("\t").append(surveyData.getId());
-        for (String s : questionsDef)
+        for(String s : questionsDef)
         {
           sb.append("\t");
           String answer = surveyData.questions.get(s);
-          if (answer != null)
+          if(answer != null)
           {
             answer = normaliseCSVString(answer);
             sb.append(answer);
@@ -1019,44 +1211,45 @@ public class SurveyManager
           }
         }
 
-        for (String s : indicatorsDef)
+        for(String s : indicatorsDef)
         {
           sb.append("\t");
           Double r = surveyData.results.get(s);
-          if (r != null)
+          if(r != null)
           {
             sb.append(getDecimalFormatter4().format(r));
           }
         }
-        for (String s : indicatorsDerivedDef)
+        for(String s : indicatorsDerivedDef)
         {
           sb.append("\t");
           Double r = surveyData.resultDerivatives.get(s.split("#")[1]);
-          if (r != null)
+          if(r != null)
           {
             sb.append(getDecimalFormatter4().format(r));
           }
         }
-        if(groupQuestion == null)
-        {
-          writeLine(writer, sb.toString());
-        }
-        else
+        boolean bInclude = true;
+        if(groupQuestion != null)
         {
           String sAnswer = surveyData.questions.get(groupQuestion);
           if(sAnswer == null || sAnswer.equals(""))
             sAnswer = "EMPTY";
-          if(sAnswer.equals(groupAnswer))
-            writeLine(writer, sb.toString());
+          bInclude = sAnswer.equals(groupAnswer);
+        }
+        if(bInclude)
+        {
+          writeLine(writer, sb.toString());
         }
         sb.setLength(0);
       }
     }
+
     writer.flush();
     writer.close();
+
     logger.info("Saved {} surveys", surveys.size());
   }
-
 
   public void exportLegendTxt(ServletOutputStream outputStream) throws IOException
   {
@@ -1079,15 +1272,15 @@ public class SurveyManager
 
     String[] header = {"question id", "lookup", "label"};
     csvWriter.writeNext(header);
-    for(String q: sortedQuestions)
+    for(String q : sortedQuestions)
     {
       if(questionLookup.containsKey(q))
       {
-        csvWriter.writeNext( new String[]{q, "label", "NOT IMPLEMENTED"});
+        csvWriter.writeNext(new String[]{q, "label", "NOT IMPLEMENTED"});
         Map<String, String> lookups = questionLookup.get(q);
-        for(Map.Entry<String, String> lookupEntry: lookups.entrySet())
+        for(Map.Entry<String, String> lookupEntry : lookups.entrySet())
         {
-          csvWriter.writeNext( new String[]{q, lookupEntry.getKey(), lookupEntry.getValue()});
+          csvWriter.writeNext(new String[]{q, lookupEntry.getKey(), lookupEntry.getValue()});
         }
       }
     }
@@ -1101,7 +1294,7 @@ public class SurveyManager
     {
       JSONObject jsonQuestion = jsonQuestions.getJSONObject(iQuestion);
       String questionID = jsonQuestion.getString("id");
-      String fullQuestionID = "Q"+sectionID+"_"+questionID;
+      String fullQuestionID = "Q" + sectionID + "_" + questionID;
       logger.debug("Parse question: {}", fullQuestionID);
       boolean bLookupFound = false;
       if(sortedQuestions.contains(fullQuestionID))
@@ -1146,7 +1339,7 @@ public class SurveyManager
 
   private void addResultKey(JSONWriter json, String qID, Map<String, Double> results)
   {
-    Double val=results.get(qID);
+    Double val = results.get(qID);
     if(val != null)
       json.key(qID).value(getDecimalFormatter4().format(val));
   }
@@ -1157,9 +1350,9 @@ public class SurveyManager
     logger.info("Remove all {} surveys", surveys.size());
     JSONWriter json = new JSONWriter(w);
     json.object().key("total").value(surveys.size());
-    synchronized (surveys)
+    synchronized(surveys)
     {
-      for (String id : surveys.keySet())
+      for(String id : surveys.keySet())
       {
         Path p = surveyRoot.resolve("survey-" + id + ".xml");
         //noinspection ResultOfMethodCallIgnored
@@ -1179,7 +1372,7 @@ public class SurveyManager
 
   public static DecimalFormat getDecimalFormatter4()
   {
-    DecimalFormatSymbols custom=new DecimalFormatSymbols();
+    DecimalFormatSymbols custom = new DecimalFormatSymbols();
     custom.setDecimalSeparator('.');
     custom.setGroupingSeparator(',');
     custom.setMinusSign('-');
@@ -1188,7 +1381,7 @@ public class SurveyManager
 
   static DecimalFormat getDecimalFormatter2()
   {
-    DecimalFormatSymbols custom=new DecimalFormatSymbols();
+    DecimalFormatSymbols custom = new DecimalFormatSymbols();
     custom.setDecimalSeparator('.');
     custom.setGroupingSeparator(',');
     custom.setMinusSign('-');
@@ -1197,7 +1390,7 @@ public class SurveyManager
 
   static DecimalFormat getDecimalFormatter0()
   {
-    DecimalFormatSymbols custom=new DecimalFormatSymbols();
+    DecimalFormatSymbols custom = new DecimalFormatSymbols();
     custom.setDecimalSeparator('.');
     custom.setGroupingSeparator(',');
     custom.setMinusSign('-');

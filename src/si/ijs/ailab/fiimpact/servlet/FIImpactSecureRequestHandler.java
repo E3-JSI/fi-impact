@@ -3,7 +3,6 @@ package si.ijs.ailab.fiimpact.servlet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.json.JSONWriter;
 import si.ijs.ailab.fiimpact.project.ProjectManager;
 import si.ijs.ailab.fiimpact.users.UserInfo;
 import si.ijs.ailab.fiimpact.users.UsersManager;
@@ -17,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -102,6 +100,8 @@ public class FIImpactSecureRequestHandler extends HttpServlet
     GET_ACTION_ROLES.put("list", "admin");
     GET_ACTION_ROLES.put("clear", "upload");
     GET_ACTION_ROLES.put("export", "export");
+    GET_ACTION_ROLES.put("export-json", "upload-extended");
+
     GET_ACTION_ROLES.put("user-profile", "admin");
     GET_ACTION_ROLES.put("accelerators", "admin");
     GET_ACTION_ROLES.put("legend", "export");
@@ -118,9 +118,7 @@ public class FIImpactSecureRequestHandler extends HttpServlet
     //user management
     POST_ACTION_ROLES.put("user-create", "user-management");
     POST_ACTION_ROLES.put("user-delete", "user-management");
-    POST_ACTION_ROLES.put("user-password", "user-management");
-    POST_ACTION_ROLES.put("user-accelerator", "user-management");
-    POST_ACTION_ROLES.put("user-roles", "user-management");
+    POST_ACTION_ROLES.put("user-edit", "user-management");
     POST_ACTION_ROLES.put("user-my-password", "admin");
 
   }
@@ -271,8 +269,15 @@ public class FIImpactSecureRequestHandler extends HttpServlet
       response.setContentType("application/x-unknown");
       response.setCharacterEncoding("utf-8");
       response.setHeader( "Content-Disposition", "filename=\"fi-impact-export.txt\"" );
+      SurveyManager.getSurveyManager().exportText(response.getOutputStream(), groupQuestion, groupAnswer, exportAction);
 
-      SurveyManager.getSurveyManager().exportTXT(response.getOutputStream(), groupQuestion, groupAnswer, exportAction);
+    }
+    else if (sAction.equals("export-json"))
+    {
+      response.setContentType("application/x-unknown");
+      response.setCharacterEncoding("utf-8");
+      response.setHeader( "Content-Disposition", "filename=\"fi-impact-export.json\"" );
+      SurveyManager.getSurveyManager().exportJson(response.getOutputStream());
 
     }
     else if (sAction.equals("legend"))
@@ -330,39 +335,19 @@ public class FIImpactSecureRequestHandler extends HttpServlet
         else
           usersManager.deleteUser(response.getOutputStream(), user, userInfo);
       }
-      else if (sAction.equals("user-password"))
+      else if (sAction.equals("user-edit"))
       {
         String user = request.getParameter("user");
         String password = request.getParameter("password");
-        if(user==null || user.equals("") || password == null || password.equals("") )
-        {
-          setBadRequest(response, "Plase provide user/password parameters for "+sAction);
-        }
-        else
-          usersManager.changeUserPassword(response.getOutputStream(), user, password, userInfo);
-      }
-      else if (sAction.equals("user-accelerator"))
-      {
-        String user = request.getParameter("user");
         String accelerator = request.getParameter("accelerator");
-
-        if(user==null || user.equals("") || accelerator == null || accelerator.equals("") )
-        {
-          setBadRequest(response, "Plase provide user/accelerator parameters for "+sAction);
-        }
-        else
-          usersManager.setUserAccelerator(response.getOutputStream(), user, accelerator, userInfo);
-      }
-      else if (sAction.equals("user-roles"))
-      {
-        String user = request.getParameter("user");
         String[] roles = request.getParameterValues("role");
+
         if(user==null || user.equals(""))
         {
-          setBadRequest(response, "Plase provide user parameter for "+sAction);
+          setBadRequest(response, "Plase provide user for "+sAction);
         }
         else
-          usersManager.replaceUserRoles(response.getOutputStream(), user, roles, userInfo);
+          usersManager.editUser(response.getOutputStream(), user, password, accelerator, roles, userInfo);
       }
       else if (sAction.equals("user-my-password"))
       {

@@ -6,8 +6,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
-import java.lang.reflect.Array;
-import java.nio.charset.Charset;
 import java.nio.file.*;
 
 //import org.apache.xpath.operations.String;
@@ -38,6 +36,15 @@ public class ProjectManager
   public final static String LIST_PROJECTS = "project-list";
   public final static String LIST_MATTERMARK = "mattermark-export";
   public final static String LIST_MAPPING = "fi-impact-url-mapping";
+  public final static String LIST_SURVEYS = "survey";
+
+  public final static String FIELD_TYPE_TEXT = "text";
+  public final static String FIELD_TYPE_LOOKUP = "lookup";
+  public final static String FIELD_TYPE_INT = "int";
+  public final static String FIELD_TYPE_DESCRIPTION = "description";
+  public final static String FIELD_TYPE_FILTER = "filter";
+  public final static String FIELD_TYPE_NUM = "num";
+  public final static String FIELD_TYPE_IGNORE = "ignore";
 
   public static class IOListDefinition
   {
@@ -116,9 +123,10 @@ public class ProjectManager
     private String missing;
     private String include_record_when;
     private String transform;
+    private String type;
 
     IOListField(String column, String label, String fieldid, String usage, String missing,
-                String include_record_when, String transform)
+                String include_record_when, String transform, String type)
     {
       this.column = column;
       this.label = label;
@@ -127,6 +135,10 @@ public class ProjectManager
       this.missing = missing;
       this.include_record_when = include_record_when;
       this.transform = transform;
+      if(type == null)
+        this.type = "text";
+      else
+        this.type = type;
     }
 
     public String getTransform()
@@ -168,17 +180,19 @@ public class ProjectManager
     {
       return getTransform() != null && getTransform().equals("log");
     }
+
+    public String getType()
+    {
+      return type;
+    }
   }
 
   private final Path projectsList;
   private final Path projectsRoot;
-  private final Path webappRoot;
   private Map<String, IOListDefinition> ioDefinitions;
-  ArrayList<IOListField> mattermarkIndicators = new ArrayList<>();
+  private ArrayList<IOListField> mattermarkIndicators = new ArrayList<>();
   private Map<String, MattermarkIndicatorInfo> mattermarkIndicatorInfoMap = new HashMap<>();
   private Map<String, OverallResult.ScoreBoundaries> mattermarkSpeedometerSlots = new HashMap<>();
-
-
 
   public Map<String, ProjectData> getProjects()
   {
@@ -202,7 +216,7 @@ public class ProjectManager
     double max;
     int count = 0;
 
-    public MattermarkIndicatorInfo(IOListField ioListField)
+    MattermarkIndicatorInfo(IOListField ioListField)
     {
       this.ioListField = ioListField;
     }
@@ -231,9 +245,8 @@ public class ProjectManager
 
   private ProjectManager(Path _webappRoot)
   {
-    webappRoot = _webappRoot;
-    projectsList = webappRoot.resolve("WEB-INF").resolve("projects-id-list.txt");
-    projectsRoot = webappRoot.resolve("WEB-INF").resolve("projects");
+    projectsList = _webappRoot.resolve("WEB-INF").resolve("projects-id-list.txt");
+    projectsRoot = _webappRoot.resolve("WEB-INF").resolve("projects");
     logger.info("Root: {}", _webappRoot);
 
     if(Files.notExists(projectsRoot))
@@ -249,7 +262,7 @@ public class ProjectManager
       }
     }
     ioDefinitions = new HashMap<>();
-    File listIoDef = webappRoot.resolve("WEB-INF").resolve("lists-io-def.xml").toFile();
+    File listIoDef = _webappRoot.resolve("WEB-INF").resolve("lists-io-def.xml").toFile();
     loadIOdef(listIoDef);
     loadProjects();
   }
@@ -296,7 +309,8 @@ public class ProjectManager
             IOListField ioListField = new IOListField(eElement.getAttribute("column"),
                     eElement.getAttribute("label"), eElement.getAttribute("fieldid"),
                     eElement.getAttribute("usage"), eElement.getAttribute("missing"),
-                    eElement.getAttribute("include-record-when"), eElement.getAttribute("transform"));
+                    eElement.getAttribute("include-record-when"), eElement.getAttribute("transform"),
+                    eElement.getAttribute("type"));
             ioListDefinition.addField(ioListField);
           }
 
@@ -462,23 +476,6 @@ public class ProjectManager
   }
 
 */
-
-  public void getJSONProject(OutputStream outputStream, String id) throws IOException
-  {
-    ProjectData pd = projects.get(id);
-    if(pd == null)
-    {
-      OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
-      JSONWriter jsonProject = new JSONWriter(w);
-      jsonProject.object().key("id").value(id).key("error").value("Project not found.").endObject();
-      w.flush();
-      w.close();
-    }
-    else
-    {
-      pd.writeUI(outputStream);
-    }
-  }
 
   private static final int ADD_STATUS_NEW = 0;
   private static final int ADD_STATUS_UPDATE = 1;
@@ -928,113 +925,7 @@ public class ProjectManager
 
   }
 
-  public void listProjects(ServletOutputStream outputStream) throws IOException
-  {
-    OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
-    logger.info("Return {} projects", projects.size());
-    JSONWriter json = new JSONWriter(w);
-    json.object().key("total").value(projects.size());
-    json.key("projects").array();
-    for(ProjectData pd : projects.values())
-    {
-      json.object();
-      json.key("id").value(pd.getId());
-      //TODO Add field keys for the list view.
-      addFieldKey(json, "P02", pd.getValue("P02"));
-      addFieldKey(json, "P04", pd.getValue("P04"));
-      addFieldKey(json, "P05", pd.getValue("P05"));
-      addFieldKey(json, "P06", pd.getValue("P06"));
-      json.endObject();
-    }
-    json.endArray();
-    json.endObject();
-    w.flush();
-    w.close();
-    logger.info("Returned {} projects", projects.size());
-  }
-
   private static final char newline = '\n';
-
-  private static void writeLine(BufferedWriter w, String s) throws IOException
-  {
-    w.write(s, 0, s.length());
-    w.write(newline);
-  }
-
-  public void exportProjects(ServletOutputStream outputStream, String exportDir, String type, String fieldsList) throws IOException
-  {
-    //TODO export to file (TXT/CSV)
-    OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
-    logger.info("Save {} projects", projects.size());
-    JSONWriter json = new JSONWriter(w);
-    json.object().key("total").value(projects.size());
-
-    SortedSet<String> columnsDef = new TreeSet<>();
-    if(fieldsList != null)
-    {
-      String[] arr = fieldsList.split(";");
-      Collections.addAll(columnsDef, arr);
-    }
-
-    synchronized(projects)
-    {
-      if(columnsDef.size() == 0)
-      {
-        IOListDefinition ioListDefinition = ioDefinitions.get(LIST_PROJECTS);
-        ArrayList<IOListField> ioListDefinitionFields = ioListDefinition.getFields();
-        for(IOListField ioListField : ioListDefinitionFields)
-            columnsDef.add(ioListField.getFieldid());
-      }
-    }
-
-    String filename = "export_all_" + type + ".txt";
-    Path root = new File(exportDir).toPath();
-    Path fOut = root.resolve(filename);
-    BufferedWriter writerAllTXT = Files.newBufferedWriter(fOut, Charset.forName("UTF-8"), StandardOpenOption.CREATE);
-    StringBuilder sb = new StringBuilder();
-    sb.append("id");
-    for(String s : columnsDef)
-    {
-      sb.append("\t").append(s);
-    }
-
-    String sHeader = sb.toString();
-    writeLine(writerAllTXT, sHeader);
-
-    sb.setLength(0);
-
-    synchronized(projects)
-    {
-      for(ProjectData pd : projects.values())
-      {
-        sb.append(pd.getId());
-        for(String s : columnsDef)
-        {
-          sb.append("\t");
-          String val = pd.getValue(s);
-          if(val != null)
-          {
-            val = val.replace("\r\n", ", ");
-            val = val.replace("\r", ", ");
-            val = val.replace("\n", ", ");
-            sb.append(val);
-          }
-        }
-        writeLine(writerAllTXT, sb.toString());
-        sb.setLength(0);
-      }
-    }
-    json.endObject();
-    w.flush();
-    w.close();
-    logger.info("Saved {} projects", projects.size());
-  }
-
-  private void addFieldKey(JSONWriter json, String qID, String val)
-  {
-    if(val != null)
-      json.key(qID).value(val);
-  }
 
   synchronized public void clearAllProjects(ServletOutputStream outputStream) throws IOException
   {
@@ -1069,6 +960,7 @@ public class ProjectManager
 
   private void recalcMattermarkIndicatorsInfo()
   {
+    logger.info("recalc Mattermark Indicators Info");
     mattermarkIndicatorInfoMap.clear();
     for(IOListField ioListField: mattermarkIndicators)
       mattermarkIndicatorInfoMap.put(ioListField.getFieldid(), new MattermarkIndicatorInfo(ioListField));
@@ -1120,8 +1012,7 @@ public class ProjectManager
       boundaries.setMax(5.000);
       mattermarkSpeedometerSlots.put(mattermarkIndicatorInfo.getId(), boundaries);
     }
-
-
+    logger.info("recalc Mattermark Indicators Info done: {}", mattermarkIndicatorInfoMap.size());
   }
 
   public MattermarkIndicatorInfo getMattermarkIndicatorInfo(String fieldId)

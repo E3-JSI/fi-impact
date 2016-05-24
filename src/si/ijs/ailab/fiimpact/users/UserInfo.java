@@ -6,10 +6,7 @@ import javax.servlet.ServletOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Created by flavio on 12/05/2016.
@@ -75,6 +72,13 @@ public class UserInfo
   {
     OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
     JSONWriter json = new JSONWriter(w);
+    getProfile(json, action);
+    w.flush();
+    w.close();
+  }
+
+  public void getProfile(JSONWriter json, String action) throws IOException
+  {
     json.object().key("user").value(getName());
     json.key("action").value(action);
     if(isDeniedUser)
@@ -97,10 +101,7 @@ public class UserInfo
     }
     json.endArray();
     json.endObject();
-    w.flush();
-    w.close();
   }
-
 
   public void setAccelerator(String _accelerator)
   {
@@ -109,7 +110,7 @@ public class UserInfo
       accelerator = "";
 
   }
-  public void setAccessRights(String[] _rights)
+  public void setAccessRights(ArrayList<String> _rights)
   {
     accessRights.clear();
     if(_rights != null)
