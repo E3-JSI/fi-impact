@@ -1,13 +1,8 @@
-#uploadModal .modal-body { height: 500px; }
-#uploadModal .fa-spinner { color: #1F71AB }
-#uploadModal form { margin: 20px 0; }
-#uploadModal #tabUpload p { margin: 50px; }
-#uploadModal .cancel { margin-right: 10px; }
-#editModal .cancel { margin-right: 10px; }
-#createModal .cancel { margin-right: 10px; }
-#deleteModal .cancel { margin-right: 10px; }
-#pwdModal .cancel { margin-right: 10px; }
-#uploadModal ul { margin: 20px 0; }
+.fiUpload { height: 400px; }
+.fiUpload .fa-spinner { color: #1F71AB; margin: 50px 0; }
+.fiModal form { margin: 20px 0; }
+.modal-footer .cancel { margin-right: 10px; }
+.fiModal ul { margin: 20px 0; }
 
 .fa-building-o { margin-left: 10px }
 .fa-trash-o { color: red }

@@ -33,7 +33,7 @@
     <![endif]-->
   </head>
   
-  <body role="document" ng-controller="fiUsers" ng-cloak>
+  <body role="document" ng-controller="fiUsers as vm" ng-cloak>
   
     <div class="container theme-showcase" role="main">
 		
@@ -43,7 +43,7 @@
 			<h1>User management</h1>
 			<div class="pull-right">
 				<i class="fa fa-user" aria-hidden="true"></i> {{profile.user}} <span ng-if="profile.accelerator.length > 0"><i class="fa fa-building-o" aria-hidden="true"></i> {{profile.accelerator}}</span>
-				<a class="btn btn-primary" id="btnCreate" data-toggle="modal" data-target="#createModal" ng-click="createModal()" type="button" href="">Create user</a>
+				<a class="btn btn-primary" id="btnCreate" data-toggle="modal" data-target="#createModal" ng-click="vm.open('create', '')" type="button" href="">Create user</a>
 				<a class="btn btn-primary" id="btnProjects" type="button" href="index.html">Projects overview</a>
 				<a class="btn btn-primary" href="../../logout.jsp">Logout</a>
 			</div>
@@ -54,120 +54,35 @@
             <tbody><tr ng-repeat="u in users">
 				<td>{{u.user}}</a></td><td>{{u.description}}</td><td>{{u.accelerator}}</td>
 				<td ng-repeat="(role, description) in roles"><i class="fa" ng-class="( hasAccess(u.user, role) ? 'fa-check' : 'fa-times')" aria-hidden="true"></i></td>
-				<td class="text-center"><a id="btnEdit" data-toggle="modal" data-target="#editModal" type="button" ng-click="editModal(u.user)" href=""><i class="fa fa-lg fa-pencil-square-o" aria-hidden="true"></i></a></td>
-				<td class="text-center"><a ng-if="profile.user != u.user" id="btnDelete" data-toggle="modal" data-target="#deleteModal" type="button" ng-click="deleteModal(u.user)" href=""><i class="fa fa-lg fa-trash-o" aria-hidden="true"></i></a></td>
+				<td class="text-center"><a type="button" ng-click="vm.open('edit', u.user)" href=""><i class="fa fa-lg fa-pencil-square-o" aria-hidden="true"></i></a></td>
+				<td class="text-center"><a ng-if="profile.user != u.user" type="button" ng-click="vm.open('delete', u.user)" href=""><i class="fa fa-lg fa-trash-o" aria-hidden="true"></i></a></td>
 			</tr></tbody>
         </table>
 		
     </div>
-	
-	<div id="editModal" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog">
-	  <div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header"><h4 class="modal-title">Edit user: {{editing.user}}</h4></div>
-			<div class="modal-body">
-				<form class="form-horizontal" enctype="application/x-www-form-urlencoded">
-					<div class="form-group">
-						<label for="userPassword" class="col-sm-3 control-label">Password</label>
-						<div class="col-sm-9"><input type="password" ng-model="editing.password" class="form-control" id="userPassword" name="password"></div>
-					</div>
-					<div class="form-group">
-						<label for="userDescription" class="col-sm-3 control-label">Description</label>
-						<div class="col-sm-9"><input type="text" ng-model="editing.description" class="form-control" id="userDescription" name="description"></div>
-					</div>
-					<div class="form-group">
-						<label for="userAccelerator" class="col-sm-3 control-label">Accelerator</label>
-						<div class="col-sm-9"><select class="form-control" ng-model="editing.accelerator" id="userAccelerator" name="accelerator" ng-disabled="profile.accelerator != ''">
-							<option value="">-</option>
-							<option ng-repeat="a in accelerators">{{a}}</option>
-						</select></div>
-					</div>
-					<div class="form-group">
-						<label for="userRoles" class="col-sm-3 control-label">Roles</label>
-						<div id="userRoles" class="col-sm-9">
-							<div class="checkbox" ng-repeat="(r, d) in roles">
-								<label><input type="checkbox" id="userRoles" ng-model="editing.roles[r]" ng-disabled="editing.self" name="role"><strong>{{r}}</strong>: {{d}}</label>
-							</div>
-						</div>
-					</div>
-					<div class="alert alert-success" ng-show="userAlert.successEdit" role="alert">Save successful</div>
-					<div class="text-center"><button class="btn btn-default cancel" id="closeEdit" data-dismiss="modal">Cancel</button><button class="btn btn-primary" type="submit" ng-click="editUser()" />Save</button></div>
-				</form>
-			</div>
-		</div>
-
-	  </div>
-	</div>
-	
-	<div id="createModal" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog">
-	  <div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header"><h4 class="modal-title">Create user</h4></div>
-			<div class="modal-body">
-				<form class="form-horizontal" enctype="application/x-www-form-urlencoded">
-					<div class="form-group">
-						<label for="userName" class="col-sm-3 control-label">User name</label>
-						<div class="col-sm-9"><input type="text" ng-model="create.user" class="form-control" id="userName" name="user" ng-click="hideAlerts()"></div>
-					</div>
-					<div class="alert alert-danger" ng-show="userAlert.enterUser" role="alert">Please enter an username</div>
-					<div class="form-group">
-						<label for="userPassword" class="col-sm-3 control-label">Password</label>
-						<div class="col-sm-9"><input type="password" ng-model="create.password" class="form-control" id="userPassword" name="password" ng-click="hideAlerts()"></div>
-					</div>
-					<div class="alert alert-danger" ng-show="userAlert.enterPassword" role="alert">Please enter a password</div>
-					<div class="form-group">
-						<label for="userDescription" class="col-sm-3 control-label">Description</label>
-						<div class="col-sm-9"><input type="text" ng-model="create.description" class="form-control" id="userDescription" name="description" ng-click="hideAlerts()"></div>
-					</div>
-					<div class="form-group">
-						<label for="userAccelerator" class="col-sm-3 control-label">Accelerator</label>
-						<div class="col-sm-9"><select class="form-control" ng-model="create.accelerator" id="userAccelerator" name="accelerator" ng-disabled="profile.accelerator != ''">
-							<option value="">-</option>
-							<option ng-repeat="a in accelerators">{{a}}</option>
-						</select></div>
-					</div>
-					<div class="alert alert-danger" ng-show="userAlert.enterDescription" role="alert">Please enter a description</div>
-					<div class="alert alert-success" ng-show="userAlert.successCreate" role="alert">User <strong>{{create.user}}</strong> created</div>
-					<div class="text-center"><button class="btn btn-default cancel" id="closeCreate" data-dismiss="modal">Cancel</button><button class="btn btn-primary" type="submit" ng-click="createUser()" />Create</button></div>
-				</form>
-			</div>
-		</div>
-
-	  </div>
-	</div>
-	
-	<div id="deleteModal" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog">
-	  <div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header"><h4 class="modal-title">Delete user</h4></div>
-			<div class="modal-body">
-				<p>Are you sure you want to delete user <strong>{{delete}}</strong>?</p>
-				<form class="form-horizontal" enctype="application/x-www-form-urlencoded">
-					<div class="text-center"><button class="btn btn-default cancel" data-dismiss="modal">Cancel</button><button class="btn btn-primary" type="submit" ng-click="deleteUser()" data-dismiss="modal" />Delete</button></div>
-				</form>
-			</div>
-		</div>
-
-	  </div>
-	</div>
 
 	
     <!-- Core JavaScript -->
-    <script src="../../js/jquery.min.js"></script>
-    <script src="../../js/bootstrap.min.js"></script>
-    <script src="../../js/angular.min.js"></script>
+    <script type="text/javascript" src="../../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../../js/angular.min.js"></script>
+	<script type="text/javascript" src="../../js/ui-bootstrap-tpls-1.3.3.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="../../js/ie10-viewport-bug-workaround.js"></script>
 	<!-- Optional includes -->
 	<script type="text/javascript" src="../../js/jquery.min.js"></script> 
 	<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script> 
 	<script type="text/javascript" src="../../js/jquery.tablesorter.pager.min.js"></script>
-	<!-- D3 JavaScript -->
-	<script src="../../js/d3.min.js"></script>
-	<script src="../../js/fiUtility.js"></script>
-	<script src="../../js/fiModel.js"></script>
-	<script src="../../js/fi.js"></script>
-	<script src="../../js/fiCtrlManager.js"></script>
+	<script type="text/javascript" src="../../js/d3.min.js"></script>
+	<!-- FI-Impact JavaScript -->
+	<script type="text/javascript" src="../../js/fiUtility.js"></script>
+	<script type="text/javascript" src="../../js/fiModel.js"></script>
+	<script type="text/javascript" src="../../js/fi.js"></script>
+	<script type="text/javascript" src="../../js/fiAdmin.js"></script>
+	<script type="text/javascript" src="../../js/fiUsers.js"></script>
+	<script type="text/javascript" src="../../js/fiCreate.js"></script>
+	<script type="text/javascript" src="../../js/fiDelete.js"></script>
+	<script type="text/javascript" src="../../js/fiEdit.js"></script>
+	
 	<script>
 		$(document).ready( function() {
 			$("#listing").tablesorter(fiTableSorter).tablesorterPager(fiTableSorterPager);

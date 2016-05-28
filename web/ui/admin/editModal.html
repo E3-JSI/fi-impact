@@ -1,0 +1,33 @@
+<div class="modal-header"><h4 class="modal-title">Edit user: {{vm.edit.user}}</h4></div>
+<div class="modal-body">
+	<form class="form-horizontal" enctype="application/x-www-form-urlencoded">
+		<div class="form-group">
+			<label for="userPassword" class="col-sm-3 control-label">Password</label>
+			<div class="col-sm-9"><input type="password" ng-model="vm.edit.password" class="form-control"></div>
+		</div>
+		<div class="form-group">
+			<label for="userDescription" class="col-sm-3 control-label">Description</label>
+			<div class="col-sm-9"><input type="text" ng-model="vm.edit.description" class="form-control"></div>
+		</div>
+		<div class="form-group">
+			<label for="userAccelerator" class="col-sm-3 control-label">Accelerator</label>
+			<div class="col-sm-9"><select class="form-control" ng-model="vm.edit.accelerator" ng-disabled="profile.accelerator != ''">
+				<option value="">-</option>
+				<option ng-repeat="a in accelerators">{{a}}</option>
+			</select></div>
+		</div>
+		<div class="form-group">
+			<label for="userRoles" class="col-sm-3 control-label">Roles</label>
+			<div id="userRoles" class="col-sm-9">
+				<div class="checkbox" ng-repeat="(r, d) in roles">
+					<label><input type="checkbox" id="userRoles" ng-model="vm.edit.roles[r]" ng-disabled="vm.edit.self" name="role"><strong>{{r}}</strong>: {{d}}</label>
+				</div>
+			</div>
+		</div>
+		<div class="alert alert-success" ng-show="vm.alert.successEdit" role="alert">Save successful</div>
+	</form>
+</div>
+<div class="modal-footer">
+	<button class="btn btn-default cancel" ng-click="vm.dismiss()">Cancel</button>
+	<button class="btn btn-primary" type="submit" ng-click="vm.editUser()">Save</button>
+</div>
