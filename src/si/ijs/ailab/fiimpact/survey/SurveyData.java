@@ -11,6 +11,8 @@ import org.xml.sax.SAXException;
 import si.ijs.ailab.fiimpact.indicators.OverallResult;
 import si.ijs.ailab.fiimpact.project.ProjectData;
 import si.ijs.ailab.fiimpact.project.ProjectManager;
+import si.ijs.ailab.fiimpact.settings.FIImpactSettings;
+import si.ijs.ailab.fiimpact.settings.IOListField;
 import si.ijs.ailab.util.AIStructures;
 import si.ijs.ailab.util.AIUtils;
 
@@ -18,7 +20,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
-import java.lang.reflect.Array;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -38,272 +39,6 @@ public class SurveyData
   public Map<String, Double> results = new TreeMap<>();
   public Map<String, Double> resultDerivatives = new TreeMap<>();
 
-  private enum OutputFormat {XML, JSON}
-
-  static final Map<String, Map<String, Double>> SCORES = new TreeMap<>();
-
-  private static String SCORES_5A1 =
-
-          "\tA\tB\tC\tD\tE\tG\tH\tI\tJ\tQ\tL\tM\tN\tO\tP\tK\n"+
-                  "A\t1.429343664\t1.179898431\t0.961603011\t1.390286064\t1.236054022\t1.227642276\t1.425778823\t0.978890118\t1.008393285\t0.812877979\t1.525322579\t1.201478265\t0.968197149\t0.623188406\t1.181697254\t1.230551934\n"+
-                  "B\t0.818947206\t1.13593529\t1.421750283\t1.122820964\t0.883734586\t0.825203252\t0.995621959\t0.999631268\t1.20263789\t1.11170402\t0.780053751\t1.511603866\t1.666666667\t1.223188406\t0.731368514\t1.277488049\n"+
-                  "C\t0.760135345\t0.215284544\t0.269490943\t0.400665196\t0.33568213\t0.203252033\t0.255752153\t0.719625737\t0.706235012\t1.538598364\t0.214677399\t1.201478265\t1.052350103\t0.271014493\t0.281039774\t0.479574098\n"+
-                  "D\t1.666666667\t0.560243865\t1.666666667\t1.4883566\t0.883734586\t0.532520325\t0.926796861\t0.470731932\t1.569544365\t0.898256848\t1.139838702\t1.666666667\t0.850383014\t1.223188406\t1.147056582\t1.177748805\n"+
-                  "E\t0.407342111\t0.509440874\t0.912491707\t1.078243448\t0.570561754\t0.825203252\t1.219303528\t0.58480826\t0.835731415\t1.069014586\t1.204086015\t0.581227064\t0.564262971\t0.81884058\t0.869931204\t0.874619731\n"+
-                  "F\t0.733638835\t0.462032158\t0.200033435\t0.213439626\t0.413975338\t0.166666667\t0.58267137\t0.916666667\t0.166666667\t1.197082889\t0.227526861\t1.201478265\t0.168744088\t0.166666667\t0.177117758\t0.166666667\n"+
-                  "G\t0.705914914\t1.666666667\t0.931266295\t1.46161009\t0.883734586\t1.666666667\t1.494603921\t1.528530605\t1.213429257\t0.556741373\t1.22978494\t1.666666667\t0.665246515\t1.066666667\t1.666666667\t1.385049978\n"+
-                  "H\t0.714415877\t0.504798325\t0.924592425\t1.666666667\t1.666666667\t1.117886179\t1.666666667\t1.134448746\t1.666666667\t1.666666667\t1.666666667\t1.511603866\t0.841967719\t1.666666667\t1.250978599\t1.666666667\n"+
-                  "I\t0.166666667\t0.166666667\t0.175292104\t0.166666667\t0.166666667\t0.857009654\t0.166666667\t1.666666667\t1.202654077\t0.166666667\t0.166666667\t0.166666667\t0.166666667\t0.262668297\t0.166666667\t0.179060979\n"+
-                  "J\t0.316821663\t0.217659798\t0.166666667\t1.111081921\t0.265609708\t0.384075203\t0.747959145\t0.166666667\t0.774004796\t0.542547136\t0.723117782\t0.413332816\t0.168541489\t0.771010145\t0.618535185\t0.341067579\n"+
-                  "K\t0.729747903\t0.713021647\t0.218419291\t1.126336793\t0.869162263\t0.529593496\t1.200075516\t0.944791667\t1.069296523\t0.771207755\t1.549248278\t1.35771179\t0.849352077\t0.715301449\t0.925640333\t1.24679248";
-
-  private static String SCORES_5B1 ="\tA\tB\tC\tD\tE\tF\tG\tH\tI\tJ\n" +
-          "A\t0.3888888888888890\t0.1388888888888890\t0.0972222222222222\t0.3472222000000000\t0.0000000000000000\t0.1388889000000000\t0.2083333000000000\t0.8333333000000000\t0.5555556000000000\t0.1388890000000000\n" +
-          "B\t0.6944444444444450\t0.0000000000000000\t0.0000000000000000\t0.8333333000000000\t0.8333333000000000\t0.0000000000000000\t0.4305556000000000\t0.0000000000000000\t0.3888889000000000\t0.3472220000000000\n" +
-          "C\t0.8333333333333330\t0.6250000000000000\t0.6944444444444450\t0.6944444000000000\t0.5555556000000000\t0.3472222000000000\t0.6944444000000000\t0.6944444000000000\t0.8333333000000000\t0.8333333000000000\n" +
-          "D\t0.4861111111111110\t0.8333333333333330\t0.8333333333333330\t0.0416667000000000\t0.6944444000000000\t0.4444444000000000\t0.0000000000000000\t0.5555556000000000\t0.1388889000000000\t0.5555560000000000\n" +
-          "E\t0.0000000000000000\t0.2777777777777780\t0.3888888888888890\t0.0000000000000000\t0.2777778000000000\t0.8333333000000000\t0.3611111000000000\t0.4166667000000000\t0.0972222000000000\t0.0000000000000000\n" +
-          "F\t0.5555555555555560\t0.6944444444444450\t0.3194444444444440\t0.5277778000000000\t0.1388889000000000\t0.5555556000000000\t0.8333333000000000\t0.7916667000000000\t0.6944444000000000\t0.6944440000000000\n" +
-          "G\t0.2083333333333330\t0.4444444444444440\t0.5555555555555560\t0.0972222000000000\t0.4166667000000000\t0.6944444000000000\t0.5555556000000000\t0.2083333000000000\t0.0000000000000000\t0.2500000000000000";
-
-  private static ArrayList<String> JSON_TRUNCATE_DECIMALS = new ArrayList<>();
-
-  private static final String[] SLOT_INTERPRETATION = {"l", "l", "m", "h", "h"};
-
-
-  static
-  {
-    //Questions listed in this list will be truncated for UI output
-    JSON_TRUNCATE_DECIMALS.add("Q1_13");
-    JSON_TRUNCATE_DECIMALS.add("Q1_16");
-    JSON_TRUNCATE_DECIMALS.add("Q1_7");
-    JSON_TRUNCATE_DECIMALS.add("Q1_8");
-    JSON_TRUNCATE_DECIMALS.add("Q1_9");
-    JSON_TRUNCATE_DECIMALS.add("Q3_2a");
-    JSON_TRUNCATE_DECIMALS.add("Q3_2b");
-    JSON_TRUNCATE_DECIMALS.add("Q3_2c");
-    JSON_TRUNCATE_DECIMALS.add("Q4_3");
-    JSON_TRUNCATE_DECIMALS.add("Q4_3a");
-    JSON_TRUNCATE_DECIMALS.add("Q4_3b");
-    JSON_TRUNCATE_DECIMALS.add("Q4_3c");
-    JSON_TRUNCATE_DECIMALS.add("Q4_3d");
-    JSON_TRUNCATE_DECIMALS.add("Q4_6");
-
-    //Weights for calculating scores
-    Map<String, Double> m = new HashMap<>();
-
-    m.put("TRL1", 1.0);
-    m.put("TRL2", 1.2);
-    m.put("TRL3", 1.3);
-    m.put("TRL4", 1.4);
-    m.put("TRL5", 1.5);
-    m.put("TRL6", 1.6);
-    m.put("TRL7", 1.7);
-    m.put("TRL8", 1.7);
-    m.put("TRL9", 1.7);
-    SCORES.put("Q2_1", m);
-
-    m = new HashMap<>();
-    m.put("A", 1.0);
-    m.put("B", 1.2);
-    SCORES.put("Q2_2", m);
-
-    m = new HashMap<>();
-    m.put("A", 0.75);
-    m.put("B", 1.00);
-    SCORES.put("Q2_3", m);
-
-    m = new HashMap<>();
-    m.put("A", 1.0);
-    m.put("B", 1.2);
-    SCORES.put("Q2_4", m);
-
-    m = new HashMap<>();
-    m.put("A", 1.0);
-    m.put("B", 1.2);
-    SCORES.put("Q2_5", m);
-
-    //SECTION 3 - MARKET
-    m = new HashMap<>();
-    m.put("A", 2.0);
-    m.put("B", 1.0);
-    m.put("C", 0.8);
-    SCORES.put("Q2_2_A_3_7_W1", m);
-
-    m = new HashMap<>();
-    m.put("A", 0.0);
-    m.put("B", 1.0);
-    m.put("C", 1.2);
-    SCORES.put("Q2_2_A_3_7_W2", m);
-
-    m = new HashMap<>();
-    m.put("A", 2.0);
-    m.put("B", 1.5);
-    m.put("C", 1.0);
-    SCORES.put("Q2_2_B_3_7_W1", m);
-
-    m = new HashMap<>();
-    m.put("A", 0.0);
-    m.put("B", 0.5);
-    m.put("C", 1.0);
-    SCORES.put("Q2_2_B_3_7_W2", m);
-
-
-    m = new HashMap<>();
-    m.put("A", 1.0);
-    m.put("B", 1.5);
-    m.put("C", 2.0);
-    m.put("D", 2.5);
-    m.put("E", 1.0);
-    SCORES.put("Q3_5", m);
-
-    m = new HashMap<>();
-    m.put("A", 1.0);
-    m.put("B", 3.0);
-    m.put("C", 5.0);
-    SCORES.put("Q3_8", m);
-
-    m = new HashMap<>();
-    m.put("A", 1.0);
-    m.put("B", 3.0);
-    m.put("C", 5.0);
-    SCORES.put("Q3_9", m);
-
-    m = new HashMap<>();
-    m.put("A", 1.0);
-    m.put("B", 3.0);
-    m.put("C", 5.0);
-    SCORES.put("Q3_10", m);
-
-    m = new HashMap<>();
-    m.put("A", 1.0);
-    m.put("B", 3.0);
-    m.put("C", 5.0);
-    SCORES.put("Q3_11", m);
-
-    //SECTION 4 - FEASIBILITY
-    m = new HashMap<>();
-    m.put("A", 1.0);
-    m.put("B", 3.0);
-    m.put("C", 5.0);
-    SCORES.put("Q4_1", m);
-
-    m = new HashMap<>();
-    m.put("A", 1.0);
-    m.put("B", 3.0);
-    m.put("C", 5.0);
-    SCORES.put("Q4_2", m);
-
-    m = new HashMap<>();
-    m.put("A", 1.0);
-    m.put("B", 3.0);
-    m.put("C", 5.0);
-    SCORES.put("Q4_4", m);
-
-    m = new HashMap<>();
-    m.put("A", 1.0);
-    m.put("B", 3.0);
-    m.put("C", 5.0);
-    SCORES.put("Q4_5", m);
-
-    m = new HashMap<>();
-    m.put("A", 2.0);
-    m.put("B", 1.2);
-    m.put("C", 1.0);
-    SCORES.put("Q2_2_A_3_7_W3", m);
-
-    m = new HashMap<>();
-    m.put("A", 0.0);
-    m.put("B", 0.8);
-    m.put("C", 1.0);
-    SCORES.put("Q2_2_A_3_7_W4", m);
-
-    m = new HashMap<>();
-    m.put("A", 2.0);
-    m.put("B", 1.8);
-    m.put("C", 1.1);
-    SCORES.put("Q2_2_B_3_7_W3", m);
-
-    m = new HashMap<>();
-    m.put("A", 0.0);
-    m.put("B", 0.2);
-    m.put("C", 0.8);
-    SCORES.put("Q2_2_B_3_7_W4", m);
-
-
-    //5A_1
-    String[] arr5a1Rows = SCORES_5A1.split("\n");
-    String[] arr5a1Verticals = arr5a1Rows[0].split("\t");
-
-    HashMap<String, Double> m5A1_Verticals = new HashMap<>();
-    HashMap<String, Double> m5A1_Benefits = new HashMap<>();
-    for(int i = 1; i < arr5a1Verticals.length; i++)
-      m5A1_Verticals.put(arr5a1Verticals[i], 0.0);
-
-    m = new HashMap<>();
-    for(int i = 1; i < arr5a1Rows.length; i++)
-    {
-      String[] arrRow = arr5a1Rows[i].split("\t");
-
-      m5A1_Benefits.put(arrRow[0], 0.0);
-
-      for(int j = 1; j < arrRow.length; j++)
-      {
-        String row_column = arrRow[0] + "_" + arr5a1Verticals[j];
-        double d = AIUtils.parseDecimal(arrRow[j], 0.0);
-        //logger.debug("{}: {}", row_column, d);
-        m.put(row_column, d);
-      }
-    }
-    SCORES.put("Q5A_1", m);
-    SCORES.put("Q5A_1_BENEFITS", m5A1_Benefits);
-    SCORES.put("Q5A_1_VERTICALS", m5A1_Verticals);
-
-    //5B_1
-    String[] arr5b1Rows = SCORES_5B1.split("\n");
-    String[] arr5b1Verticals = arr5b1Rows[0].split("\t");
-
-    HashMap<String, Double> m5B1_Verticals = new HashMap<>();
-    HashMap<String, Double> m5B1_Benefits = new HashMap<>();
-    for(int i = 1; i < arr5b1Verticals.length; i++)
-      m5B1_Verticals.put(arr5b1Verticals[i], 0.0);
-
-    m = new HashMap<>();
-    for(int i = 1; i < arr5b1Rows.length; i++)
-    {
-      String[] arrRow = arr5b1Rows[i].split("\t");
-
-      m5B1_Benefits.put(arrRow[0], 0.0);
-
-      for(int j = 1; j < arrRow.length; j++)
-      {
-        String row_column = arrRow[0] + "_" + arr5b1Verticals[j];
-        double d = AIUtils.parseDecimal(arrRow[j], 0.0);
-        //logger.debug("{}: {}", row_column, d);
-        m.put(row_column, d);
-      }
-    }
-    SCORES.put("Q5B_1", m);
-    SCORES.put("Q5B_1_BENEFITS", m5A1_Benefits);
-    SCORES.put("Q5B_1_VERTICALS", m5A1_Verticals);
-
-
-  }
-
-
-  private static double SPEEDOMETER_R = 100.0;
-  private static double SPEEDOMETER_r = 80.0;
-
-  private static String SPEEDOMETER_ARC_SVG = "M %s %s A %s %s 0 0 1 %s %s L %s %s A %s %s 0 0 0 %s %s";
-  private static String[] SPEEDOMETER_COLORS = {"#923933", "#F4B900", "#00A54F"};
-  private static String SPEEDOMETER_NEEDLE_SVG = "M %s %s L %s %s L %s %s";
-
-  private ProjectManager projectManager;
-
-  public SurveyData()
-  {
-    projectManager = ProjectManager.getProjectManager();
-  }
 
   private String getSVGArc(double dR, double dr, double boundaryLo, double boundaryHi)
   {
@@ -322,13 +57,13 @@ public class SurveyData
 
 
     //"M %s %s A %s %s 0 0 1 %s %s L %s %s A %s %s 0 0 0 %s %s"
-    String svg = String.format(SPEEDOMETER_ARC_SVG,
-            SurveyManager.getDecimalFormatter2().format(dR0x),SurveyManager.getDecimalFormatter2().format(dR0y),
-            SurveyManager.getDecimalFormatter2().format(dR),SurveyManager.getDecimalFormatter2().format(dR),
-            SurveyManager.getDecimalFormatter2().format(dR1x),SurveyManager.getDecimalFormatter2().format(dR1y),
-            SurveyManager.getDecimalFormatter2().format(dr1x),SurveyManager.getDecimalFormatter2().format(dr1y),
-            SurveyManager.getDecimalFormatter2().format(dr),SurveyManager.getDecimalFormatter2().format(dr),
-            SurveyManager.getDecimalFormatter2().format(dr0x),SurveyManager.getDecimalFormatter2().format(dr0y));
+    String svg = String.format(FIImpactSettings.SPEEDOMETER_ARC_SVG,
+            FIImpactSettings.getDecimalFormatter2().format(dR0x), FIImpactSettings.getDecimalFormatter2().format(dR0y),
+            FIImpactSettings.getDecimalFormatter2().format(dR), FIImpactSettings.getDecimalFormatter2().format(dR),
+            FIImpactSettings.getDecimalFormatter2().format(dR1x), FIImpactSettings.getDecimalFormatter2().format(dR1y),
+            FIImpactSettings.getDecimalFormatter2().format(dr1x), FIImpactSettings.getDecimalFormatter2().format(dr1y),
+            FIImpactSettings.getDecimalFormatter2().format(dr), FIImpactSettings.getDecimalFormatter2().format(dr),
+            FIImpactSettings.getDecimalFormatter2().format(dr0x), FIImpactSettings.getDecimalFormatter2().format(dr0y));
 
     return svg;
 
@@ -336,7 +71,7 @@ public class SurveyData
 
   private void getAverageSVG(double averagePercent, JSONObject jsonSpeedometerSVG)
   {
-    double R = SPEEDOMETER_R;
+    double R = FIImpactSettings.SPEEDOMETER_R;
     double len = 15.0;
     double r = 3;
 
@@ -354,14 +89,14 @@ public class SurveyData
     double yr = average_y - r*Math.sin(avg_rad - Math.PI / 2.0);
 
     //"M %s %s L %s %s L %s %s";
-    String svg = String.format(SPEEDOMETER_NEEDLE_SVG,
-            SurveyManager.getDecimalFormatter2().format(xl),SurveyManager.getDecimalFormatter2().format(yl),
-            SurveyManager.getDecimalFormatter2().format(xt),SurveyManager.getDecimalFormatter2().format(yt),
-            SurveyManager.getDecimalFormatter2().format(xr),SurveyManager.getDecimalFormatter2().format(yr));
+    String svg = String.format(FIImpactSettings.SPEEDOMETER_NEEDLE_SVG,
+            FIImpactSettings.getDecimalFormatter2().format(xl), FIImpactSettings.getDecimalFormatter2().format(yl),
+            FIImpactSettings.getDecimalFormatter2().format(xt), FIImpactSettings.getDecimalFormatter2().format(yt),
+            FIImpactSettings.getDecimalFormatter2().format(xr), FIImpactSettings.getDecimalFormatter2().format(yr));
 
     jsonSpeedometerSVG.put("average", svg);
-    jsonSpeedometerSVG.put("average_x", SurveyManager.getDecimalFormatter2().format(average_x));
-    jsonSpeedometerSVG.put("average_y", SurveyManager.getDecimalFormatter2().format(average_y));
+    jsonSpeedometerSVG.put("average_x", FIImpactSettings.getDecimalFormatter2().format(average_x));
+    jsonSpeedometerSVG.put("average_y", FIImpactSettings.getDecimalFormatter2().format(average_y));
 
   }
 
@@ -382,10 +117,10 @@ public class SurveyData
     double yr = -r*Math.sin(res_rad+Math.PI/2.0);
 
     //"M %s %s L %s %s L %s %s";
-    String svg = String.format(SPEEDOMETER_NEEDLE_SVG,
-            SurveyManager.getDecimalFormatter2().format(xl),SurveyManager.getDecimalFormatter2().format(yl),
-            SurveyManager.getDecimalFormatter2().format(xt),SurveyManager.getDecimalFormatter2().format(yt),
-            SurveyManager.getDecimalFormatter2().format(xr),SurveyManager.getDecimalFormatter2().format(yr));
+    String svg = String.format(FIImpactSettings.SPEEDOMETER_NEEDLE_SVG,
+            FIImpactSettings.getDecimalFormatter2().format(xl), FIImpactSettings.getDecimalFormatter2().format(yl),
+            FIImpactSettings.getDecimalFormatter2().format(xt), FIImpactSettings.getDecimalFormatter2().format(yt),
+            FIImpactSettings.getDecimalFormatter2().format(xr), FIImpactSettings.getDecimalFormatter2().format(yr));
 
     return svg;
   }
@@ -398,8 +133,8 @@ public class SurveyData
     double x = r + r*dPercentResult*Math.cos(di*2*Math.PI/dtotal+Math.PI/2.0);
     double y = r - r*dPercentResult*Math.sin(di * 2 * Math.PI / dtotal + Math.PI / 2.0);
 
-    String sx = SurveyManager.getDecimalFormatter2().format(x);
-    String sy = SurveyManager.getDecimalFormatter2().format(y);
+    String sx = FIImpactSettings.getDecimalFormatter2().format(x);
+    String sy = FIImpactSettings.getDecimalFormatter2().format(y);
     String svg = sx+","+sy;
     segment.put("x", sx);
     segment.put("y", sy);
@@ -430,14 +165,14 @@ public class SurveyData
 
     logger.debug("create result for {}/{}", type, sectionName);
 
-    Map<String, Map<String, OverallResult>> allResults = SurveyManager.getSurveyManager().getResults();
+    Map<String, Map<String, OverallResult>> allResults = FIImpactSettings.getFiImpactSettings().getSurveyManager().getResults();
     Map<String, OverallResult> typeResults = allResults.get(type);
 
     OverallResult or = typeResults.get(sectionName);
     if(or==null)
       logger.error("Overal result null for {}", sectionName);
 
-    String averageSlot = SLOT_INTERPRETATION[or.getAverageSlot()];
+    String averageSlot = FIImpactSettings.SLOT_INTERPRETATION[or.getAverageSlot()];
     logger.debug("Calculating interpretation for {}", sectionName);
     Double dSlot = resultDerivatives.get(sectionName + "_GRAPH_SLOT");
     if(dSlot == null)
@@ -445,7 +180,7 @@ public class SurveyData
 
     int iMySlot = dSlot.intValue();
     logger.debug("My slot: {}", iMySlot);
-    String mySlot = SLOT_INTERPRETATION[iMySlot];
+    String mySlot = FIImpactSettings.SLOT_INTERPRETATION[iMySlot];
     logger.debug("My slot interpretation: {}", mySlot);
     String key = mySlot + averageSlot;
 
@@ -457,7 +192,7 @@ public class SurveyData
       interpretationKey = "interpretation_mattermark";
     }
 
-    String response = SurveyManager.fiImpactModel.getJSONObject(interpretationKey).getString(key);
+    String response = FIImpactSettings.getFiImpactSettings().getFiImpactModel().getJSONObject(interpretationKey).getString(key);
 
     Double dResult = results.get(sectionName);
     double R = 250.0;
@@ -465,8 +200,8 @@ public class SurveyData
     if(dResult != null)
     {
       dPercentResult = or.getSpeedometerPercent(dResult);
-      jsonResult.put("result_percent", SurveyManager.getDecimalFormatter2().format(dPercentResult));
-      jsonOverviewPoint.put("result_percent", SurveyManager.getDecimalFormatter2().format(dPercentResult));
+      jsonResult.put("result_percent", FIImpactSettings.getDecimalFormatter2().format(dPercentResult));
+      jsonOverviewPoint.put("result_percent", FIImpactSettings.getDecimalFormatter2().format(dPercentResult));
     }
     JSONObject xy = new JSONObject();
     jsonOverviewPoint.put("result_coord", xy);
@@ -476,14 +211,14 @@ public class SurveyData
     overviewOutLineResult+=svg;
     radarOverviewOut.put("line_result", overviewOutLineResult);
 
-    jsonResult.put("speedometer_lm", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercentLM()));
-    jsonResult.put("speedometer_mh", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercentMH()));
+    jsonResult.put("speedometer_lm", FIImpactSettings.getDecimalFormatter2().format(or.getSpeedometerPercentLM()));
+    jsonResult.put("speedometer_mh", FIImpactSettings.getDecimalFormatter2().format(or.getSpeedometerPercentMH()));
 
-    jsonResult.put("score_min", SurveyManager.getDecimalFormatter0().format(or.getMinScore()));
-    jsonResult.put("score_max", SurveyManager.getDecimalFormatter0().format(or.getMaxScore()));
+    jsonResult.put("score_min", FIImpactSettings.getDecimalFormatter0().format(or.getMinScore()));
+    jsonResult.put("score_max", FIImpactSettings.getDecimalFormatter0().format(or.getMaxScore()));
 
-    jsonResult.put("average_percent", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercent(or.getAverage())));
-    jsonOverviewPoint.put("average_percent", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercent(or.getAverage())));
+    jsonResult.put("average_percent", FIImpactSettings.getDecimalFormatter2().format(or.getSpeedometerPercent(or.getAverage())));
+    jsonOverviewPoint.put("average_percent", FIImpactSettings.getDecimalFormatter2().format(or.getSpeedometerPercent(or.getAverage())));
     jsonResult.put("speedometer_histogram", or.toJSONHistogram());
 
     xy = new JSONObject();
@@ -509,9 +244,9 @@ public class SurveyData
     {
       JSONObject jsonSpeedometerSegment = new JSONObject();
       jsonSpeedometerSegmentsSVG.put(jsonSpeedometerSegment);
-      jsonSpeedometerSegment.put("color", SPEEDOMETER_COLORS[i]);
+      jsonSpeedometerSegment.put("color", FIImpactSettings.SPEEDOMETER_COLORS[i]);
 
-      svg = getSVGArc(SPEEDOMETER_R, SPEEDOMETER_r, speedometerBoundaries.get(i), speedometerBoundaries.get(i + 1));
+      svg = getSVGArc(FIImpactSettings.SPEEDOMETER_R, FIImpactSettings.SPEEDOMETER_r, speedometerBoundaries.get(i), speedometerBoundaries.get(i + 1));
       jsonSpeedometerSegment.put("arc", svg);
 
 
@@ -528,7 +263,7 @@ public class SurveyData
         segmentPercent = segmentN/total;
 
       double dr = 12.0;
-      double dR = SPEEDOMETER_R*0.65*(segmentPercent)+dr;
+      double dR = FIImpactSettings.SPEEDOMETER_R*0.65*(segmentPercent)+dr;
       //logger.debug("R= {}, r={}, percent={}, n={}, N={}", dR, dr, segmentPercent, segmentN, total);
 
       svg = getSVGArc(dR, dr, speedometerBoundaries.get(i), speedometerBoundaries.get(i+1));
@@ -543,14 +278,14 @@ public class SurveyData
 
     //"Your ranking for %s based on the data submitted is currently %s.
     // In this section you scored better than %s% of the %s (total) projects and proposals that have answered this survey.";
-    String scoreInWords = SurveyManager.fiImpactModel.getString(scoreInWordsKey);
+    String scoreInWords = FIImpactSettings.getFiImpactSettings().getFiImpactModel().getString(scoreInWordsKey);
     Double dPercent = resultDerivatives.get(sectionName + "_" + type + "_R");
     if(dPercent == null)
       dPercent = 0.0;
     dPercent = 100.0 - dPercent;
 
     scoreInWords = String.format(scoreInWords,
-            sectionLabel, SurveyManager.fiImpactModel.getJSONObject("ranking").getString(Integer.toString(dSlot.intValue())),
+            sectionLabel, FIImpactSettings.getFiImpactSettings().getFiImpactModel().getJSONObject("ranking").getString(Integer.toString(dSlot.intValue())),
             Integer.toString(dPercent.intValue()), Integer.toString(or.getN()));
      response = String.format(response, sectionLabel, sectionLabel);
      jsonResult.put("interpretation", scoreInWords + " " + response);
@@ -596,14 +331,14 @@ public class SurveyData
         Element r = doc.createElement("result");
         root.appendChild(r);
         r.setAttribute("id", re.getKey());
-        r.setAttribute("score", SurveyManager.getDecimalFormatter4().format(re.getValue()));
+        r.setAttribute("score", FIImpactSettings.getDecimalFormatter4().format(re.getValue()));
       }
       for (Map.Entry<String, Double> re : resultDerivatives.entrySet())
       {
         Element r = doc.createElement("result");
         root.appendChild(r);
         r.setAttribute("id", re.getKey());
-        r.setAttribute("score", SurveyManager.getDecimalFormatter0().format(re.getValue()));
+        r.setAttribute("score", FIImpactSettings.getDecimalFormatter0().format(re.getValue()));
       }
 
     }
@@ -614,7 +349,7 @@ public class SurveyData
   }
 
 
-  private void writeUI(OutputStream os, OutputFormat outputFormat) throws IOException
+  private void writeUI(OutputStream os, FIImpactSettings.OutputFormat outputFormat) throws IOException
   {
 
       JSONObject jsonSurvey = new JSONObject();
@@ -636,7 +371,7 @@ public class SurveyData
 
       jsonSurvey.put("overview", radarOverviewOut);
 
-      JSONArray modelSections = SurveyManager.fiImpactModel.getJSONArray("sections");
+      JSONArray modelSections = FIImpactSettings.getFiImpactSettings().getFiImpactModel().getJSONArray("sections");
 
       int overviewSectionsTotal = 0;
       for(int i = 0; i < modelSections.length(); i++)
@@ -717,7 +452,7 @@ public class SurveyData
                       Double res = results.get(segmentResultId);
                       if(res == null)
                         res = 0.0;
-                      segmentAnswer.put("result", SurveyManager.getDecimalFormatter2().format(res));
+                      segmentAnswer.put("result", FIImpactSettings.getDecimalFormatter2().format(res));
                     }
 
                     JSONArray subSegmentAnswers = new JSONArray();
@@ -755,7 +490,7 @@ public class SurveyData
                       JSONArray subSegmentTop = new JSONArray();
                       segmentAnswer.put("top_list", subSegmentTop);
 
-                      JSONArray jsonTopListDef = SurveyManager.fiImpactModel.getJSONObject(topList).optJSONArray(sSegmentId);
+                      JSONArray jsonTopListDef = FIImpactSettings.getFiImpactSettings().getFiImpactModel().getJSONObject(topList).optJSONArray(sSegmentId);
                       if(jsonTopListDef != null)
                       {
                         for(int l = 0; l < jsonTopListDef.length(); l++)
@@ -1052,7 +787,7 @@ public class SurveyData
                 String type = getType();
                 if (type.equals("S"))
                   type = "IS";
-                OverallResult or = SurveyManager.getSurveyManager().getResults().get(type).get(questionID + "_" + key);
+                OverallResult or = FIImpactSettings.getFiImpactSettings().getSurveyManager().getResults().get(type).get(questionID + "_" + key);
                 if (or != null)
                 {
                   Double dResult = results.get(questionID + "_" + key);
@@ -1064,8 +799,8 @@ public class SurveyData
 
                   double dPercentAverage = or.getSpeedometerPercent(or.getAverage());
 
-                  subSegmentAnswer.put("result_percent", SurveyManager.getDecimalFormatter2().format(dPercentResult));
-                  subSegmentAnswer.put("average_percent", SurveyManager.getDecimalFormatter2().format(or.getSpeedometerPercent(or.getAverage())));
+                  subSegmentAnswer.put("result_percent", FIImpactSettings.getDecimalFormatter2().format(dPercentResult));
+                  subSegmentAnswer.put("average_percent", FIImpactSettings.getDecimalFormatter2().format(or.getSpeedometerPercent(or.getAverage())));
 
                   double R = 200;
 
@@ -1123,7 +858,7 @@ public class SurveyData
 
 
 
-      if(outputFormat == OutputFormat.JSON)
+      if(outputFormat == FIImpactSettings.OutputFormat.JSON)
       {
         OutputStreamWriter w = new OutputStreamWriter(os, "utf-8");
         jsonSurvey.write(w);
@@ -1154,7 +889,7 @@ public class SurveyData
 
   private String truncateDecimals(String id, String sAnswer)
   {
-    if (JSON_TRUNCATE_DECIMALS.contains(id))
+    if (FIImpactSettings.JSON_TRUNCATE_DECIMALS.contains(id))
     {
       int index = sAnswer.indexOf('.');
       if (index != -1)
@@ -1308,12 +1043,12 @@ public class SurveyData
 
   public void writeUIXML(OutputStream os) throws IOException
   {
-    writeUI(os, OutputFormat.XML);
+    writeUI(os, FIImpactSettings.OutputFormat.XML);
   }
 
   public void writeUIJSON(OutputStream os) throws IOException
   {
-    writeUI(os, OutputFormat.JSON);
+    writeUI(os, FIImpactSettings.OutputFormat.JSON);
   }
 
   public void read(InputStream is) throws ParserConfigurationException, IOException, SAXException
@@ -1375,11 +1110,11 @@ public class SurveyData
 
     if(Q2_1 != null && Q2_2 != null && Q2_3 != null && Q2_4 != null && Q2_5 != null)
     {
-      Double A2_1 = SCORES.get("Q2_1").get(Q2_1);
-      Double A2_2 = SCORES.get("Q2_2").get(Q2_2);
-      Double A2_3 = SCORES.get("Q2_3").get(Q2_3);
-      Double A2_4 = SCORES.get("Q2_4").get(Q2_4);
-      Double A2_5 = SCORES.get("Q2_5").get(Q2_5);
+      Double A2_1 = FIImpactSettings.SCORES.get("Q2_1").get(Q2_1);
+      Double A2_2 = FIImpactSettings.SCORES.get("Q2_2").get(Q2_2);
+      Double A2_3 = FIImpactSettings.SCORES.get("Q2_3").get(Q2_3);
+      Double A2_4 = FIImpactSettings.SCORES.get("Q2_4").get(Q2_4);
+      Double A2_5 = FIImpactSettings.SCORES.get("Q2_5").get(Q2_5);
 
       //logger.debug("A2_X: {}, {}, {}, {}, {}", A2_1, A2_2, A2_3, A2_4, A2_5);
 
@@ -1418,14 +1153,14 @@ public class SurveyData
       Double W2 = null;
 
       String keyQ2_2 = "Q2_2_" + Q2_2 + "_3_7_";
-      Map<String, Double> m = SCORES.get(keyQ2_2 + "W1");
+      Map<String, Double> m = FIImpactSettings.SCORES.get(keyQ2_2 + "W1");
 
       if(m != null)
       {
         W1 = m.get(Q3_7);
       }
 
-      m = SCORES.get(keyQ2_2 + "W2");
+      m = FIImpactSettings.SCORES.get(keyQ2_2 + "W2");
 
       if(m != null)
       {
@@ -1433,18 +1168,18 @@ public class SurveyData
       }
 
       String[] arr = Q3_5.split(",");
-      Double A3_5 = SCORES.get("Q3_5").get("E");
+      Double A3_5 = FIImpactSettings.SCORES.get("Q3_5").get("E");
       for(String s : arr)
       {
-        Double dTmp = SCORES.get("Q3_5").get(s);
+        Double dTmp = FIImpactSettings.SCORES.get("Q3_5").get(s);
         if(dTmp != null && dTmp > A3_5)
           A3_5 = dTmp;
       }
 
-      Double A3_8 = SCORES.get("Q3_8").get(Q3_8);
-      Double A3_9 = SCORES.get("Q3_9").get(Q3_9);
-      Double A3_10 = SCORES.get("Q3_10").get(Q3_10);
-      Double A3_11 = SCORES.get("Q3_11").get(Q3_11);
+      Double A3_8 = FIImpactSettings.SCORES.get("Q3_8").get(Q3_8);
+      Double A3_9 = FIImpactSettings.SCORES.get("Q3_9").get(Q3_9);
+      Double A3_10 = FIImpactSettings.SCORES.get("Q3_10").get(Q3_10);
+      Double A3_11 = FIImpactSettings.SCORES.get("Q3_11").get(Q3_11);
 
       if(A3_5 != null && A3_8 != null && A3_9 != null && A3_10 != null && A3_11 != null && W1 != null && W2 != null)
       {
@@ -1485,24 +1220,24 @@ public class SurveyData
       Double W4 = null;
 
       String keyQ2_2 = "Q2_2_" + Q2_2 + "_3_7_";
-      Map<String, Double> m = SCORES.get(keyQ2_2 + "W3");
+      Map<String, Double> m = FIImpactSettings.SCORES.get(keyQ2_2 + "W3");
 
       if(m != null)
       {
         W3 = m.get(Q3_7);
       }
 
-      m = SCORES.get(keyQ2_2 + "W4");
+      m = FIImpactSettings.SCORES.get(keyQ2_2 + "W4");
 
       if(m != null)
       {
         W4 = m.get(Q3_7);
       }
 
-      Double A4_1 = SCORES.get("Q4_1").get(Q4_1);
-      Double A4_2 = SCORES.get("Q4_2").get(Q4_2);
-      Double A4_4 = SCORES.get("Q4_4").get(Q4_4);
-      Double A4_5 = SCORES.get("Q4_5").get(Q4_5);
+      Double A4_1 = FIImpactSettings.SCORES.get("Q4_1").get(Q4_1);
+      Double A4_2 = FIImpactSettings.SCORES.get("Q4_2").get(Q4_2);
+      Double A4_4 = FIImpactSettings.SCORES.get("Q4_4").get(Q4_4);
+      Double A4_5 = FIImpactSettings.SCORES.get("Q4_5").get(Q4_5);
       Double A4_6 = AIUtils.parseDecimal(Q4_6, 0.0);
 
       if(A4_1 != null && A4_2 != null && A4_4 != null && A4_5 != null && W3 != null && W4 != null)
@@ -1538,17 +1273,17 @@ public class SurveyData
 
     HashMap<String, Integer> Q5A1_list = new HashMap<>();
 
-    Map<String, Double> m5A1_Benefits = SCORES.get("Q5A_1_BENEFITS");
-    Map<String, Double> m5A1_Verticals = SCORES.get("Q5A_1_VERTICALS");
+    Map<String, Double> m5A1_Benefits = FIImpactSettings.SCORES.get("Q5A_1_BENEFITS");
+    Map<String, Double> m5A1_Verticals = FIImpactSettings.SCORES.get("Q5A_1_VERTICALS");
 
-    Map<String, Double> m5A1_weights = SCORES.get("Q5A_1");
+    Map<String, Double> m5A1_weights = FIImpactSettings.SCORES.get("Q5A_1");
 
     HashMap<String, Integer> Q5B1_list = new HashMap<>();
 
-    Map<String, Double> m5B1_Benefits = SCORES.get("Q5B_1_BENEFITS");
-    Map<String, Double> m5B1_Verticals = SCORES.get("Q5B_1_VERTICALS");
+    Map<String, Double> m5B1_Benefits = FIImpactSettings.SCORES.get("Q5B_1_BENEFITS");
+    Map<String, Double> m5B1_Verticals = FIImpactSettings.SCORES.get("Q5B_1_VERTICALS");
 
-    Map<String, Double> m5B1_weights = SCORES.get("Q5B_1");
+    Map<String, Double> m5B1_weights = FIImpactSettings.SCORES.get("Q5B_1");
 
     //questionnaire v1 has all market sectors in 3_3.
     //questionnaire v2 has main market sector in 3_3a and "other" sectors in 3_3a.
@@ -1677,7 +1412,7 @@ public class SurveyData
     //------------SOCIAL IMPACT 6A, 6B--------------------
     //logger.debug("Calc social impact");
 
-    for(String qID : SurveyManager.SOCIAL_IMPACT_QUESTIONS)
+    for(String qID : FIImpactSettings.SOCIAL_IMPACT_QUESTIONS)
     {
       String qA = questions.get(qID);
       //logger.debug("{}: {}", qID, qA);
@@ -1695,47 +1430,33 @@ public class SurveyData
     //calculate mattermark results - normalise to scale 0.0 - 5.0
     //logger.debug("Calc Mattermark.");
 
-    ProjectManager pm = ProjectManager.getProjectManager();
-    ArrayList<ProjectManager.IOListField> mattermarkIndicators = pm.getMattermarkIndicators();
-    for(ProjectManager.IOListField indicator : mattermarkIndicators)
+    ArrayList<IOListField> mattermarkIndicators = FIImpactSettings.getFiImpactSettings().getMattermarkIndicators();
+    for(IOListField indicator : mattermarkIndicators)
       results.put(indicator.getFieldid(), 0.0);
 
-    String Q1_22 = questions.get("Q1_22");
-    if(Q1_22 == null)
+    ProjectData pd = getProject();
+    if(pd != null)
     {
-      logger.warn("No FI accelerator project associated with questionnaire {}/{}", externalId, id);
-    }
-    else
-    {
+      for(IOListField indicator : mattermarkIndicators)
+      {
 
-      ProjectData pd = pm.getProjects().get(Q1_22);
-      if(pd == null)
-      {
-        logger.warn("No project data for {}", Q1_22);
-      }
-      else
-      {
-        for(ProjectManager.IOListField indicator : mattermarkIndicators)
+        //logger.info("Get {}", indicator.getFieldid());
+        String sInd = pd.getMattermarkFields().get(indicator.getFieldid());
+        Double dInd = null;
+        if (sInd != null && !sInd.equals(""))
+          dInd = Double.valueOf(sInd);
+        if(dInd != null)
         {
+            //logger.info("Mattermark indicator {}={}", indicator.getFieldid(), dInd);
 
-          //logger.info("Get {}", indicator.getFieldid());
-          String sInd = pd.getMattermarkFields().get(indicator.getFieldid());
-          Double dInd = null;
-          if (sInd != null && !sInd.equals(""))
-            dInd = Double.valueOf(sInd);
-          if(dInd != null)
-          {
-              //logger.info("Mattermark indicator {}={}", indicator.getFieldid(), dInd);
+          ProjectManager.MattermarkIndicatorInfo mattermarkIndicatorInfo = FIImpactSettings.getFiImpactSettings().getProjectManager().getMattermarkIndicatorInfo(indicator.getFieldid());
+          if(mattermarkIndicatorInfo.getIoListField().isTransformLog())
+            dInd = Math.signum(dInd) * Math.log(Math.abs(dInd) + 1.0);
 
-            ProjectManager.MattermarkIndicatorInfo mattermarkIndicatorInfo = projectManager.getMattermarkIndicatorInfo(indicator.getFieldid());
-            if(mattermarkIndicatorInfo.getIoListField().isTransformLog())
-              dInd = Math.signum(dInd) * Math.log(Math.abs(dInd) + 1.0);
-
-            // dInd = normalise to 0.0 - 5.0 scale by using ProjectManger.get.... min/max values
-            double dNormalisedResult = (dInd - mattermarkIndicatorInfo.getMin()) / (mattermarkIndicatorInfo.getMax() - mattermarkIndicatorInfo.getMin()) * 5.0;
-            results.put(indicator.getFieldid(), dNormalisedResult);
-            //logger.info("Mattermark indicator Normalised {}={}", indicator.getFieldid(), dInd);
-          }
+          // dInd = normalise to 0.0 - 5.0 scale by using ProjectManger.get.... min/max values
+          double dNormalisedResult = (dInd - mattermarkIndicatorInfo.getMin()) / (mattermarkIndicatorInfo.getMax() - mattermarkIndicatorInfo.getMin()) * 5.0;
+          results.put(indicator.getFieldid(), dNormalisedResult);
+          //logger.info("Mattermark indicator Normalised {}={}", indicator.getFieldid(), dInd);
         }
       }
     }
@@ -1748,6 +1469,28 @@ public class SurveyData
     questions.clear();
     results.clear();
     resultDerivatives.clear();
+  }
+
+  public ProjectData getProject()
+  {
+    ProjectManager pm = FIImpactSettings.getFiImpactSettings().getProjectManager();
+    ProjectData pd = null;
+    String Q1_22 = questions.get("Q1_22");
+    if(Q1_22 == null)
+    {
+      String Q0_1 = questions.get("Q0_1");
+      if(Q0_1 == null || Q0_1.equals("I"))
+        logger.warn("No FI accelerator project associated with questionnaire {}/{}", externalId, id);
+    }
+    else
+    {
+      pd = pm.getProjects().get(Q1_22);
+      if(pd == null)
+      {
+        logger.warn("No project data for {}", Q1_22);
+      }
+    }
+    return pd;
   }
 
   public void addQuestions(String[] arrQuestions)
@@ -1814,7 +1557,7 @@ public class SurveyData
   {
     String s = questions.get("Q0_1");
     if(s==null || s.equals(""))
-      return SurveyManager.QUESTIONNAIRE_TYPE_DEFAULT;
+      return FIImpactSettings.QUESTIONNAIRE_TYPE_DEFAULT;
     else
       return s;
   }

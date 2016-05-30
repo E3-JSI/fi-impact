@@ -15,8 +15,8 @@ import org.apache.fop.apps.MimeConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+import si.ijs.ailab.fiimpact.settings.FIImpactSettings;
 import si.ijs.ailab.fiimpact.survey.SurveyData;
-import si.ijs.ailab.fiimpact.survey.SurveyManager;
 import si.ijs.ailab.util.AIUtils;
 
 import javax.servlet.ServletOutputStream;
@@ -114,7 +114,7 @@ public class PDFManager
       // Step 5: Setup input and output for XSLT transformation
       // Setup input stream
       ByteArrayOutputStream osSurvey = new ByteArrayOutputStream();
-      SurveyManager.getSurveyManager().getXMLSurvey(osSurvey, id);
+      FIImpactSettings.getFiImpactSettings().getSurveyManager().getXMLSurvey(osSurvey, id);
       InputStream inputStream = new ByteArrayInputStream(osSurvey.toByteArray());
 
       Source src = new StreamSource(inputStream);
@@ -173,7 +173,7 @@ public class PDFManager
 
   synchronized public void createPDFAll(ServletOutputStream outputStream) throws IOException
   {
-    Map<String, SurveyData> surveys = SurveyManager.getSurveyManager().getSurveys();
+    Map<String, SurveyData> surveys = FIImpactSettings.getFiImpactSettings().getSurveyManager().getSurveys();
     int cntOK = 0;
     int cntERR = 0;
     logger.info("Create all PDFs");

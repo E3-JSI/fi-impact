@@ -3,10 +3,9 @@ package si.ijs.ailab.fiimpact.servlet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import si.ijs.ailab.fiimpact.project.ProjectManager;
+import si.ijs.ailab.fiimpact.settings.FIImpactSettings;
 import si.ijs.ailab.fiimpact.users.UserInfo;
 import si.ijs.ailab.fiimpact.users.UsersManager;
-import si.ijs.ailab.fiimpact.survey.SurveyManager;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -44,7 +43,6 @@ public class FIImpactSecureRequestHandler extends HttpServlet
 
   private Path webappRoot;
 
-  private ProjectManager projectManager;
   private UsersManager usersManager;
 
   @Override
@@ -87,7 +85,6 @@ public class FIImpactSecureRequestHandler extends HttpServlet
 
 
     webappRoot = new File (config.getServletContext().getRealPath("/")).toPath();
-    projectManager=ProjectManager.getProjectManager(webappRoot);
     usersManager=UsersManager.getUsersManager(webappRoot);
   }
 
@@ -186,7 +183,7 @@ public class FIImpactSecureRequestHandler extends HttpServlet
         groupAnswer = userInfo.getAccelerator();
 
       }
-      SurveyManager.getSurveyManager().list(response.getOutputStream(), groupQuestion, groupAnswer);
+      FIImpactSettings.getFiImpactSettings().getSurveyManager().list(response.getOutputStream(), groupQuestion, groupAnswer);
     }
     else if (sAction.equals("load"))
     {
@@ -194,20 +191,20 @@ public class FIImpactSecureRequestHandler extends HttpServlet
       response.setContentType("application/json");
       response.setCharacterEncoding("utf-8");
       //surveyManager.loadAll(response.getOutputStream(), "list.csv");
-      SurveyManager.getSurveyManager().loadAllTest(response.getOutputStream(), importDir);
+      FIImpactSettings.getFiImpactSettings().getSurveyManager().loadAllTest(response.getOutputStream(), importDir);
     }
     else if(sAction.equals("clear"))
     {
       response.setContentType("application/json");
       response.setCharacterEncoding("utf-8");
-      SurveyManager.getSurveyManager().clearAll(response.getOutputStream());
+      FIImpactSettings.getFiImpactSettings().getSurveyManager().clearAll(response.getOutputStream());
 
     }
     else if(sAction.equals("accelerators"))
     {
       response.setContentType("application/json");
       response.setCharacterEncoding("utf-8");
-      SurveyManager.getSurveyManager().getJSONAccelerators(response.getOutputStream(), userInfo.getAccelerator());
+      FIImpactSettings.getFiImpactSettings().getSurveyManager().getJSONAccelerators(response.getOutputStream(), userInfo.getAccelerator());
     }
     else if (sAction.equals("export"))
     {
@@ -229,28 +226,28 @@ public class FIImpactSecureRequestHandler extends HttpServlet
       {
         case "full":
         {
-          exportAction = SurveyManager.EXPORT_FI_IMPACT_QUESTIONS | SurveyManager.EXPORT_FI_IMPACT_INDICATORS |
-                  SurveyManager.EXPORT_MATTERMARK_FIELDS | SurveyManager.EXPORT_MATTERMARK_INDICATORS |
-                  SurveyManager.EXPORT_DERIVED_INDICATORS | SurveyManager.EXPORT_PROJECT_DATA;
+          exportAction = FIImpactSettings.EXPORT_FI_IMPACT_QUESTIONS | FIImpactSettings.EXPORT_FI_IMPACT_INDICATORS |
+                  FIImpactSettings.EXPORT_MATTERMARK_FIELDS | FIImpactSettings.EXPORT_MATTERMARK_INDICATORS |
+                  FIImpactSettings.EXPORT_DERIVED_INDICATORS | FIImpactSettings.EXPORT_PROJECT_DATA;
 
           break;
         }
         case "full-no-derived":
         {
-          exportAction = SurveyManager.EXPORT_FI_IMPACT_QUESTIONS | SurveyManager.EXPORT_FI_IMPACT_INDICATORS |
-                  SurveyManager.EXPORT_MATTERMARK_FIELDS | SurveyManager.EXPORT_MATTERMARK_INDICATORS |
-                  SurveyManager.EXPORT_PROJECT_DATA;
+          exportAction = FIImpactSettings.EXPORT_FI_IMPACT_QUESTIONS | FIImpactSettings.EXPORT_FI_IMPACT_INDICATORS |
+                  FIImpactSettings.EXPORT_MATTERMARK_FIELDS | FIImpactSettings.EXPORT_MATTERMARK_INDICATORS |
+                  FIImpactSettings.EXPORT_PROJECT_DATA;
           break;
         }
         case "short":
         {
-          exportAction = SurveyManager.EXPORT_SHORT_LIST;
+          exportAction = FIImpactSettings.EXPORT_SHORT_LIST;
           break;
         }
         case "accelerator":
         {
           groupQuestion = "Q1_1";
-          exportAction = SurveyManager.EXPORT_SHORT_LIST;
+          exportAction = FIImpactSettings.EXPORT_SHORT_LIST;
           groupAnswer = request.getParameter("id");
           if(groupAnswer != null)
             groupAnswer = new String(groupAnswer.getBytes("iso-8859-1"), "UTF-8");
@@ -269,7 +266,7 @@ public class FIImpactSecureRequestHandler extends HttpServlet
       response.setContentType("application/x-unknown");
       response.setCharacterEncoding("utf-8");
       response.setHeader( "Content-Disposition", "filename=\"fi-impact-export.txt\"" );
-      SurveyManager.getSurveyManager().exportText(response.getOutputStream(), groupQuestion, groupAnswer, exportAction);
+      FIImpactSettings.getFiImpactSettings().getSurveyManager().exportText(response.getOutputStream(), groupQuestion, groupAnswer, exportAction);
 
     }
     else if (sAction.equals("export-json"))
@@ -277,19 +274,17 @@ public class FIImpactSecureRequestHandler extends HttpServlet
       response.setContentType("application/x-unknown");
       response.setCharacterEncoding("utf-8");
       response.setHeader( "Content-Disposition", "filename=\"fi-impact-export.json\"" );
-      SurveyManager.getSurveyManager().exportJson(response.getOutputStream());
+      FIImpactSettings.getFiImpactSettings().getSurveyManager().exportJson(response.getOutputStream());
 
     }
     else if (sAction.equals("legend"))
     {
       //Export legend to csv
-
       response.setContentType("application/x-unknown");
       response.setCharacterEncoding("utf-8");
       response.setHeader( "Content-Disposition", "filename=\"fi-impact-legend.txt\"" );
 
-      SurveyManager.getSurveyManager().exportLegendTxt(response.getOutputStream());
-
+      FIImpactSettings.getFiImpactSettings().exportLegendTxt(response.getOutputStream());
     }
   }
 
@@ -461,13 +456,13 @@ public class FIImpactSecureRequestHandler extends HttpServlet
           switch(sAction)
           {
             case "upload-mattermark":
-              projectManager.importMattermark(response.getOutputStream(), pFile);
+              FIImpactSettings.getFiImpactSettings().getProjectManager().importMattermark(response.getOutputStream(), pFile);
               break;
             case "upload-mapping":
-              projectManager.importMappings(response.getOutputStream(), pFile);
+              FIImpactSettings.getFiImpactSettings().getProjectManager().importMappings(response.getOutputStream(), pFile);
             break;
             case "upload-projects":
-              projectManager.importProjects(response.getOutputStream(), pFile);
+              FIImpactSettings.getFiImpactSettings().getProjectManager().importProjects(response.getOutputStream(), pFile);
             break;
           }
 

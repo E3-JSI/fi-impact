@@ -2,13 +2,12 @@ package si.ijs.ailab.fiimpact.project;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import si.ijs.ailab.util.AIStructures;
+import si.ijs.ailab.fiimpact.settings.IOListField;
 import si.ijs.ailab.util.AIUtils;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -181,24 +180,24 @@ public class ProjectData
 
 	}
 
-	public void addFields(ArrayList<ProjectManager.IOListField> fieldDefinitions, String[] fieldValues)
+	public void addFields(ArrayList<IOListField> fieldDefinitions, String[] fieldValues)
 	{
 		fields.clear();
 		for (int i = 0; i < fieldValues.length; i++)
 		{
-			ProjectManager.IOListField ioListField = fieldDefinitions.get(i);
+			IOListField ioListField = fieldDefinitions.get(i);
 			if(ioListField!=null)
 				fields.put(ioListField.getFieldid(), fieldValues[i]);
 		}
 
 	}
 
-  public void addFieldsMattermark(ArrayList<ProjectManager.IOListField> fieldDefinitions, String[] fieldValues)
+  public void addFieldsMattermark(ArrayList<IOListField> fieldDefinitions, String[] fieldValues)
   {
     mattermarkFields.clear();
     for (int i = 0; i < fieldValues.length; i++)
     {
-			ProjectManager.IOListField ioListField = fieldDefinitions.get(i);
+			IOListField ioListField = fieldDefinitions.get(i);
 			if(ioListField != null)
       	mattermarkFields.put(ioListField.getFieldid(), fieldValues[i]);
     }
@@ -251,7 +250,12 @@ public class ProjectData
     return AIUtils.parseInteger(mattermarkFields.get(fieldid), 0);
   }
 
-  public static void main(String[] args)
+	public Map<String, String> getFields()
+	{
+		return fields;
+	}
+
+	public static void main(String[] args)
   {
   }
 
