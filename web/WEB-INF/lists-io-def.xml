@@ -1,65 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lists>
-	<list name="project-list">
-		<filed column="PROGRESSIVE NUMBER" label="PROGRESSIVE NUMBER" fieldid="P01"/>
-		<filed column="FI-IMPACT IDENTIFIER" label="FI-IMPACT IDENTIFIER" fieldid="P02" usage="id"/>
-		<filed column="Help" label="Help" fieldid="P03" usage="ignore"/>
-		<filed column="ACCELERATOR" label="ACCELERATOR" fieldid="P04"/>
-		<filed column="COUNTRY" label="COUNTRY" fieldid="P05"/>
-		<filed column="ORGANIZATION NAME" label="ORGANIZATION NAME" fieldid="P06" missing="0;-"/>
-		<filed column="PROJECT NAME" label="PROJECT NAME" fieldid="P07" missing="0"/>
-		<filed column="ADDRESS" label="ADDRESS" fieldid="P08" missing="0;-"/>
-		<filed column="VERTICAL MARKET (IDC ANALYSIS)" label="VERTICAL MARKET" fieldid="P09" missing="0"/>
-		<filed column="B2B/B2C" label="B2B/B2C" fieldid="P10" missing="0"/>
-		<filed column="N. OF TEAM MEMBERS" label="N. OF TEAM MEMBERS" fieldid="P11" missing="#N/A;N/A;Not available"/>
-		<filed column="N. OF YEARS OF EXPERIENCE" label="YEARS OF EXPERIENCE" fieldid="P12" missing="#N/A;N/A;Not available;-"/>
-		<filed column="SELECTED (YES/NO)" label="SELECTED" fieldid="P13" include-record-when="YES"/>
-		<filed column="STATUS" label="STATUS" fieldid="P14" missing="0"/>
-		<filed column="NAME OF PROJECT COORDINATOR" label="PROJECT COORDINATOR" fieldid="P15" missing="0;#N/A"/>
-		<filed column="ABSTRACT" label="ABSTRACT" fieldid="P16" missing="0"/>
-		<filed column="TECH PROVIDER OR SERVICE PROVIDER (NON-IT) IDC" label="PROVIDER TYPE" fieldid="P17" missing="0"/>
-		<filed column="SMART CITY" label="SMART CITY" fieldid="P18"/>
-		<filed column="CLOUD" label="CLOUD" fieldid="P19"/>
-		<filed column="SOCIAL MEDIA" label="SOCIAL MEDIA" fieldid="P20"/>
-		<filed column="MOBILE" label="MOBILE" fieldid="P21"/>
-		<filed column="BIG DATA/ANALYTICS" label="BIG DATA/ANALYTICS" fieldid="P22"/>
-		<filed column="IOT" label="IOT" fieldid="P23"/>
-		<filed column="3D PRINTING" label="3D PRINTING" fieldid="P24"/>
-		<filed column="SOFTWARE OR HARDWARE (ONLY FOR TECH PROVIDERS) IDC" label="SOFTWARE/HARDWARE " fieldid="P25" missing="0;#N/A;?"/>
-		<filed column="SOFTWARE INDIVIDUAL MARKET (ONLY SOFTWARE) IDC" label="SOFTWARE INDIVIDUAL MARKET" fieldid="P26" missing="0;#N/A;?"/>
-		<filed column="SOFTWARE PRIMARY MARKET" label="SOFTWARE PRIMARY MARKET" fieldid="P27" missing="0;#N/A;?"/>
-		<filed column="SOFTWARE SECONDARY MARKET" label="SOFTWARE SECONDARY MARKET" fieldid="P28" missing="0;#N/A;?"/>
-		<filed column="CALL" label="CALL" fieldid="P29"/>
-		<filed column="RESPONDENT TO FIMPACT ASSESSMENT?" label="RESPONDED TO FIMPACT ASSESSMENT" fieldid="P30" usage="ignore"/>
-		<filed column="WEBSITE URL" label="WEBSITE URL" fieldid="P31" missing="0;#N/A;?"/>
-		<filed column="SME/STARTUP" label="SME/STARTUP" fieldid="P32" missing="0;#N/A;?"/>
-		<filed column="ACCELERATOR FUNDING" label="ACCELERATOR FUNDING" fieldid="P33" missing="#N/A;?"/>
-		<filed column="CLEAN WEBSITE URL" label="CLEAN WEBSITE URL" fieldid="P34" usage="clean-url" missing="0;#N/A"/>
+	<list name="project-list" header_row="3">
+		<filed column="PROGRESSIVE NUMBER" label="PROGRESSIVE NUMBER" fieldid="PROGRESSIVE_NUMBER" plot="ignore" graph="ignore" type="text"/>
+		<filed column="FI-IMPACT IDENTIFIER" label="FI-IMPACT IDENTIFIER" fieldid="FI-IMPACT_ID" plot="ignore" graph="ignore" usage="id" type="text"/>
+		<filed column="Help" label="Help" fieldid="P_IGNORE_01" plot="ignore" graph="ignore" usage="ignore" type="text"/>
+		<filed column="ACCELERATOR" label="ACCELERATOR" fieldid="ACCELERATOR" plot="ignore" graph="ignore" type="lookup"/>
+		<filed column="COUNTRY" label="COUNTRY" fieldid="COUNTRY" plot="ignore" graph="ignore" type="lookup"/>
+		<filed column="ORGANIZATION NAME" label="ORGANIZATION NAME" fieldid="ORGANIZATION_NAME" plot="ignore" graph="ignore" missing="0;-" type="text"/>
+		<filed column="PROJECT NAME" label="PROJECT NAME" fieldid="PROJECT_NAME" plot="ignore" graph="ignore" missing="0" type="text"/>
+		<filed column="ADDRESS" label="ADDRESS" fieldid="ADDRESS" plot="ignore" graph="ignore" missing="0;-" type="text"/>
+		<filed column="VERTICAL MARKET (IDC ANALYSIS)" label="VERTICAL MARKET" fieldid="VERTICAL_MARKET" plot="ignore" graph="feature-selection" missing="0" type="multi"/>
+		<filed column="B2B/B2C" label="B2B/B2C" fieldid="B2B_B2C" plot="selection" graph="feature-selection" missing="0" type="lookup"/>
+		<filed column="N. OF TEAM MEMBERS" label="N. OF TEAM MEMBERS" fieldid="TEAM_MEMBERS" plot="ignore" graph="ignore" missing="#N/A;N/A;Not available" type="int"/>
+		<filed column="N. OF YEARS OF EXPERIENCE" label="YEARS OF EXPERIENCE" fieldid="YEARS_OF_EXPERIENCE" plot="ignore" graph="ignore" missing="#N/A;N/A;Not available;-" type="int"/>
+		<filed column="SELECTED (YES/NO)" label="SELECTED" fieldid="SELECTED" plot="ignore" graph="ignore" include-record-when="YES" type="lookup"/>
+		<filed column="STATUS" label="STATUS" fieldid="STATUS" plot="ignore" graph="ignore" missing="0" type="lookup"/>
+		<filed column="NAME OF PROJECT COORDINATOR" label="PROJECT COORDINATOR" fieldid="PROJECT_COORDINATOR" plot="ignore" graph="ignore" missing="0;#N/A" type="text"/>
+		<filed column="ABSTRACT" label="ABSTRACT" fieldid="ABSTRACT" plot="ignore" graph="feature-text" missing="0" type="text"/>
+		<filed column="TECH PROVIDER OR SERVICE PROVIDER (NON-IT) IDC" label="PROVIDER TYPE" fieldid="PROVIDER_TYPE" plot="selection" graph="feature-selection" missing="0" type="lookup"/>
+		<filed column="SMART CITY" label="SMART CITY" fieldid="ICT_TOOLS_SMART_CITY" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="CLOUD" label="CLOUD" fieldid="ICT_TOOLS_CLOUD" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="SOCIAL MEDIA" label="SOCIAL MEDIA" fieldid="ICT_TOOLS_SOCIAL_MEDIA" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="MOBILE" label="MOBILE" fieldid="ICT_TOOLS_MOBILE" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="BIG DATA/ANALYTICS" label="BIG DATA/ANALYTICS" fieldid="ICT_TOOLS_BIG_DATA" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="IOT" label="IOT" fieldid="ICT_TOOLS_IOT" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="3D PRINTING" label="3D PRINTING" fieldid="ICT_TOOLS_3D_PRINTING" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="WEARABLES" label="WEARABLES" fieldid="ICT_TOOLS_WEARABLES" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="ROBOTICS" label="ROBOTICS" fieldid="ICT_TOOLS_ROBOTICS" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="DRONES" label="DRONES" fieldid="ICT_TOOLS_DRONES" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="SOFTWARE OR HARDWARE (ONLY FOR TECH PROVIDERS) IDC" label="SOFTWARE/HARDWARE" fieldid="SW_HW" plot="selection" graph="feature-selection" missing="0;#N/A;?" type="lookup"/>
+		<filed column="SOFTWARE INDIVIDUAL MARKET (ONLY SOFTWARE) IDC" label="SOFTWARE INDIVIDUAL MARKET" fieldid="SW_INDIVIDUAL_MARKET" plot="selection" graph="feature-selection" missing="0;#N/A;?" type="lookup"/>
+		<filed column="SOFTWARE PRIMARY MARKET" label="SOFTWARE PRIMARY MARKET" fieldid="SW_PRIMARY_MARKET" plot="selection" graph="feature-selection" missing="0;#N/A;?" type="lookup"/>
+		<filed column="SOFTWARE SECONDARY MARKET" label="SOFTWARE SECONDARY MARKET" fieldid="SW_SECONDARY_MARKET" plot="selection" graph="feature-selection" missing="0;#N/A;?" type="lookup"/>
+		<filed column="CALL" label="CALL" fieldid="P29" plot="ignore" graph="ignore" type="int"/>
+		<filed column="RESPONDENT TO FIMPACT ASSESSMENT?" label="RESPONDED TO FIMPACT ASSESSMENT" fieldid="P_IGNORE_02" plot="ignore" graph="ignore" usage="ignore" type="lookup"/>
+		<filed column="WEBSITE URL" label="WEBSITE URL" fieldid="WEBSITE_URL" plot="ignore" graph="ignore" missing="0;#N/A;?" type="text"/>
+		<filed column="SME/STARTUP" label="SME/STARTUP" fieldid="SME_STARTUP" plot="selection" graph="feature-selection" missing="0;#N/A;?" type="lookup"/>
+		<filed column="HPI" label="SUCCESS HPI" fieldid="SUCCESS_HPI" plot="ignore" graph="ignore" type="lookup"/>
+		<filed column="VIP" label="SUCCESS VIP" fieldid="SUCCESS_VIP" plot="ignore" graph="ignore" type="lookup"/>
+		<filed column="IDG Shortlist" label="SUCCESS IDG" fieldid="SUCCESS_IDG" plot="ignore" graph="ignore" type="lookup"/>
+		<filed column="Website MAP" label="Website - clean" fieldid="MAP_WEBSITE" plot="ignore" graph="ignore" usage="clean-url" type="text"/>
+		<!--This one is imported from the mapping file!!!-->
+	</list>
+	<list name="fi-impact-url-mapping">
+		<filed column="Website" label="Website" fieldid="M_MAP_WEBSITE" usage="clean-url"/>
+		<filed column="Identifier" label="FI-IMPACT IDENTIFIER" fieldid="M_MAP_FI-IMPACT_ID" usage="id"/>
 	</list>
 	<list name="mattermark-export">
-		<filed column="Company Name" label="Company Name" fieldid="M01"/>
-		<filed column="Growth Score" label="Growth Score" fieldid="MATTERMARK_GROWTH" usage="indicator" transform="log"/>
-		<filed column="Mindshare Score" label="Mindshare Score" fieldid="M03"/>
-		<filed column="Momentum Score" label="Momentum Score" fieldid="MATTERMARK_MOMENTUM" usage="indicator" transform="log"/>
-		<filed column="Mattermark URL" label="Mattermark URL" fieldid="M05" usage="external"/>
-		<filed column="Website" label="Website" fieldid="M06" usage="clean-url"/>
-		<filed column="Description" label="Description" fieldid="M07"/>
-		<filed column="Is Raising On AngelList" label="Is Raising On AngelList" fieldid="M08"/>
+		<filed column="Company Name" label="Company Name" fieldid="M01" type="text"/>
+		<filed column="Growth Score" label="Growth Score" fieldid="MATTERMARK_GROWTH" plot="indicator" graph="ignore" usage="indicator" transform="log" type="int"/>
+		<filed column="Mindshare Score" label="Mindshare Score" fieldid="M03" type="int"/>
+		<filed column="Momentum Score" label="Momentum Score" fieldid="M04" type="int"/>
+		<filed column="Mattermark URL" label="Mattermark URL" fieldid="M05" usage="external" type="text"/>
+		<filed column="Website" label="Website" fieldid="M06" usage="clean-url" type="text"/>
+		<filed column="Description" label="Description" fieldid="M07" type="text"/>
+		<filed column="Is Raising On AngelList" label="Is Raising On AngelList" fieldid="M08" type="lookup"/>
 		<filed column="AngelList Raising Amount" label="AngelList Raising Amount" fieldid="M09"/>
 		<filed column="AngelList Pre-Money Valuation" label="AngelList Pre-Money Valuation" fieldid="M10"/>
 		<filed column="AngelList Raised Amount" label="AngelList Raised Amount" fieldid="M11"/>
 		<filed column="Industry" label="Industry" fieldid="M12"/>
 		<filed column="Business Model" label="Business Model" fieldid="M13"/>
-		<filed column="Keywords" label="Keywords" fieldid="M14"/>
+		<filed column="Keywords" label="Keywords" fieldid="M14" type="text"/>
 		<filed column="Investors" label="Investors" fieldid="M15"/>
-		<filed column="Employee Count" label="Employee Count" fieldid="MATTERMARK_EMPLOYEE_COUNT" usage="indicator" /> <!--transform="log"-->
+		<filed column="Employee Count" label="Employee Count" fieldid="MATTERMARK_EMPLOYEE_COUNT" usage="indicator"/>
 		<filed column="Employees Month Ago" label="Employees Month Ago" fieldid="M17"/>
 		<filed column="Employees Added This Month" label="Employees Added This Month" fieldid="M18"/>
 		<filed column="Employees MoM" label="Employees MoM" fieldid="M19"/>
 		<filed column="Employees 6 Months Ago" label="Employees 6 Months Ago" fieldid="M20"/>
 		<filed column="Employees Added In 6 Months" label="Employees Added In 6 Months" fieldid="M21"/>
 		<filed column="Employees 6 Months Growth" label="Employees 6 Months Growth" fieldid="M22"/>
-		<filed column="Est. Monthly Uniques" label="Est. Monthly Uniques" fieldid="MATTERMARK_MONTHLY_UNIQUES" usage="indicator"/> <!--transform="log"-->
+		<filed column="Est. Monthly Uniques" label="Est. Monthly Uniques" fieldid="MATTERMARK_MONTHLY_UNIQUES" usage="indicator"/>
 		<filed column="Monthly Uniques Week Ago" label="Monthly Uniques Week Ago" fieldid="M24"/>
 		<filed column="Monthly Uniques WoW" label="Monthly Uniques WoW" fieldid="M25"/>
 		<filed column="Monthly Uniques Month Ago" label="Monthly Uniques Month Ago" fieldid="M26"/>
@@ -115,5 +125,116 @@
 		<filed column="New person months since last funding" label="New person months since last funding" fieldid="M76"/>
 		<filed column="New funding employee growth" label="New funding employee growth" fieldid="M77"/>
 		<filed column="Date Added" label="Date Added" fieldid="M78"/>
+	</list>
+	<list name="survey">
+		<filed column="Q0_1" label="Type" fieldid="Q0_1" transform="" plot="selection" graph="selection" type="lookup"/>
+		<filed column="Q0_2" label="Version" fieldid="Q0_2" transform="" plot="ignore" graph="ignore" type="lookup"/>
+		<filed column="Q1_1" label="Which Accelerator is funding you?" fieldid="Q1_1" transform="" plot="selection" graph="selection" type="lookup"/>
+		<filed column="Q1_2" label="In which country is your organisation headquartered?" fieldid="Q1_2" transform="" plot="selection" graph="selection" type="lookup"/>
+		<filed column="Q1_3" label="What is the name of your organisation?" fieldid="Q1_3" transform="" plot="display" graph="display" type="text"/>
+		<filed column="Q1_4" label="What is the name of your project?" fieldid="Q1_4" transform="" plot="display" graph="display" type="text"/>
+		<filed column="Q1_5" label="What is the mailing address of your organisation?" fieldid="Q1_5" transform="" plot="ignore" graph="ignore" type="text"/>
+		<filed column="Q1_6a" label="Are you an SME (&lt;250 employees)" fieldid="Q1_6a" transform="" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="Q1_6b" label="Are you a self-employed individual entrepreneur " fieldid="Q1_6b" transform="" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="Q1_6c" label="Is your organisation owned by a Large organisation (over 60%)?" fieldid="Q1_6c" transform="" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="Q1_7" label="How many people are in the implementing team?" fieldid="Q1_7" transform="" plot="ignore" graph="feature" type="int"/>
+		<filed column="Q1_8" label="How many full time employees are in your organization?" fieldid="Q1_8" transform="" plot="ignore" graph="feature" type="int"/>
+		<filed column="Q1_9" label="What was the organisation&apos;s annual turnover in the last complete financial year?" fieldid="Q1_9" transform="" plot="ignore" graph="feature" type="num"/>
+		<filed column="Q1_10" label="Does your proposal sell/offer an IT solution or a service?" fieldid="Q1_10" transform="" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="Q1_11" label="Is your solution based soley on software or does it include also a hardware component?" fieldid="Q1_11" transform="" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="Q1_12" label="Which FIWARE enablers are being used (or planned to be used) in the project?" fieldid="Q1_12" transform="" plot="ignore" graph="feature" type="multi"/>
+		<filed column="Q1_13" label="How much funding has been received from the accelerator?" fieldid="Q1_13" transform="" plot="ignore" graph="feature" type="num"/>
+		<filed column="Q1_14" label="What is the name of the coordinator of your proposal?" fieldid="Q1_14" transform="" plot="ignore" graph="ignore" type="text"/>
+		<filed column="Q1_15" label="Please provide up to 300 word abstract of your project?" fieldid="Q1_15" transform="" plot="ignore" graph="feature-text" type="text"/>
+		<filed column="Q1_16" label="How many years has your orgainsation been operational?" fieldid="Q1_16" transform="" plot="ignore" graph="feature" type="int"/>
+		<filed column="Q1_17" label="City" fieldid="Q1_17" transform="" plot="ignore" graph="ignore" type="text"/>
+		<filed column="Q1_18a" label="Manufacturing specific enablers" fieldid="Q1_18a" transform="" plot="ignore" graph="ignore" type="multi"/>
+		<filed column="Q1_18b" label="Media specific enablers" fieldid="Q1_18b" transform="" plot="ignore" graph="ignore" type="multi"/>
+		<filed column="Q1_18c" label="eHealth specific enablers" fieldid="Q1_18c" transform="" plot="ignore" graph="ignore" type="multi"/>
+		<filed column="Q1_18d" label="Energy specific enablers" fieldid="Q1_18d" transform="" plot="ignore" graph="ignore" type="multi"/>
+		<filed column="Q1_19" label="The project being assessed is" fieldid="Q1_19" transform="" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="Q1_20" label="Does this project use or plan to use FIWARE enablers?" fieldid="Q1_20" transform="" plot="selection" graph="feature" type="lookup"/>
+		<filed column="Q1_21" label="Please provide up to 300 word abstract outlining the focus and benefits of your project" fieldid="Q1_21" transform="" plot="ignore" graph="feature-text" type="text"/>
+		<filed column="Q1_22" label="IDC unique project ID" fieldid="Q1_22" transform="" plot="ignore" graph="ignore" type="text"/>
+		<filed column="Q1_23" label="Timestamp submitted" fieldid="Q1_23" transform="" plot="ignore" graph="ignore" type="text"/>
+		<filed column="Q2_1" label="How near is your concept to being commercially exploitable?" fieldid="Q2_1" transform="" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="Q2_2" label="Does your business idea provide an Incremental innovation or does it radically change existing products or services?" fieldid="Q2_2" transform="" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="Q2_3" label="Does a similar solution already exist in the marketplace?" fieldid="Q2_3" transform="" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="Q2_4" label="Is the original concept developed by a single person or is it a group effort?" fieldid="Q2_4" transform="" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="Q2_5" label="Will your business idea create a new standalone offereing or does it fit into an existing commercial strategy?" fieldid="Q2_5" transform="" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="Q3_1" label="Select the Business Model that best reflects your idea?" fieldid="Q3_1" transform="" plot="ignore" graph="ignore" type="multi"/>
+		<filed column="Q3_2a" label="How will your expected revenues be divided among the business models choosen above? licenses" fieldid="Q3_2a" transform="" plot="ignore" graph="feature" type="num"/>
+		<filed column="Q3_2b" label="How will your expected revenues be divided among the business models choosen above? subscribtions" fieldid="Q3_2b" transform="" plot="ignore" graph="feature" type="num"/>
+		<filed column="Q3_2c" label="How will your expected revenues be divided among the business models choosen above? project fees" fieldid="Q3_2c" transform="" plot="ignore" graph="feature" type="num"/>
+		<filed column="Q3_2d" label="How will your expected revenues be divided among the business models choosen above? production income" fieldid="Q3_2d" transform="" plot="ignore" graph="feature" type="num"/>
+		<filed column="Q3_2e" label="How will your expected revenues be divided among the business models choosen above? markup income" fieldid="Q3_2e" transform="" plot="ignore" graph="feature" type="num"/>
+		<filed column="Q3_2f" label="How will your expected revenues be divided among the business models choosen above? usage fees " fieldid="Q3_2f" transform="" plot="ignore" graph="feature" type="num"/>
+		<filed column="Q3_2g" label="How will your expected revenues be divided among the business models choosen above? rental income" fieldid="Q3_2g" transform="" plot="ignore" graph="feature" type="num"/>
+		<filed column="Q3_2h" label="How will your expected revenues be divided among the business models choosen above? advertising " fieldid="Q3_2h" transform="" plot="ignore" graph="feature" type="num"/>
+		<filed column="Q3_2i" label="How will your expected revenues be divided among the business models choosen above? transactions income" fieldid="Q3_2i" transform="" plot="ignore" graph="feature" type="num"/>
+		<filed column="Q3_2j" label="How will your expected revenues be divided among the business models choosen above? freemium income" fieldid="Q3_2j" transform="" plot="ignore" graph="feature" type="num"/>
+		<filed column="Q3_2k" label="How will your expected revenues be divided among the business models choosen above? customer analysis income" fieldid="Q3_2k" transform="" plot="ignore" graph="feature" type="num"/>
+		<filed column="Q3_3" label="If you are targeting any secondary market sectors, please select" fieldid="Q3_3" transform="" plot="ignore" graph="ignore" type="multi"/>
+		<filed column="Q3_3a" label="In which primary market sector do you plan to sell your product or service?" fieldid="Q3_3a" transform="" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="Q3_3b" label="Why are you targeting or prioritising this market sector?" fieldid="Q3_3b" transform="" plot="ignore" graph="feature-text" type="text"/>
+		<filed column="Q3_3c" label="Why are you targeting these additional markets? " fieldid="Q3_3c" transform="" plot="ignore" graph="feature-text" type="text"/>
+		<filed column="Q3_4" label="Through which Channel do you expect to sell your product/service?" fieldid="Q3_4" transform="" plot="ignore" graph="feature" type="multi"/>
+		<filed column="Q3_5" label="In the next three years where do you expect to sell your product/service?" fieldid="Q3_5" transform="" plot="selection" graph="feature" type="multi"/>
+		<filed column="Q3_5c" label="" fieldid="Q3_5c" transform="" plot="ignore" graph="ignore" type="lookup"/>
+		<filed column="Q3_6" label="When will (did) your Product/Service enter the open market?" fieldid="Q3_6" transform="" plot="selection" graph="feature" type="int"/>
+		<filed column="Q3_7" label="What is the level of competition in your target market?" fieldid="Q3_7" transform="" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="Q3_8" label="Have you verified your value proposition with the target customers?" fieldid="Q3_8" transform="" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="Q3_9" label="What is the status of your commercial strategy to acquire customers?" fieldid="Q3_9" transform="" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="Q3_10" label="If this is a new market what is the status of your market strategy?" fieldid="Q3_10" transform="" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="Q3_11" label="If this is market with many compettitors what is the status of your market strategy?" fieldid="Q3_11" transform="" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="Q3_12" label="(Consumer): Which primary consumer market are you targeting?" fieldid="Q3_12" transform="" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="Q3_12a" label="Why are you targeting this market sector?" fieldid="Q3_12a" transform="" plot="ignore" graph="feature-text" type="text"/>
+		<filed column="Q3_13" label="If you are targeting any secondary consumer market sectors, please select" fieldid="Q3_13" transform="" plot="ignore" graph="ignore" type="multi"/>
+		<filed column="Q3_13a" label="Why are you targeting these additional markets?" fieldid="Q3_13a" transform="" plot="ignore" graph="feature-text" type="text"/>
+		<filed column="Q4_1" label="Have you estimated and provided for the capital investments required until revenues can sustain your business?" fieldid="Q4_1" transform="" plot="selection" graph="feature" type="lookup"/>
+		<filed column="Q4_2" label="Have you estimated how much your sales will grow on a yearly basis?" fieldid="Q4_2" transform="" plot="selection" graph="feature" type="lookup"/>
+		<filed column="Q4_3a" label="What is your average expected growth rateof your revenue for the next four years" fieldid="Q4_3a" transform="" plot="ignore" graph="feature" type="num"/>
+		<filed column="Q4_3b" label="What is your average expected growth rateof your revenue for the next four years" fieldid="Q4_3b" transform="" plot="ignore" graph="feature" type="num"/>
+		<filed column="Q4_3c" label="What is your average expected growth rateof your revenue for the next four years" fieldid="Q4_3c" transform="" plot="ignore" graph="feature" type="num"/>
+		<filed column="Q4_3d" label="What is your average expected growth rateof your revenue for the next four years" fieldid="Q4_3d" transform="" plot="ignore" graph="feature" type="num"/>
+		<filed column="Q4_4" label="Have you estimated the cost and time required to acquire a new customer in your target market?" fieldid="Q4_4" transform="" plot="selection" graph="feature" type="lookup"/>
+		<filed column="Q4_5" label="Have you planned for expanding your sales force and marketing activities to match the expected growth rate?" fieldid="Q4_5" transform="" plot="selection" graph="feature" type="lookup"/>
+		<filed column="Q4_6" label="What is the % required capital you already have " fieldid="Q4_6" transform="" plot="ignore" graph="feature" type="num"/>
+		<filed column="Q5A_1_A" label="B2B/B2G benefits:  A. Reducing operational costs" fieldid="Q5A_1_A" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q5A_1_B" label="B2B/B2G benefits:  B. Improving sales performance" fieldid="Q5A_1_B" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q5A_1_C" label="B2B/B2G benefits:  C. Improving marketing effectiveness" fieldid="Q5A_1_C" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q5A_1_D" label="B2B/B2G benefits:  D. Enhancing customer (citizen for public sector,  patient for healthcare) care" fieldid="Q5A_1_D" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q5A_1_E" label="B2B/B2G benefits:  E. Innovating the product or service companies sell/provide" fieldid="Q5A_1_E" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q5A_1_F" label="B2B/B2G benefits:  F. Strenghtening multi-channel delivery strategy" fieldid="Q5A_1_F" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q5A_1_G" label="B2B/B2G benefits:  G. Simplifying regulatory tasks and complying with regulations" fieldid="Q5A_1_G" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q5A_1_H" label="B2B/B2G benefits:  H. Improving data protection" fieldid="Q5A_1_H" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q5A_1_I" label="B2B/B2G benefits:  I. Increasing use and distribution of open data and transparency" fieldid="Q5A_1_I" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q5A_1_J" label="B2B/B2G benefits:  J. Improving scalability of existing tools" fieldid="Q5A_1_J" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q5A_1_K" label="B2B/B2G benefits:  K. Improving operational efficiency" fieldid="Q5A_1_K" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q5B_1_A" label="B2C benefits: A. Answering communication/collaboration needs" fieldid="Q5B_1_A" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q5B_1_B" label="B2C benefits: B. Providing better entertainment" fieldid="Q5B_1_B" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q5B_1_C" label="B2C benefits: C. Improving quality of life" fieldid="Q5B_1_C" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q5B_1_D" label="B2C benefits: D. Simplifying daily tasks" fieldid="Q5B_1_D" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q5B_1_E" label="B2C benefits: E. Reducing/Saving time" fieldid="Q5B_1_E" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q5B_1_F" label="B2C benefits: F. Having easier and faster access to information/services" fieldid="Q5B_1_F" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q5B_1_G" label="B2C benefits: G. Saving money" fieldid="Q5B_1_G" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q6A_1_A" label="Social benefit: Perceived security of communities, neighbourhoods and housing" fieldid="Q6A_1_A" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q6A_1_B" label="Social benefit: Protection of privacy and security of personal digital data" fieldid="Q6A_1_B" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q6A_1_C" label="Social benefit: Citizens involvement and participation in open government" fieldid="Q6A_1_C" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q6A_1_D" label="Social benefit: E-inclusion" fieldid="Q6A_1_D" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q6A_1_E" label="Social benefit: Fitness and well-being" fieldid="Q6A_1_E" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q6A_1_F" label="Social benefit: Health" fieldid="Q6A_1_F" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q6A_1_G" label="Social benefit: Quality of life in urban areas" fieldid="Q6A_1_G" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q6A_1_H" label="Social benefit: Quality of life as a result of better access to information and data" fieldid="Q6A_1_H" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q6A_1_I" label="Social benefit: Social inclusion" fieldid="Q6A_1_I" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q6A_1_J" label="Social benefit: Access and use of e-learning and innovative learning methodologies" fieldid="Q6A_1_J" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q6A_1_K" label="Social benefit: Demand and use of sustainable transport solutions" fieldid="Q6A_1_K" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q6B_1_A" label="QoL improvement for: Disabled" fieldid="Q6B_1_A" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q6B_1_B" label="QoL improvement for: Elderly" fieldid="Q6B_1_B" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q6B_1_C" label="QoL improvement for: Ethnic or cultural minorities" fieldid="Q6B_1_C" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q6B_1_D" label="QoL improvement for: Low income" fieldid="Q6B_1_D" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q6B_1_E" label="QoL improvement for: Socially excluded groups" fieldid="Q6B_1_E" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="Q6B_1_F" label="QoL improvement for: Unemployed" fieldid="Q6B_1_F" transform="" plot="ignore" graph="ignore" type="int"/>
+		<filed column="prvstatement" label="" fieldid="prvstatement" transform="" plot="ignore" graph="ignore" type="ignore"/>
 	</list>
 </lists>

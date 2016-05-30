@@ -2,13 +2,12 @@ package si.ijs.ailab.fiimpact.project;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import si.ijs.ailab.util.AIStructures;
+import si.ijs.ailab.fiimpact.settings.IOListField;
 import si.ijs.ailab.util.AIUtils;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -56,7 +55,11 @@ public class ProjectData
 			Element f = doc.createElement("field");
 			idc.appendChild(f);
 			f.setAttribute("id", fe.getKey());
-			f.setAttribute("val", fe.getValue());
+      //!!hotfix - #11 causes read problems, so replace it!
+      String answer = fe.getValue();
+      if(answer != null)
+        answer = answer.replace('\u000B', ' ');
+      f.setAttribute("answer", answer);
 		}
 
 		Element mattermark = doc.createElement("mattermark");
@@ -67,7 +70,11 @@ public class ProjectData
 			Element f = doc.createElement("field");
 			mattermark.appendChild(f);
 			f.setAttribute("id", fe.getKey());
-			f.setAttribute("val", fe.getValue());
+      //!!hotfix - #11 causes read problems, so replace it!
+      String answer = fe.getValue();
+      if(answer != null)
+        answer = answer.replace('\u000B', ' ');
+      f.setAttribute("answer", answer);
 		}
 
 		AIUtils.save(doc, os);
@@ -139,7 +146,7 @@ public class ProjectData
       for(int i = 0; i < nl.getLength(); i++)
       {
         Element e = (Element) nl.item(i);
-        fields.put(e.getAttribute("id"), e.getAttribute("val"));
+        fields.put(e.getAttribute("id"), e.getAttribute("answer"));
 
       }
     }
@@ -151,12 +158,12 @@ public class ProjectData
       for(int i = 0; i < nl.getLength(); i++)
       {
         Element e = (Element) nl.item(i);
-        mattermarkFields.put(e.getAttribute("id"), e.getAttribute("val"));
+        mattermarkFields.put(e.getAttribute("id"), e.getAttribute("answer"));
 
       }
     }
 
-    logger.info("Loaded project {} with {} project fields and {} Mattermark fields.", id, mattermarkFields.size());
+    //logger.info("Loaded project {} with {} project fields and {} Mattermark fields.", id, fields.size(), mattermarkFields.size());
 	}
 
 	public void addFields(String[] arrFields)
@@ -173,22 +180,26 @@ public class ProjectData
 
 	}
 
-	public void addFields(ArrayList<ProjectManager.IOListField> fieldDefinitions, ArrayList<String> fieldValues)
+	public void addFields(ArrayList<IOListField> fieldDefinitions, String[] fieldValues)
 	{
 		fields.clear();
-		for (int i = 0; i < fieldValues.size(); i++)
+		for (int i = 0; i < fieldValues.length; i++)
 		{
-			fields.put(fieldDefinitions.get(i).getFieldid(), fieldValues.get(i));
+			IOListField ioListField = fieldDefinitions.get(i);
+			if(ioListField!=null)
+				fields.put(ioListField.getFieldid(), fieldValues[i]);
 		}
 
 	}
 
-  public void addFieldsMattermark(ArrayList<ProjectManager.IOListField> fieldDefinitions, ArrayList<String> fieldValues)
+  public void addFieldsMattermark(ArrayList<IOListField> fieldDefinitions, String[] fieldValues)
   {
     mattermarkFields.clear();
-    for (int i = 0; i < fieldValues.size(); i++)
+    for (int i = 0; i < fieldValues.length; i++)
     {
-      mattermarkFields.put(fieldDefinitions.get(i).getFieldid(), fieldValues.get(i));
+			IOListField ioListField = fieldDefinitions.get(i);
+			if(ioListField != null)
+      	mattermarkFields.put(ioListField.getFieldid(), fieldValues[i]);
     }
 
   }
@@ -220,6 +231,10 @@ public class ProjectData
     return fields.get(fieldid);
   }
 
+	public void setValue(String fieldid, String val)
+	{
+		fields.put(fieldid, val);
+	}
   public boolean isMattermarkValueSet(String fieldid)
   {
     return mattermarkFields.get(fieldid) != null && !mattermarkFields.get(fieldid).equals("");
@@ -235,7 +250,12 @@ public class ProjectData
     return AIUtils.parseInteger(mattermarkFields.get(fieldid), 0);
   }
 
-  public static void main(String[] args)
+	public Map<String, String> getFields()
+	{
+		return fields;
+	}
+
+	public static void main(String[] args)
   {
   }
 

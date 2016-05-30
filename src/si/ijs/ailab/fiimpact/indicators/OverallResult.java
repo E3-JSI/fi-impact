@@ -2,6 +2,7 @@ package si.ijs.ailab.fiimpact.indicators;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import si.ijs.ailab.fiimpact.settings.FIImpactSettings;
 import si.ijs.ailab.fiimpact.survey.SurveyData;
 import si.ijs.ailab.fiimpact.survey.SurveyManager;
 import si.ijs.ailab.util.AIStructures;
@@ -225,7 +226,7 @@ public class OverallResult
   {
     JSONObject jsonAverage = new JSONObject();
     jsonAverage.put("id", id);
-    jsonAverage.put("average", SurveyManager.getDecimalFormatter4().format(average));
+    jsonAverage.put("average", FIImpactSettings.getDecimalFormatter4().format(average));
     jsonAverage.put("average_slot", graph.getSlot(average));
     JSONArray jsonHistogram = toJSONHistogram();
     jsonAverage.put("histogram", jsonHistogram);
