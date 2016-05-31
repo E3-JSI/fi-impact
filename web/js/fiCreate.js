@@ -6,7 +6,7 @@
 
 		vm.dismiss = function () { $uibModalInstance.dismiss(); };
 		
-		vm.create = { user: '', password: '', description: '', accelerator: '' }
+		vm.create = { user: '', password: '', description: '', accelerator: $scope.profile.accelerator }
 		
 		vm.alert = {
 			enterUser: false,

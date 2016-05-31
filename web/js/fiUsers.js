@@ -13,10 +13,18 @@
 			});
 		}
 		
+		$scope.updateUsers = function() {
+			$http.get('../../manager?action=user-list').then(
+				function successCallback(response) { $scope.users = response.data.users },
+				function errorCallback(response) { console.log('Failed getting users.') }
+			);
+		}
+		
 		$scope.profile = fi.profile
 		$scope.accelerators = fi.accelerators
-		$scope.users = fi.users.users
-		$scope.roles = fi.roles
+		$scope.users = []
+		$scope.updateUsers()
+		$scope.roles = fi.getJSON('../../manager?action=roles')
 		delete $scope.roles.admin
 		$scope.properties = ['description', 'accelerator', 'access']
 		
@@ -45,16 +53,6 @@
 				}
 			})
 			return access
-		}
-		
-		$scope.updateUsers = function() {
-			$http({
-				method: 'GET',
-				url: '../../manager?action=user-list'
-			}).then(
-				function successCallback(response) { $scope.users = response.data.users },
-				function errorCallback(response) { console.log('Failed getting users.') }
-			);
 		}
 		
 	}]);

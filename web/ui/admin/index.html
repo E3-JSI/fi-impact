@@ -45,20 +45,20 @@
 				<i class="fa fa-user" aria-hidden="true"></i> {{profile.user}} <span ng-if="profile.accelerator.length > 0"><i class="fa fa-building-o" aria-hidden="true"></i> {{profile.accelerator}}</span>
 				<div class="btn-group" role="group" style="margin-left: 10px">
 					<button id="btnUpload" type="button" class="btn" ng-class="{'btn-primary': access('upload'), 'btn-secondary': !access('upload')}" ng-disabled="!access('upload')" ng-click="vm.open('upload')">Upload</button>
-					<div class="btn-group">
+					
+					<div class="btn-group" uib-dropdown is-open="status.isopen">
 						<a class="btn" ng-class="{'btn-primary': access('export'), 'btn-secondary': !access('export')}" ng-disabled="!access('export')" href="../../manager?action=export&type=short">Export</a>
-						<button type="button" class="btn dropdown-toggle" ng-class="{'btn-primary': access('export'), 'btn-secondary': !access('export')}" ng-disabled="!access('export')" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<button id="export-dropdown" type="button" class="btn btn-primary dropdown-toggle" uib-dropdown-toggle on-toggle="toggled(open)" ng-class="{'btn-primary': access('export'), 'btn-secondary': !access('export')}" ng-disabled="!access('export')">
 							<span class="caret"></span>
-							<span class="sr-only">Toggle Dropdown</span>
 						</button>
-						<ul class="dropdown-menu">
-							<li><a href="../../manager?action=export&type=short" title="Basic project info with KPIs">Basic</a></li>
-							<li><a href="../../manager?action=export&type=full-no-derived" title="Surveys, KPIs, projects info, Mattermark data and indicators">Full</a></li>
+						<ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="export-dropdown">
+							<li role="menuitem"><a href="../../manager?action=export&type=short" title="Basic project info with KPIs">Basic</a></li>
+							<li role="menuitem"><a href="../../manager?action=export&type=full-no-derived" title="Surveys, KPIs, projects info, Mattermark data and indicators">Full</a></li>
 							<li role="separator" class="divider"></li>
-							<li><a href="../../manager?action=legend" title="Legend">Legend</a></li>
+							<li role="menuitem"><a href="../../manager?action=legend" title="Legend">Legend</a></li>
 							<li role="separator" class="divider"></li>
 							<li class="disabled">accelerators</li>
-							<li ng-repeat="a in accelerators"><a ng-href="../../manager?action=export&type=accelerator&id={{a}}" title="Filtered by accelerator, basic project info with KPIs">{{a}}</a></li>
+							<li role="menuitem" ng-repeat="a in accelerators"><a ng-href="../../manager?action=export&type=accelerator&id={{a}}" title="Filtered by accelerator, basic project info with KPIs">{{a}}</a></li>
 						</ul>
 					</div>
 				</div>

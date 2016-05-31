@@ -1,5 +1,11 @@
 var fiData = function (id) { // id is optional
 	
+	this.getJSON = function (jsonUrl) {
+		var result = null;
+		$.ajax({ url: jsonUrl, type: 'get', dataType: 'json', async: false, success: function(data) { result = data; } });
+		return result;
+	}
+	
 	this.model = {
 		"speedometers": {
 			"S_2": "innovation",
@@ -27,11 +33,9 @@ var fiData = function (id) { // id is optional
 		this.id = id;
 	}
 	else {
-		this.manager = getJSON('../../manager?action=list')
-		this.profile = getJSON('../../manager?action=user-profile')
-		this.accelerators = getJSON('../..//manager?action=accelerators')
-		this.roles = getJSON('../../manager?action=roles')
-		this.users = getJSON('../../manager?action=user-list')
+		this.manager = this.getJSON('../../manager?action=list')
+		this.profile = this.getJSON('../../manager?action=user-profile')
+		this.accelerators = this.getJSON('../..//manager?action=accelerators')
 	}
 	
 	// * * * * * * * * * *
@@ -87,12 +91,6 @@ var fiData = function (id) { // id is optional
 		$.each(json.sections.S_6A.answers.Q6A_1.answers, function(i, v) {
 			result.socialBenefits[v.id] = { id: v.id, value: v.result_percent, average: v.average_percent, label: v.label };
 		});
-		return result;
-	}
-	
-	function getJSON(jsonUrl) {
-		var result = null;
-		$.ajax({ url: jsonUrl, type: 'get', dataType: 'json', async: false, success: function(data) { result = data; } });
 		return result;
 	}
 	

@@ -6,6 +6,7 @@
 		$scope.surveys = fi.manager.surveys
 		$scope.profile = fi.profile
 		$scope.accelerators = fi.accelerators
+		$scope.firstLogin = ($scope.profile.first_login == "true")
 		
 		vm.open = function(modal) {
 			var modalInstance = $uibModal.open({
@@ -16,6 +17,7 @@
 			});
 		}
 		
+		if ($scope.firstLogin) vm.open('password')
 		
 		var ratioToPercent = function(r) { return Math.round(r*100); console.log("test"); }
 		$.each($scope.surveys, function( i, v ) {
