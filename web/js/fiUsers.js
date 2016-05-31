@@ -2,6 +2,12 @@
 	'use strict';
 	angular.module('fiManagerApp').controller('fiUsers', ['$http', '$scope', '$uibModal', 'formSubmit', function($http, $scope, $uibModal, formSubmit) {
 		var vm = this;
+
+		var getJSON = function (jsonUrl) {
+			var result = null;
+			$.ajax({ url: jsonUrl, type: 'get', dataType: 'json', async: false, success: function(data) { result = data; } });
+			return result;
+		}
 		
 		vm.open = function(modal, user) {
 			var modalInstance = $uibModal.open({
@@ -20,11 +26,11 @@
 			);
 		}
 		
-		$scope.profile = fi.profile
-		$scope.accelerators = fi.accelerators
+		$scope.profile = getJSON('../../manager?action=user-profile')
+		$scope.accelerators = getJSON('../..//manager?action=accelerators')
 		$scope.users = []
 		$scope.updateUsers()
-		$scope.roles = fi.getJSON('../../manager?action=roles')
+		$scope.roles = getJSON('../../manager?action=roles')
 		delete $scope.roles.admin
 		$scope.properties = ['description', 'accelerator', 'access']
 		

@@ -18,32 +18,34 @@
 			filter: ''
 		}
 		
+		vm.raw = []
 		vm.data = []
 		vm.total = 0
 		vm.filterDictionary = {}
 		
-		vm.plotChart = function() {
-			vm.data = []
-			getData.async('data', function(response) {
-				vm.total = response.data.total
-				var filtering = getFilterGroups()
-				console.log(vm.filterDictionary)
-				$.each(response.data.surveys, function(type, list) {
-					if (!filtering) vm.data.push({ key: type, values: [] })
-					$.each(list, function(i, value) {
-						var typeIndex = vm.data.length-1
-						var index = ( filtering ? getOptionIndex(value.filters[vm.scatter.filter]) : typeIndex )
-						vm.data[index].values.push({ shape: symbols[typeIndex], size: 0.5, x: Math.round(value.KPI[vm.scatter.abscissa]*100)/100, y: Math.round(value.KPI[vm.scatter.ordinate]*100)/100 })
-					});
-				});
-				drawGraph(vm.data)
-			})
-		}
-		
 		getData.async('legend', function(response) {
 			vm.legend = response.data
 		})
-		vm.plotChart()
+		
+		getData.async('data', function(response) {
+			vm.total = response.data.total
+			vm.raw = response.data.surveys
+			vm.plotChart()
+		})
+		
+		vm.plotChart = function() {
+			vm.data = []
+			var filtering = getFilterGroups()
+			$.each(vm.raw, function(type, list) {
+				if (!filtering) vm.data.push({ key: type, values: [] })
+				$.each(list, function(i, value) {
+					var typeIndex = vm.data.length-1
+					var index = ( filtering ? getOptionIndex(value.filters[vm.scatter.filter]) : typeIndex )
+					vm.data[index].values.push({ shape: symbols[typeIndex], size: 0.5, x: Math.round(value.KPI[vm.scatter.abscissa]*100)/100, y: Math.round(value.KPI[vm.scatter.ordinate]*100)/100 })
+				});
+			});
+			drawGraph(vm.data)
+		}
 		
 		var getOptionIndex = function(option) {
 			var optionData = vm.filterDictionary[option]

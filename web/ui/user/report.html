@@ -49,7 +49,7 @@
 					<li><a class="page-scroll" href="#socialImpact">Social Impact</a></li>
 					<li><a class="page-scroll" href="#mattermark">Mattermark</a></li>
 					<li><a class="page-scroll" href="#overview">Overview</a></li>
-					<li><a id="pdfDownload"><i class="fa fa-download"></i> PDF</a></li>
+					<li><a id="pdfDownload" ng-click='download()'><i class="fa fa-download"></i> PDF</a></li>
                 </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
@@ -326,27 +326,8 @@
 	<script src="../../js/fiRadar.js"></script>
 	<script src="../../js/Speedometer2.js"></script>
 	<!-- FI JavaScript -->
-	<script src="../../js/fi.js"></script>
-	<script>
-	$(document).ready( function() {
-		$.each(fi.json.speedometers, function(i, v) { d3Speedometer('#' + v + 'Gauge', fi.json[v].speedometer); });
-		window.radar = {
-			Overview: new fiRadar("bodyOverview", fi.json.radarOverview),
-			SocialA: new fiRadar("bodySocialA", fi.json.radarSocialA, {w: 400, h: 400, levels: 5}, fi.model.radarLevelsSocial),
-			SocialB: new fiRadar("bodySocialB", fi.json.radarSocialB, {w: 400, h: 400, levels: 5}, fi.model.radarLevelsSocial)
-		};
-		$.each(window.radar, function(i, v) { v.draw("#radar" + i) });
-		
-		$("#pdfDownload").click(function() {
-			$.get( "../../service?action=pdf&id=" + fi.id, function(data) {
-				if ($(data).find('status').attr('status') == "OK") {
-					var win = window.open('../../pdf/survey-' + fi.id + '.pdf', '_blank');
-					if (win) { win.focus(); }
-				}
-			});
-		});
-	});
-	</script>
+	<script src="../../js/fiReport.js"></script>
+
 </body>
 
 </html>

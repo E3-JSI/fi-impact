@@ -1,11 +1,19 @@
 (function () {
 	'use strict';
-	angular.module('fiManagerApp').controller('fiProjects', ['$scope', 'formSubmit', '$uibModal',  'fileUpload', function($scope, formSubmit, $uibModal, fileUpload) {
+	angular.module('fiManagerApp').controller('fiProjects', ['$scope', 'formSubmit', '$uibModal', 'fileUpload', function($scope, formSubmit, $uibModal, fileUpload) {
 		var vm = this;
 		
-		$scope.surveys = fi.manager.surveys
-		$scope.profile = fi.profile
-		$scope.accelerators = fi.accelerators
+		var getJSON = function (jsonUrl) {
+			var result = null;
+			$.ajax({ url: jsonUrl, type: 'get', dataType: 'json', async: false, success: function(data) { result = data; } });
+			return result;
+		}
+		
+		var manager = getJSON('../../manager?action=list')
+		
+		$scope.surveys = manager.surveys
+		$scope.profile = getJSON('../../manager?action=user-profile')
+		$scope.accelerators = getJSON('../..//manager?action=accelerators')
 		$scope.firstLogin = ($scope.profile.first_login == "true")
 		
 		vm.open = function(modal) {
