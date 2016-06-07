@@ -164,11 +164,11 @@ public class FIImpactRequestHandler extends HttpServlet
       response.setContentType("application/json");
       response.setCharacterEncoding("utf-8");
 
-      if(arrSelections.length == 0)
+      /*if(arrSelections.length == 0)
       {
         logger.info("default to standard plot selections");
         arrSelections = new String[] {"Q1_1", "Q1_2"};
-      }
+      }*/
       FIImpactSettings.getFiImpactSettings().getSurveyManager().listFilter(response.getOutputStream(), arrQuestions, arrSelections, sId);
     }
     else if (sAction.equals("plot-legend"))

@@ -129,8 +129,8 @@
 	<list name="survey">
 		<filed column="Q0_1" label="Type" fieldid="Q0_1" transform="" plot="selection" graph="selection" type="lookup"/>
 		<filed column="Q0_2" label="Version" fieldid="Q0_2" transform="" plot="ignore" graph="ignore" type="lookup"/>
-		<filed column="Q1_1" label="Which Accelerator is funding you?" fieldid="Q1_1" transform="" plot="selection" graph="selection" type="lookup"/>
-		<filed column="Q1_2" label="In which country is your organisation headquartered?" fieldid="Q1_2" transform="" plot="selection" graph="selection" type="lookup"/>
+		<filed column="Q1_1" label="Which Accelerator is funding you?" fieldid="Q1_1" transform="" plot="selection" graph="selection" type="category"/>
+		<filed column="Q1_2" label="In which country is your organisation headquartered?" fieldid="Q1_2" transform="" plot="selection" graph="selection" type="category"/>
 		<filed column="Q1_3" label="What is the name of your organisation?" fieldid="Q1_3" transform="" plot="display" graph="display" type="text"/>
 		<filed column="Q1_4" label="What is the name of your project?" fieldid="Q1_4" transform="" plot="display" graph="display" type="text"/>
 		<filed column="Q1_5" label="What is the mailing address of your organisation?" fieldid="Q1_5" transform="" plot="ignore" graph="ignore" type="text"/>

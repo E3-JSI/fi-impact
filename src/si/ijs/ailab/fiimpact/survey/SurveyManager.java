@@ -36,8 +36,8 @@ public class SurveyManager
   }
 
   private final Map<String, SurveyData> surveys = Collections.synchronizedMap(new HashMap<String, SurveyData>());
-  private SortedSet<String> accelerators = Collections.synchronizedSortedSet(new TreeSet<String>());
-  //private List<String> sortedQuestions = Collections.synchronizedList(new ArrayList<String>());
+  private IOListField accelerators = null;
+
 
   Map<String, Map<String, OverallResult>> getResults()
   {
@@ -75,6 +75,7 @@ public class SurveyManager
 
   public SurveyManager()
   {
+    accelerators = FIImpactSettings.getFiImpactSettings().getListFieldDefinition("Q1_1");
     load();
   }
 
@@ -144,8 +145,6 @@ public class SurveyManager
     logger.info("Recalc Results");
     //results.clear();
     Map<String, Map<String, OverallResult>> resultsNew = new TreeMap<>();
-    SortedSet<String> acceleratorsNew = Collections.synchronizedSortedSet(new TreeSet<String>());
-    //SortedSet<String> sortedQuestionsSet = Collections.synchronizedSortedSet(new TreeSet<String>());
 
     for(String type : FIImpactSettings.QUESTIONNAIRE_TYPE)
     {
@@ -166,6 +165,17 @@ public class SurveyManager
     IOListDefinition surveyPredefinedFields = FIImpactSettings.getFiImpactSettings().getListDefinition(FIImpactSettings.LIST_SURVEYS);
     synchronized(surveys)
     {
+      //Category fields have to be redone on calc all
+      ArrayList<IOListField> categoryFields = new ArrayList<>();
+      for(IOListField ioListField: FIImpactSettings.getFiImpactSettings().getAllFields().values())
+      {
+        if(ioListField.getType().equals(FIImpactSettings.FIELD_TYPE_CATEGORY))
+        {
+          categoryFields.add(ioListField);
+          ioListField.getLookup().clear();
+        }
+      }
+
       for(SurveyData sd : surveys.values())
       {
         String sdType = sd.getType();
@@ -185,9 +195,13 @@ public class SurveyManager
             }
           }
         }
-        String Q1_1 = sd.questions.get("Q1_1");
-        if(Q1_1 != null && !Q1_1.equals(""))
-          acceleratorsNew.add(Q1_1);
+
+        for(IOListField ioListField: categoryFields)
+        {
+          String answer = sd.questions.get(ioListField.getFieldid());
+          if(answer != null && !answer.equals(""))
+            ioListField.addLookup(answer, answer);
+        }
 
         for(String questionID : sd.questions.keySet())
           if(!surveyPredefinedFields.getFieldsById().containsKey(questionID))
@@ -204,7 +218,6 @@ public class SurveyManager
     synchronized(surveys)
     {
       results = resultsNew;
-      accelerators = acceleratorsNew;
     }
     logger.info("Recalc results done");
 
@@ -327,7 +340,7 @@ public class SurveyManager
       OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
       JSONWriter jsonSurvey = new JSONWriter(w);
       jsonSurvey.array();
-      for(String s : accelerators)
+      for(String s : accelerators.getLookup().keySet())
       {
         if(userAccelerator.equals("") || userAccelerator.equals(s))
           jsonSurvey.value(s);
@@ -635,11 +648,12 @@ public class SurveyManager
   //Highlights - a list of fields for the highlighting F1;F2;...
   public void listFilter(ServletOutputStream outputStream, String[] filter, String[] highlights, String referenceSurveyInternalID) throws IOException
   {
-    OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
     logger.info("Return {} surveys", surveys.size());
-    JSONWriter json = new JSONWriter(w);
-    json.object().key("total").value(surveys.size());
-    json.key("surveys").array();
+    JSONObject json = new JSONObject();
+    json.put("total", surveys.size());
+    JSONObject jsonSurveys = new JSONObject();
+    json.put("surveys", jsonSurveys);
+    Map<String, JSONArray> surveysByType = new TreeMap<>();
 
     Map<String, List<String>> mapFilter = new TreeMap<>();
     if(filter != null)
@@ -713,14 +727,9 @@ public class SurveyManager
 
       if(bInclude)
       {
-        json.object();
-
-        json.key("info").object();
-        addQuestionKey(json, "Q1_3", surveyData.questions);
-        addQuestionKey(json, "Q1_4", surveyData.questions);
-        json.endObject();
 
         String node_type = "normal";
+
         ProjectData pd = surveyData.getProject();
         if(pd != null)
         {
@@ -734,58 +743,95 @@ public class SurveyManager
         if(surveyData.getId().equals(referenceSurveyInternalID))
           node_type = "SELECTED";
 
-        json.key("type").value(node_type);
 
-        json.key("filters").object();
-
-        for(String s: highlights)
+        JSONArray jsonSurveysTypeArr = surveysByType.get(node_type);
+        if(jsonSurveysTypeArr == null)
         {
+          jsonSurveysTypeArr = new JSONArray();
+          surveysByType.put(node_type, jsonSurveysTypeArr);
+          jsonSurveys.put(node_type, jsonSurveysTypeArr);
 
-          IOListField ioListField = FIImpactSettings.getFiImpactSettings().getListFieldDefinition(s);
-          if(!ioListField.getListId().equals(FIImpactSettings.LIST_SURVEYS))
+        }
+        JSONObject jsonSurvey = new JSONObject();
+        jsonSurveysTypeArr.put(jsonSurvey);
+
+        JSONObject jsonInfo = new JSONObject();
+        jsonSurvey.put("info", jsonInfo);
+        addQuestionKey(jsonInfo, "Q1_3", surveyData.questions);
+        addQuestionKey(jsonInfo, "Q1_4", surveyData.questions);
+
+        JSONObject jsonFilters = new JSONObject();
+        jsonSurvey.put("filters", jsonFilters);
+
+        if(highlights.length > 0)
+        {
+          for(String s : highlights)
           {
-            if(pd != null)
+
+            IOListField ioListField = FIImpactSettings.getFiImpactSettings().getListFieldDefinition(s);
+            if(!ioListField.getListId().equals(FIImpactSettings.LIST_SURVEYS))
             {
-              if(ioListField.getListId().equals(FIImpactSettings.LIST_PROJECTS))
-                addQuestionKey(json, s, pd.getFields());
-              else if(ioListField.getListId().equals(FIImpactSettings.LIST_MATTERMARK))
-                addQuestionKey(json, s, pd.getMattermarkFields());
+              if(pd != null)
+              {
+                if(ioListField.getListId().equals(FIImpactSettings.LIST_PROJECTS))
+                  addQuestionKey(jsonFilters, s, pd.getFields());
+                else if(ioListField.getListId().equals(FIImpactSettings.LIST_MATTERMARK))
+                  addQuestionKey(jsonFilters, s, pd.getMattermarkFields());
+              }
+            }
+            else
+              addQuestionKey(jsonFilters, s, surveyData.questions);
+          }
+        }
+        else
+        {
+          for(IOListField ioListField: FIImpactSettings.getFiImpactSettings().getAllFields().values())
+          {
+
+            if (ioListField.getPlot().equals(FIImpactSettings.FIELD_PLOT_SELECTION))
+            {
+              if(!ioListField.getListId().equals(FIImpactSettings.LIST_SURVEYS))
+              {
+                if(pd != null)
+                {
+                  if(ioListField.getListId().equals(FIImpactSettings.LIST_PROJECTS))
+                    addQuestionKey(jsonFilters, ioListField.getFieldid(), pd.getFields());
+                  else if(ioListField.getListId().equals(FIImpactSettings.LIST_MATTERMARK))
+                    addQuestionKey(jsonFilters, ioListField.getFieldid(), pd.getMattermarkFields());
+                }
+              }
+              else
+                addQuestionKey(jsonFilters, ioListField.getFieldid(), surveyData.questions);
             }
           }
-          else
-            addQuestionKey(json, s, surveyData.questions);
+
         }
 
-        json.endObject();
+        JSONObject jsonKPI = new JSONObject();
+        jsonSurvey.put("KPI", jsonKPI);
+        addResultKey(jsonKPI, "INNOVATION", surveyData.results);
+        addResultKey(jsonKPI, "MARKET", surveyData.results);
+        addResultKey(jsonKPI, "FEASIBILITY", surveyData.results);
+        addResultKey(jsonKPI, "MARKET_NEEDS", surveyData.results);
+        addResultKey(jsonKPI, "MATTERMARK_GROWTH", surveyData.results);
 
-        json.key("KPI").object();
-        addResultKey(json, "INNOVATION", surveyData.results);
-        addResultKey(json, "MARKET", surveyData.results);
-        addResultKey(json, "FEASIBILITY", surveyData.results);
-        addResultKey(json, "MARKET_NEEDS", surveyData.results);
-        ArrayList<IOListField> mattermarkIndicators = FIImpactSettings.getFiImpactSettings().getMattermarkIndicators();
-        for(IOListField indicator : mattermarkIndicators)
-          addResultKey(json, indicator.getFieldid(), surveyData.results);
+        jsonKPI = new JSONObject();
+        jsonSurvey.put("KPI_percent", jsonKPI);
 
-        json.endObject();
-        json.key("KPI_percent").object();
+        addResultKey(jsonKPI, "INNOVATION_GRAPH_PERCENT", surveyData.resultDerivatives);
+        addResultKey(jsonKPI, "MARKET_GRAPH_PERCENT", surveyData.resultDerivatives);
+        addResultKey(jsonKPI, "FEASIBILITY_GRAPH_PERCENT", surveyData.resultDerivatives);
+        addResultKey(jsonKPI, "MARKET_NEEDS_GRAPH_PERCENT", surveyData.resultDerivatives);
+        addResultKey(jsonKPI, "MATTERMARK_GROWTH_GRAPH_PERCENT", surveyData.resultDerivatives);
 
-        addResultKey(json, "INNOVATION_GRAPH_PERCENT", surveyData.resultDerivatives);
-        addResultKey(json, "MARKET_GRAPH_PERCENT", surveyData.resultDerivatives);
-        addResultKey(json, "FEASIBILITY_GRAPH_PERCENT", surveyData.resultDerivatives);
-        addResultKey(json, "MARKET_NEEDS_GRAPH_PERCENT", surveyData.resultDerivatives);
-
-        //add results for all mattermark indicators
-        for(IOListField indicator : mattermarkIndicators)
-          addResultKey(json, indicator.getFieldid()+"_GRAPH_PERCENT", surveyData.resultDerivatives);
-        json.endObject();
-        json.endObject();
       }
     }
-    json.endArray();
-    json.endObject();
+
+    OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
+    json.write(w);
     w.flush();
     w.close();
+
     logger.info("Returned {} surveys", surveys.size());
 
   }
@@ -1209,6 +1255,25 @@ public class SurveyManager
     Double val = results.get(qID);
     if(val != null)
       json.key(qID).value(FIImpactSettings.getDecimalFormatter4().format(val));
+  }
+
+  private void addQuestionKey(JSONObject json, String qID, Map<String, String> questions)
+  {
+    String val = questions.get(qID);
+    if(val != null)
+      json.put(qID, val);
+  }
+
+  private void addResultKey(JSONObject json, String qID, Map<String, Double> results)
+  {
+    Double val = results.get(qID);
+    if(val != null)
+    {
+      if(FIImpactSettings.RANDOM_VARIANCE_PLOT)
+        val = val +(val*0.05*(Math.random()*2.0-1.0));
+
+      json.put(qID, FIImpactSettings.getDecimalFormatter4().format(val));
+    }
   }
 
   synchronized public void clearAll(ServletOutputStream outputStream) throws IOException

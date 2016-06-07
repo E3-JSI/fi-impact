@@ -15,41 +15,7 @@
 		}, {
 			"id" : "1",
 			"questions" : [{
-					"id" : "1",
-					"lookup" : [{
-							"A" : "Ceedtech"
-						}, {
-							"B" : "Creatifi"
-						}, {
-							"C" : "European Pioneers"
-						}, {
-							"D" : "Fabulous"
-						}, {
-							"E" : "FI-Adopt"
-						}, {
-							"F" : "FI-C3"
-						}, {
-							"G" : "Fiche"
-						}, {
-							"H" : "Finish"
-						}, {
-							"I" : "Finodex"
-						}, {
-							"J" : "Fractals"
-						}, {
-							"K" : "FrontierCities"
-						}, {
-							"L" : "Impact"
-						}, {
-							"M" : "Incense"
-						}, {
-							"N" : "Smart Agri-food"
-						}, {
-							"O" : "Soul-fi"
-						}, {
-							"P" : "Speedup Europe"
-						}
-					]
+					"id" : "1"
 				}, {
 					"id" : "2",
 					"merge" : [{

@@ -52,6 +52,7 @@ public class FIImpactSettings
   private static final char newline = '\n';
   public static final String SHORT_QUESTIONS_LIST = "Q1_1;Q1_2;Q1_3;Q1_4;Q1_22";
   public static final String SHORT_INDICATORS_LIST = "FEASIBILITY;INNOVATION;MARKET;MARKET_NEEDS";
+  public static final boolean RANDOM_VARIANCE_PLOT = false;
 
   private static FIImpactSettings fiImpactSettings;
 
@@ -367,6 +368,7 @@ public class FIImpactSettings
 
   public final static String FIELD_TYPE_TEXT = "text";
   public final static String FIELD_TYPE_LOOKUP = "lookup";
+  public final static String FIELD_TYPE_CATEGORY = "category";
   public final static String FIELD_TYPE_MULTI = "multi";
   public final static String FIELD_TYPE_INT = "int";
   public final static String FIELD_TYPE_NUM = "num";
@@ -650,6 +652,11 @@ public class FIImpactSettings
     return ioAllFields.get(id);
   }
 
+  public Map<String, IOListField> getAllFields()
+  {
+    return ioAllFields;
+  }
+
   public ArrayList<IOListField> getMattermarkIndicators()
   {
     return mattermarkIndicators;
@@ -746,6 +753,7 @@ public class FIImpactSettings
         json.object();
         json.key("field").value(ioListField.getFieldid());
         json.key("label").value(ioListField.getLabel());
+        json.key("type").value(ioListField.getType());
         if(ioListField.getLookup().size() > 0)
         {
           json.key("lookup").array();
