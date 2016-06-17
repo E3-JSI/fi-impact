@@ -3,6 +3,7 @@ package si.ijs.ailab.fiimpact.servlet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import si.ijs.ailab.fiimpact.qminer.QMinerManager;
 import si.ijs.ailab.fiimpact.settings.FIImpactSettings;
 import si.ijs.ailab.fiimpact.users.UserInfo;
 import si.ijs.ailab.fiimpact.users.UsersManager;
@@ -34,10 +35,6 @@ public class FIImpactSecureRequestHandler extends HttpServlet
   private int MAX_REQUEST_SIZE = 10 * 1024 * 1024;
   private int MAX_TEMP_MEM_SIZE = 5 * 1024 * 1024;
 
-
-  private String importDir;
-  private String exportDir;
-
   private Path uploadDir;
   private Path tempUploadDir;
 
@@ -48,12 +45,6 @@ public class FIImpactSecureRequestHandler extends HttpServlet
   @Override
   public void init(ServletConfig config) throws ServletException
   {
-    //E:\Dropbox\FI-IMPACT\data\FI-IMPACT_Export_20150624
-    importDir = config.getServletContext().getInitParameter("import-dir");
-    //E:\Dropbox\FI-IMPACT\data\export.txt
-    exportDir = config.getServletContext().getInitParameter("export-dir");
-    logger.info("import-dir={}", importDir);
-    logger.info("export-dir={}", exportDir);
 
     String sUploadDir = config.getServletContext().getInitParameter("upload-dir");
     if(sUploadDir != null)
@@ -93,11 +84,15 @@ public class FIImpactSecureRequestHandler extends HttpServlet
   private static final Map<String, String> POST_ACTION_ROLES = new HashMap<>();
 
   {
-    GET_ACTION_ROLES.put("load", "upload");
     GET_ACTION_ROLES.put("list", "admin");
     GET_ACTION_ROLES.put("clear", "upload");
     GET_ACTION_ROLES.put("export", "export");
     GET_ACTION_ROLES.put("export-json", "upload-extended");
+
+    GET_ACTION_ROLES.put(QMinerManager.ACTION_START_UPDATE_JOB, "upload-extended");
+    GET_ACTION_ROLES.put(QMinerManager.ACTION_STOP_UPDATE_JOB, "upload-extended");
+    GET_ACTION_ROLES.put(QMinerManager.ACTION_POST_DATASET, "upload-extended");
+    GET_ACTION_ROLES.put(QMinerManager.ACTION_GET_STATUS, "upload-extended");
 
     GET_ACTION_ROLES.put("user-profile", "admin");
     GET_ACTION_ROLES.put("accelerators", "admin");
@@ -185,14 +180,6 @@ public class FIImpactSecureRequestHandler extends HttpServlet
       }
       FIImpactSettings.getFiImpactSettings().getSurveyManager().list(response.getOutputStream(), groupQuestion, groupAnswer);
     }
-    else if (sAction.equals("load"))
-    {
-      //id is external
-      response.setContentType("application/json");
-      response.setCharacterEncoding("utf-8");
-      //surveyManager.loadAll(response.getOutputStream(), "list.csv");
-      FIImpactSettings.getFiImpactSettings().getSurveyManager().loadAllTest(response.getOutputStream(), importDir);
-    }
     else if(sAction.equals("clear"))
     {
       response.setContentType("application/json");
@@ -276,6 +263,22 @@ public class FIImpactSecureRequestHandler extends HttpServlet
       response.setHeader( "Content-Disposition", "filename=\"fi-impact-export.json\"" );
       FIImpactSettings.getFiImpactSettings().getSurveyManager().exportJson(response.getOutputStream());
 
+    }
+    else if (sAction.equals(QMinerManager.ACTION_START_UPDATE_JOB))
+    {
+      FIImpactSettings.getFiImpactSettings().getQMinerManager().actionStartJob(response.getOutputStream());
+    }
+    else if (sAction.equals(QMinerManager.ACTION_STOP_UPDATE_JOB))
+    {
+      FIImpactSettings.getFiImpactSettings().getQMinerManager().actionStopJob(response.getOutputStream());
+    }
+    else if (sAction.equals(QMinerManager.ACTION_POST_DATASET))
+    {
+      FIImpactSettings.getFiImpactSettings().getQMinerManager().actionPostDataset(response.getOutputStream());
+    }
+    else if (sAction.equals(QMinerManager.ACTION_GET_STATUS))
+    {
+      FIImpactSettings.getFiImpactSettings().getQMinerManager().actionGetStatus(response.getOutputStream());
     }
     else if (sAction.equals("legend"))
     {

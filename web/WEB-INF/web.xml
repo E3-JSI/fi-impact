@@ -13,12 +13,8 @@
 		<param-value>E:\server\Tomcat7\webapps\fi-impact\WEB-INF\tmp</param-value>
 	</context-param>
 	<context-param>
-		<param-name>import-dir</param-name>
-		<param-value>E:\Dropbox\FI-IMPACT\data\FI-IMPACT_Export_20150624</param-value>
-	</context-param>
-	<context-param>
-		<param-name>export-dir</param-name>
-		<param-value>E:\server\Tomcat7\webapps\fi-impact\WEB-INF\transfer</param-value>
+		<param-name>qMinerUrl</param-name>
+		<param-value>http://localhost:3000/</param-value>
 	</context-param>
 	<welcome-file-list>
 		<welcome-file>

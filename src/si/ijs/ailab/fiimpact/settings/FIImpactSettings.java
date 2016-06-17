@@ -14,9 +14,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import si.ijs.ailab.fiimpact.indicators.OverallResult;
 import si.ijs.ailab.fiimpact.project.ProjectManager;
+import si.ijs.ailab.fiimpact.qminer.QMinerManager;
 import si.ijs.ailab.fiimpact.survey.SurveyManager;
 import si.ijs.ailab.util.AIUtils;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -52,7 +54,7 @@ public class FIImpactSettings
   private static final char newline = '\n';
   public static final String SHORT_QUESTIONS_LIST = "Q1_1;Q1_2;Q1_3;Q1_4;Q1_22";
   public static final String SHORT_INDICATORS_LIST = "FEASIBILITY;INNOVATION;MARKET;MARKET_NEEDS";
-  public static final boolean RANDOM_VARIANCE_PLOT = false;
+  public static final boolean RANDOM_VARIANCE_PLOT = true;
 
   private static FIImpactSettings fiImpactSettings;
 
@@ -398,16 +400,20 @@ public class FIImpactSettings
   private final Path surveyRoot;
   private final SurveyManager surveyManager;
   private final ProjectManager projectManager;
+  private final QMinerManager qMinerManager;
   private final JSONObject fiImpactModel;
 
 
 
-  public FIImpactSettings(Path _webappRoot)
+  public FIImpactSettings(ServletContext servletContext)
   {
     fiImpactSettings = this;
-    surveyMapFile = _webappRoot.resolve("WEB-INF").resolve("survey-id-list.txt");
-    surveyRoot = _webappRoot.resolve("WEB-INF").resolve("survey");
-    logger.debug("Root: {}", _webappRoot.toString());
+
+    Path webappRoot = new File(servletContext.getRealPath("/")).toPath();
+
+    surveyMapFile = webappRoot.resolve("WEB-INF").resolve("survey-id-list.txt");
+    surveyRoot = webappRoot.resolve("WEB-INF").resolve("survey");
+    logger.debug("Root: {}", webappRoot.toString());
     //slots = _slots;
     if(Files.notExists(surveyRoot))
     {
@@ -423,7 +429,7 @@ public class FIImpactSettings
     }
 
     String jsonData;
-    Path m = _webappRoot.resolve("js").resolve("fiModelNew.js");
+    Path m = webappRoot.resolve("js").resolve("fiModelNew.js");
     JSONObject fiImpactModelTemp = null;
     try
     {
@@ -441,8 +447,8 @@ public class FIImpactSettings
     if(fiImpactModel == null)
       logger.error("Error loading fiModelNew.js");
 
-    projectsList = _webappRoot.resolve("WEB-INF").resolve("projects-id-list.txt");
-    projectsRoot = _webappRoot.resolve("WEB-INF").resolve("projects");
+    projectsList = webappRoot.resolve("WEB-INF").resolve("projects-id-list.txt");
+    projectsRoot = webappRoot.resolve("WEB-INF").resolve("projects");
 
     if(Files.notExists(projectsRoot))
     {
@@ -458,23 +464,25 @@ public class FIImpactSettings
     }
     ioDefinitions = new HashMap<>();
     ioAllFields = new HashMap<>();
-    File listIoDef = _webappRoot.resolve("WEB-INF").resolve("lists-io-def.xml").toFile();
+    File listIoDef = webappRoot.resolve("WEB-INF").resolve("lists-io-def.xml").toFile();
     loadIOdef(listIoDef);
 
     parseSurveyLookups();
 
     projectManager = new ProjectManager();
     surveyManager = new SurveyManager();
+    String url = servletContext.getInitParameter("qMinerUrl");
+    logger.info("qMinerUrl: {}", url);
+    qMinerManager = new QMinerManager(url);
   }
 
-  public static synchronized void createSettings(Path _webappRoot)
+  public static synchronized void createSettings(ServletContext servletContext)
   {
     if(fiImpactSettings == null)
     {
-      new FIImpactSettings(_webappRoot);
+      new FIImpactSettings(servletContext);
     }
   }
-
 
   public static FIImpactSettings getFiImpactSettings()
   {
@@ -517,6 +525,11 @@ public class FIImpactSettings
   public SurveyManager getSurveyManager()
   {
     return surveyManager;
+  }
+
+  public QMinerManager getQMinerManager()
+  {
+    return qMinerManager;
   }
 
   public ProjectManager getProjectManager()

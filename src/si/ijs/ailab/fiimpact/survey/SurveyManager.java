@@ -427,162 +427,6 @@ public class SurveyManager
   }
 
 
-  public void loadAllTest(ServletOutputStream outputStream, String rootDirName) throws IOException
-  {
-    //Path p = webappRoot.resolve("WEB-INF").resolve(fileName);
-    Path rootDir = new File(rootDirName).toPath();
-    logger.info("Load data from dir {}", rootDir.toString());
-
-    OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
-    JSONWriter json = new JSONWriter(w);
-    json.object().key("total_before").value(surveys.size());
-    int totalNewSurveys = 0;
-
-    if(Files.isDirectory(rootDir))
-    {
-      try (DirectoryStream<Path> stream = Files.newDirectoryStream(rootDir))
-      {
-        for(Path p : stream)
-        {
-
-          String fileName = p.getFileName().toString();
-          if(fileName.endsWith(".txt"))
-          {
-            logger.info("Load data from file {}", p.toString());
-            fileName = fileName.substring(0, fileName.length() - 4);
-            BufferedReader brData = new BufferedReader(new InputStreamReader(new FileInputStream(p.toFile()), "Cp1252"));
-            ArrayList<ArrayList<String>> lines = new ArrayList<>();
-            String line = brData.readLine();
-            StringBuilder sb = null;
-            boolean bMulti = false;
-            ArrayList<String> lineList = null;
-            while(line != null)
-            {
-              //logger.debug("Line {}", line);
-              String[] lineArr = line.split("\t");
-              if(!bMulti)
-              {
-                lineList = new ArrayList<>();
-                lines.add(lineList);
-              }
-
-              for(String s : lineArr)
-              {
-                if(bMulti)
-                {
-                  if(s.endsWith("\"")) //multi-line or multi-tab end
-                  {
-                    sb.append(" ").append(s.substring(0, s.length() - 1));
-                    lineList.add(sb.toString());
-                    sb = null;
-                    logger.debug("... {}.", s);
-                    bMulti = false;
-                  }
-                  else
-                  {
-                    sb.append(" ").append(s);
-                    logger.debug("... {} ...", s);
-                  }
-                }
-                else
-                {
-                  if(s.startsWith("\"") && s.endsWith("\""))
-                  {
-                    lineList.add(s.substring(1, s.length() - 1));
-
-                  }
-                  else if(s.startsWith("\"")) //multi-line or multi-tab
-                  {
-                    sb = new StringBuilder();
-                    sb.append(s.substring(1));
-                    bMulti = true;
-                    logger.debug("Loading multi-line: {}", s);
-                  }
-                  else
-                  {
-                    lineList.add(s);
-                  }
-                }
-              }
-              line = brData.readLine();
-            }
-
-            ArrayList<String> headerList = lines.get(0);
-            ArrayList<String> identifiers = new ArrayList<>();
-            logger.debug("header: {} items", headerList.size());
-            for(int i = 2; i < headerList.size(); i++)
-            {
-              String externalId = fileName + "_" + headerList.get(i);
-              String id = externalIDMap.get(externalId);
-              SurveyData surveyData;
-              if(id == null)
-              {
-                surveyData = new SurveyData();
-                id = java.util.UUID.randomUUID().toString();
-                surveyData.setExternalId(externalId);
-                surveyData.setId(id);
-                externalIDMap.put(externalId, id);
-                surveys.put(id, surveyData);
-              }
-              else
-              {
-                surveyData = surveys.get(id);
-              }
-              surveyData.clear();
-              logger.debug("Added: {}/{}", externalId, id);
-              identifiers.add(id);
-            }
-
-            for(int i = 1; i < lines.size(); i++)
-            {
-              logger.debug("Extracting answer: {}", i);
-              ArrayList<String> answersLine = lines.get(i);
-              String questionID = answersLine.get(0);
-              logger.debug("Question {}", questionID);
-
-              if(questionID != null && !questionID.equals(""))
-              {
-                for(int j = 2; j < answersLine.size(); j++)
-                {
-                  String id = identifiers.get(j - 2);
-                  String answer = answersLine.get(j);
-                  SurveyData sd = surveys.get(id);
-                  logger.debug("{}: {}={}", id, questionID, answer);
-                  sd.addQuestion(questionID, answer);
-                }
-              }
-            }
-            totalNewSurveys += identifiers.size();
-          }
-        }
-      }
-      catch (IOException e)
-      {
-        logger.error("Error scanning directory", e);
-      }
-    }
-
-
-    saveMap();
-    synchronized(surveys)
-    {
-      for(SurveyData surveyData : surveys.values())
-      {
-        surveyData.calculateResults();
-        surveyData.saveSurvey(FIImpactSettings.getFiImpactSettings().getSurveyRoot());
-      }
-      recalcResults();
-
-      logger.info("Added {} surveys, total {}.", totalNewSurveys, surveys.size());
-      json.key("total_added").value(totalNewSurveys);
-      json.key("total_after").value(surveys.size());
-      json.endObject();
-      w.flush();
-      w.close();
-    }
-
-  }
-
   public void list(ServletOutputStream outputStream, String groupQuestion, String groupAnswer) throws IOException
   {
     OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
@@ -842,7 +686,7 @@ public class SurveyManager
     return (mask & flag) != 0;
   }
 
-  public void exportJson(ServletOutputStream outputStream) throws IOException
+  public void exportJson(OutputStream outputStream) throws IOException
   {
     logger.info("Export {} surveys to JSON (for QMiner analysys)", surveys.size());
     OutputStreamWriter writer = new OutputStreamWriter(outputStream, "utf-8");
@@ -1003,7 +847,7 @@ public class SurveyManager
     writer.flush();
     writer.close();
 
-    logger.info("Saved {} surveys", surveys.size());
+    logger.info("Exported {} surveys", surveys.size());
   }
 
   public void exportText(ServletOutputStream outputStream, String groupQuestion, String groupAnswer, int exportSettings) throws IOException
@@ -1269,8 +1113,10 @@ public class SurveyManager
     Double val = results.get(qID);
     if(val != null)
     {
+      json.put("LABEL_"+qID, FIImpactSettings.getDecimalFormatter4().format(val));
+
       if(FIImpactSettings.RANDOM_VARIANCE_PLOT)
-        val = val +(val*0.05*(Math.random()*2.0-1.0));
+        val = val +(0.1*(Math.random()*2.0-1.0));
 
       json.put(qID, FIImpactSettings.getDecimalFormatter4().format(val));
     }
