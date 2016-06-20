@@ -549,7 +549,7 @@ public class SurveyData
                   {
                     if (sbAnswer.length() != 0)
                       sbAnswer.append(", ");
-                    String city = questions.get(getLookup(lookupDef, "A"));
+                    String city = questions.get("Q1_17");
                     if (city != null && !city.equals(""))
                       sbAnswer.append(city);
                     else
@@ -559,7 +559,7 @@ public class SurveyData
                   {
                     if (sbAnswer.length() != 0)
                       sbAnswer.append(", ");
-                    String country = questions.get(getLookup(lookupDef, "B"));
+                    String country = questions.get("Q1_2");
                     if (country != null && !country.equals(""))
                       sbAnswer.append(country);
                     else
@@ -568,7 +568,7 @@ public class SurveyData
                   }
                   if (s.contains("C")) //"C" : "Multiple Countries"
                   {
-                    String countryList = questions.get(getLookup(lookupDef, "C"));
+                    String countryList = questions.get("Q3_5c");
                     if (sbAnswer.length() != 0)
                       sbAnswer.append(", ");
                     sbAnswer.append("Multiple Countries");

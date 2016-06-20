@@ -1,7 +1,6 @@
 package si.ijs.ailab.fiimpact.settings;
 
 import com.opencsv.CSVWriter;
-import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -42,7 +41,7 @@ public class FIImpactSettings
 
   public static final Map<String, OverallResult.ScoreBoundaries> SPEEDOMETER_SLOTS = new HashMap<>();
   public static final ArrayList<String> SOCIAL_IMPACT_QUESTIONS = new ArrayList<>();
-  public static final String[] QUESTIONNAIRE_TYPE = new String[]{"I", "S", "IS"};;
+  public static final String[] QUESTIONNAIRE_TYPE = new String[]{"I", "S", "IS"};
   public static final String QUESTIONNAIRE_TYPE_DEFAULT = "I";
   public static final int EXPORT_SHORT_LIST = 1;
   public static final int EXPORT_FI_IMPACT_QUESTIONS = 2;
@@ -405,7 +404,7 @@ public class FIImpactSettings
 
 
 
-  public FIImpactSettings(ServletContext servletContext)
+  private FIImpactSettings(ServletContext servletContext)
   {
     fiImpactSettings = this;
 
@@ -490,7 +489,7 @@ public class FIImpactSettings
   }
 
 
-  public static String readFile(Path file, Charset encoding)
+  private static String readFile(Path file, Charset encoding)
           throws IOException
   {
     byte[] encoded = Files.readAllBytes(file);
@@ -678,58 +677,84 @@ public class FIImpactSettings
 
   private void parseSurveyLookups()
   {
-    //question id, lookup code, lookup label
-    Map<String, Map<String, String>> questionLookup = new HashMap<>();
+    logger.info("Parse lookups");
     JSONArray jsonSections = FIImpactSettings.getFiImpactSettings().getFiImpactModel().getJSONArray("sections");
     for(int iSection = 0; iSection < jsonSections.length(); iSection++)
     {
       JSONObject jsonSection = jsonSections.getJSONObject(iSection);
       String sectionID = jsonSection.getString("id");
       JSONArray jsonQuestions = jsonSection.getJSONArray("questions");
-      parseQuestions(sectionID, jsonQuestions, "");
+      parseQuestions(sectionID, jsonQuestions, null);
     }
+    logger.info("Parse lookups done");
   }
 
 
-  private void parseQuestions(String sectionID, JSONArray jsonQuestions, String parenQuestion)
+  private void parseQuestions(String sectionID, JSONArray jsonQuestions, String parentQuestion)
   {
-    logger.debug("Parse: {}/{}", sectionID, parenQuestion);
+    logger.debug("Parse: {}/{}", sectionID, parentQuestion);
     for(int iQuestion = 0; iQuestion < jsonQuestions.length(); iQuestion++)
     {
       JSONObject jsonQuestion = jsonQuestions.getJSONObject(iQuestion);
       String questionID = jsonQuestion.getString("id");
       String fullQuestionID = "Q" + sectionID + "_" + questionID;
-      logger.debug("Parse question: {}", fullQuestionID);
+      //logger.debug("Parse question: {}", fullQuestionID);
       boolean bLookupFound = false;
       IOListDefinition ioListDefinition = getListDefinition(LIST_SURVEYS);
-      IOListField ioListField = ioListDefinition.getFieldsById().get(fullQuestionID);
+      IOListField ioListField;
+      if(parentQuestion == null)
+        ioListField = ioListDefinition.getFieldsById().get(fullQuestionID);
+      else
+        ioListField = ioListDefinition.getCalculatedFieldsById().get(parentQuestion);
 
       if(ioListField != null)
       {
+        //logger.info("Found : {}", ioListField.getFieldid());
         JSONArray jsonLookups = jsonQuestion.optJSONArray("lookup");
+        if(parentQuestion != null)
+          ioListField.addCalculatedFrom(fullQuestionID);
+
         if(jsonLookups != null)
         {
           for(int iLookup = 0; iLookup < jsonLookups.length(); iLookup++)
           {
             JSONObject jsonLookup = jsonLookups.getJSONObject(iLookup);
+            String key = null;
+            String value = null;
             if(jsonLookup.length() == 1)
             {
-              String key = jsonLookup.keys().next();
-              ioListField.addLookup(key, jsonLookup.getString(key));
+              key = jsonLookup.keys().next();
+              value = jsonLookup.getString(key);
             }
             else if(jsonLookup.length() == 2)
             {
-              ioListField.addLookup(jsonLookup.getString("id"), jsonLookup.getString("label"));
+              key = jsonLookup.getString("id");
+              value = jsonLookup.getString("label");
+            }
+            if(key != null)
+            {
+              if(parentQuestion != null && !value.equals(""))
+                key =  questionID + key;
+              ioListField.addLookup(key, value);
             }
           }
           bLookupFound = true;
         }
       }
+
       if(!bLookupFound)
       {
         JSONArray jsonMerge = jsonQuestion.optJSONArray("merge");
-        if(jsonMerge != null)
-          parseQuestions(sectionID, jsonMerge, questionID);
+        String calculated = jsonQuestion.optString("calculated");
+        if(jsonMerge != null && calculated != null && calculated.equals("true"))
+        {
+          logger.info("Adding calculated filed {}", fullQuestionID);
+          ioListField = new IOListField(LIST_SURVEYS, null, jsonQuestion.optString("label"), fullQuestionID,
+                  null, null, null, null, "multi", "selection", "selection");
+          ioListDefinition.addCalculatedField(ioListField);
+          ioAllFields.put(ioListField.getFieldid(), ioListField);
+          parseQuestions(sectionID, jsonMerge, fullQuestionID);
+        }
       }
     }
 
@@ -746,12 +771,12 @@ public class FIImpactSettings
 
     for(IOListField ioListField: ioListDefinition.getFields())
     {
-        csvWriter.writeNext(new String[]{ioListField.getFieldid(), "label", ioListField.getLabel()});
-        Map<String, String> lookups = ioListField.getLookup();
-        for(Map.Entry<String, String> lookupEntry : lookups.entrySet())
-        {
-          csvWriter.writeNext(new String[]{ioListField.getFieldid(), lookupEntry.getKey(), lookupEntry.getValue()});
-        }
+      csvWriter.writeNext(new String[]{ioListField.getFieldid(), "label", ioListField.getLabel()});
+      Map<String, String> lookups = ioListField.getLookup();
+      for(Map.Entry<String, String> lookupEntry : lookups.entrySet())
+      {
+        csvWriter.writeNext(new String[]{ioListField.getFieldid(), lookupEntry.getKey(), lookupEntry.getValue()});
+      }
     }
     csvWriter.close();
   }
@@ -777,6 +802,25 @@ public class FIImpactSettings
         json.endObject();
       }
     }
+    for(IOListField ioListField: ioListDefinition.getCalculatedFieldsById().values())
+    {
+      if (ioListField.getPlot().equals(plotFieldType))
+      {
+        json.object();
+        json.key("field").value(ioListField.getFieldid());
+        json.key("label").value(ioListField.getLabel());
+        json.key("type").value(ioListField.getType());
+        if(ioListField.getLookup().size() > 0)
+        {
+          json.key("lookup").array();
+          for(Map.Entry<String, String> lookupEntry: ioListField.getLookup().entrySet())
+            json.object().key(lookupEntry.getKey()).value(lookupEntry.getValue()).endObject();
+          json.endArray();
+        }
+        json.endObject();
+      }
+    }
+
   }
 
   public void getPlotLegend(ServletOutputStream outputStream) throws IOException

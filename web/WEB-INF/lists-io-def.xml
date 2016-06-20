@@ -134,9 +134,9 @@
 		<filed column="Q1_3" label="What is the name of your organisation?" fieldid="Q1_3" transform="" plot="display" graph="display" type="text"/>
 		<filed column="Q1_4" label="What is the name of your project?" fieldid="Q1_4" transform="" plot="display" graph="display" type="text"/>
 		<filed column="Q1_5" label="What is the mailing address of your organisation?" fieldid="Q1_5" transform="" plot="ignore" graph="ignore" type="text"/>
-		<filed column="Q1_6a" label="Are you an SME (&lt;250 employees)" fieldid="Q1_6a" transform="" plot="selection" graph="feature-selection" type="lookup"/>
-		<filed column="Q1_6b" label="Are you a self-employed individual entrepreneur " fieldid="Q1_6b" transform="" plot="selection" graph="feature-selection" type="lookup"/>
-		<filed column="Q1_6c" label="Is your organisation owned by a Large organisation (over 60%)?" fieldid="Q1_6c" transform="" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="Q1_6a" label="Are you an SME (&lt;250 employees)" fieldid="Q1_6a" transform="" plot="ignore" graph="feature-selection" type="lookup"/>
+		<filed column="Q1_6b" label="Are you a self-employed individual entrepreneur " fieldid="Q1_6b" transform="" plot="ignore" graph="feature-selection" type="lookup"/>
+		<filed column="Q1_6c" label="Is your organisation owned by a Large organisation (over 60%)?" fieldid="Q1_6c" transform="" plot="ignore" graph="feature-selection" type="lookup"/>
 		<filed column="Q1_7" label="How many people are in the implementing team?" fieldid="Q1_7" transform="" plot="ignore" graph="feature" type="int"/>
 		<filed column="Q1_8" label="How many full time employees are in your organization?" fieldid="Q1_8" transform="" plot="ignore" graph="feature" type="int"/>
 		<filed column="Q1_9" label="What was the organisation&apos;s annual turnover in the last complete financial year?" fieldid="Q1_9" transform="" plot="ignore" graph="feature" type="num"/>
@@ -181,7 +181,7 @@
 		<filed column="Q3_4" label="Through which Channel do you expect to sell your product/service?" fieldid="Q3_4" transform="" plot="ignore" graph="feature" type="multi"/>
 		<filed column="Q3_5" label="In the next three years where do you expect to sell your product/service?" fieldid="Q3_5" transform="" plot="selection" graph="feature" type="multi"/>
 		<filed column="Q3_5c" label="" fieldid="Q3_5c" transform="" plot="ignore" graph="ignore" type="lookup"/>
-		<filed column="Q3_6" label="When will (did) your Product/Service enter the open market?" fieldid="Q3_6" transform="" plot="selection" graph="feature" type="int"/>
+		<filed column="Q3_6" label="When will (did) your Product/Service enter the open market?" fieldid="Q3_6" transform="" plot="selection" graph="feature" type="category"/>
 		<filed column="Q3_7" label="What is the level of competition in your target market?" fieldid="Q3_7" transform="" plot="selection" graph="feature-selection" type="lookup"/>
 		<filed column="Q3_8" label="Have you verified your value proposition with the target customers?" fieldid="Q3_8" transform="" plot="selection" graph="feature-selection" type="lookup"/>
 		<filed column="Q3_9" label="What is the status of your commercial strategy to acquire customers?" fieldid="Q3_9" transform="" plot="selection" graph="feature-selection" type="lookup"/>

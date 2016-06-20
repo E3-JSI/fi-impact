@@ -631,7 +631,6 @@ public class SurveyManager
         {
           for(IOListField ioListField: FIImpactSettings.getFiImpactSettings().getAllFields().values())
           {
-
             if (ioListField.getPlot().equals(FIImpactSettings.FIELD_PLOT_SELECTION))
             {
               if(!ioListField.getListId().equals(FIImpactSettings.LIST_SURVEYS))
@@ -639,13 +638,15 @@ public class SurveyManager
                 if(pd != null)
                 {
                   if(ioListField.getListId().equals(FIImpactSettings.LIST_PROJECTS))
-                    addQuestionKey(jsonFilters, ioListField.getFieldid(), pd.getFields());
+                    addQuestionKey(jsonFilters, ioListField, pd.getFields());
                   else if(ioListField.getListId().equals(FIImpactSettings.LIST_MATTERMARK))
-                    addQuestionKey(jsonFilters, ioListField.getFieldid(), pd.getMattermarkFields());
+                    addQuestionKey(jsonFilters, ioListField, pd.getMattermarkFields());
                 }
               }
               else
-                addQuestionKey(jsonFilters, ioListField.getFieldid(), surveyData.questions);
+              {
+                addQuestionKey(jsonFilters, ioListField, surveyData.questions);
+              }
             }
           }
 
@@ -715,6 +716,7 @@ public class SurveyManager
     json.key("usage").value("node_type");
     json.key("type").value("text");
     json.endObject();
+
 
     for(IOListField ioListField : listSurveysDef.getFields())
     {
@@ -1107,6 +1109,39 @@ public class SurveyManager
     if(val != null)
       json.put(qID, val);
   }
+
+  private void addQuestionKey(JSONObject json, IOListField ioListField, Map<String, String> questions)
+  {
+    if(ioListField.getCalculatedFrom().size() > 0)
+    {
+      StringBuilder sb = new StringBuilder();
+      for(String s: ioListField.getCalculatedFrom())
+      {
+        String val = questions.get(s);
+        if(val != null)
+        {
+          String lookupval = s.substring(s.lastIndexOf("_")+1) + val;
+          String lookuplabel = ioListField.getLookup().get(lookupval);
+          if(lookuplabel != null)
+          {
+            if(sb.length() > 0)
+              sb.append(",");
+            sb.append(lookupval);
+            //logger.debug("appended {}", lookupval);
+          }
+        }
+      }
+      if(sb.length() > 0) //!!FF Hack!!!
+        json.put(ioListField.getFieldid(), sb.toString());
+      else
+        json.put(ioListField.getFieldid(), "B");
+    }
+    else
+      addQuestionKey(json, ioListField.getFieldid(), questions);
+
+  }
+
+
 
   private void addResultKey(JSONObject json, String qID, Map<String, Double> results)
   {

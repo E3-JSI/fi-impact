@@ -1,8 +1,7 @@
 package si.ijs.ailab.fiimpact.settings;
 
-import java.util.Collections;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  * Created by flavio on 25/05/2016.
@@ -21,6 +20,7 @@ public class IOListField
   String plot;
   String graph;
   private SortedMap<String, String> lookup = Collections.synchronizedSortedMap(new TreeMap<String, String>());
+  private List<String> calculatedFrom = Collections.synchronizedList(new ArrayList<String>());
 
   IOListField(String listId, String column, String label, String fieldid, String usage, String missing,
               String include_record_when, String transform, String type, String plot, String graph)
@@ -102,6 +102,16 @@ public class IOListField
   public void addLookup(String key, String value)
   {
     lookup.put(key, value);
+  }
+
+  public List<String> getCalculatedFrom()
+  {
+    return calculatedFrom;
+  }
+
+  public void addCalculatedFrom(String questionID)
+  {
+    calculatedFrom.add(questionID);
   }
 
   public String getPlot()
