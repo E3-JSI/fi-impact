@@ -58,7 +58,28 @@
         <br />
         <input type="submit" value="Go!" />
     </form>
-
+    <h3>QMiner manager</h3>
+    <form action="../../manager" method="get" enctype="application/x-www-form-urlencoded" target="output_frame">
+        <br />
+        Action: <select name="action">
+        <option value="q-start-job">q-start-job</option>
+        <option value="q-stop-job">q-stop-job</option>
+        <option value="q-post-dataset">q-post-dataset</option>
+        <option value="q-get-status">q-get-status</option>
+    </select>
+        <br />
+        <input type="submit" value="Go!" />
+    </form>
+    <h3>QMiner graph</h3>
+    <form action="../../service" method="get" enctype="application/x-www-form-urlencoded" target="output_frame">
+        Survey id: <input type="text" name="id" size="50" />
+        <br />
+        Action: <select name="action">
+        <option value="q-get-graph">q-get-graph</option>
+    </select>
+        <br />
+        <input type="submit" value="Go!" />
+    </form>
         <iframe name="output_frame" src="" id="output_frame" width="800" height="500">
         </iframe>
     </body>

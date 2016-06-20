@@ -71,9 +71,10 @@
 		</div>
 		
         <table id="listing" class="table table-striped">
-			<thead><tr><th>Project</th><th>Feasibility</th><th>Innovation</th><th>Market</th><th>Market Needs</th><th>Mattermark Growth</th>
+			<thead><tr><th>Project</th><th>Graphs</th><th>Feasibility</th><th>Innovation</th><th>Market</th><th>Market Needs</th><th>Mattermark Growth</th>
 				<th>Accelerator</th><th>Organisation</th><th>Country</th></tr></thead> 
             <tbody><tr ng-repeat="s in surveys"><td><a href="../../ui/user/report.html?id={{s.id_internal}}">{{s.Q1_4}}</a>
+				<td><a href="../../ui/user/benchmarking.html?id={{s.id_internal}}">{{s.Q1_4}}</a></td>
 				<div ng-bind-html="s.lineChart | sanitize"></div></td>
 				<td class="textRight">{{s.feasibility}}%</td><td class="textRight">{{s.innovation}}%</td><td class="textRight">{{s.market}}%</td><td class="textRight">{{s.business}}%</td>
 				<td class="textRight">{{s.mattermark}}%</td>
