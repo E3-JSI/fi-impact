@@ -36,8 +36,8 @@ public class SurveyManager
   }
 
   private final Map<String, SurveyData> surveys = Collections.synchronizedMap(new HashMap<String, SurveyData>());
-  private SortedSet<String> accelerators = Collections.synchronizedSortedSet(new TreeSet<String>());
-  //private List<String> sortedQuestions = Collections.synchronizedList(new ArrayList<String>());
+  private IOListField accelerators = null;
+
 
   Map<String, Map<String, OverallResult>> getResults()
   {
@@ -75,6 +75,7 @@ public class SurveyManager
 
   public SurveyManager()
   {
+    accelerators = FIImpactSettings.getFiImpactSettings().getListFieldDefinition("Q1_1");
     load();
   }
 
@@ -144,8 +145,6 @@ public class SurveyManager
     logger.info("Recalc Results");
     //results.clear();
     Map<String, Map<String, OverallResult>> resultsNew = new TreeMap<>();
-    SortedSet<String> acceleratorsNew = Collections.synchronizedSortedSet(new TreeSet<String>());
-    //SortedSet<String> sortedQuestionsSet = Collections.synchronizedSortedSet(new TreeSet<String>());
 
     for(String type : FIImpactSettings.QUESTIONNAIRE_TYPE)
     {
@@ -166,6 +165,17 @@ public class SurveyManager
     IOListDefinition surveyPredefinedFields = FIImpactSettings.getFiImpactSettings().getListDefinition(FIImpactSettings.LIST_SURVEYS);
     synchronized(surveys)
     {
+      //Category fields have to be redone on calc all
+      ArrayList<IOListField> categoryFields = new ArrayList<>();
+      for(IOListField ioListField: FIImpactSettings.getFiImpactSettings().getAllFields().values())
+      {
+        if(ioListField.getType().equals(FIImpactSettings.FIELD_TYPE_CATEGORY))
+        {
+          categoryFields.add(ioListField);
+          ioListField.getLookup().clear();
+        }
+      }
+
       for(SurveyData sd : surveys.values())
       {
         String sdType = sd.getType();
@@ -185,9 +195,13 @@ public class SurveyManager
             }
           }
         }
-        String Q1_1 = sd.questions.get("Q1_1");
-        if(Q1_1 != null && !Q1_1.equals(""))
-          acceleratorsNew.add(Q1_1);
+
+        for(IOListField ioListField: categoryFields)
+        {
+          String answer = sd.questions.get(ioListField.getFieldid());
+          if(answer != null && !answer.equals(""))
+            ioListField.addLookup(answer, answer);
+        }
 
         for(String questionID : sd.questions.keySet())
           if(!surveyPredefinedFields.getFieldsById().containsKey(questionID))
@@ -204,7 +218,6 @@ public class SurveyManager
     synchronized(surveys)
     {
       results = resultsNew;
-      accelerators = acceleratorsNew;
     }
     logger.info("Recalc results done");
 
@@ -327,7 +340,7 @@ public class SurveyManager
       OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
       JSONWriter jsonSurvey = new JSONWriter(w);
       jsonSurvey.array();
-      for(String s : accelerators)
+      for(String s : accelerators.getLookup().keySet())
       {
         if(userAccelerator.equals("") || userAccelerator.equals(s))
           jsonSurvey.value(s);
@@ -414,162 +427,6 @@ public class SurveyManager
   }
 
 
-  public void loadAllTest(ServletOutputStream outputStream, String rootDirName) throws IOException
-  {
-    //Path p = webappRoot.resolve("WEB-INF").resolve(fileName);
-    Path rootDir = new File(rootDirName).toPath();
-    logger.info("Load data from dir {}", rootDir.toString());
-
-    OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
-    JSONWriter json = new JSONWriter(w);
-    json.object().key("total_before").value(surveys.size());
-    int totalNewSurveys = 0;
-
-    if(Files.isDirectory(rootDir))
-    {
-      try (DirectoryStream<Path> stream = Files.newDirectoryStream(rootDir))
-      {
-        for(Path p : stream)
-        {
-
-          String fileName = p.getFileName().toString();
-          if(fileName.endsWith(".txt"))
-          {
-            logger.info("Load data from file {}", p.toString());
-            fileName = fileName.substring(0, fileName.length() - 4);
-            BufferedReader brData = new BufferedReader(new InputStreamReader(new FileInputStream(p.toFile()), "Cp1252"));
-            ArrayList<ArrayList<String>> lines = new ArrayList<>();
-            String line = brData.readLine();
-            StringBuilder sb = null;
-            boolean bMulti = false;
-            ArrayList<String> lineList = null;
-            while(line != null)
-            {
-              //logger.debug("Line {}", line);
-              String[] lineArr = line.split("\t");
-              if(!bMulti)
-              {
-                lineList = new ArrayList<>();
-                lines.add(lineList);
-              }
-
-              for(String s : lineArr)
-              {
-                if(bMulti)
-                {
-                  if(s.endsWith("\"")) //multi-line or multi-tab end
-                  {
-                    sb.append(" ").append(s.substring(0, s.length() - 1));
-                    lineList.add(sb.toString());
-                    sb = null;
-                    logger.debug("... {}.", s);
-                    bMulti = false;
-                  }
-                  else
-                  {
-                    sb.append(" ").append(s);
-                    logger.debug("... {} ...", s);
-                  }
-                }
-                else
-                {
-                  if(s.startsWith("\"") && s.endsWith("\""))
-                  {
-                    lineList.add(s.substring(1, s.length() - 1));
-
-                  }
-                  else if(s.startsWith("\"")) //multi-line or multi-tab
-                  {
-                    sb = new StringBuilder();
-                    sb.append(s.substring(1));
-                    bMulti = true;
-                    logger.debug("Loading multi-line: {}", s);
-                  }
-                  else
-                  {
-                    lineList.add(s);
-                  }
-                }
-              }
-              line = brData.readLine();
-            }
-
-            ArrayList<String> headerList = lines.get(0);
-            ArrayList<String> identifiers = new ArrayList<>();
-            logger.debug("header: {} items", headerList.size());
-            for(int i = 2; i < headerList.size(); i++)
-            {
-              String externalId = fileName + "_" + headerList.get(i);
-              String id = externalIDMap.get(externalId);
-              SurveyData surveyData;
-              if(id == null)
-              {
-                surveyData = new SurveyData();
-                id = java.util.UUID.randomUUID().toString();
-                surveyData.setExternalId(externalId);
-                surveyData.setId(id);
-                externalIDMap.put(externalId, id);
-                surveys.put(id, surveyData);
-              }
-              else
-              {
-                surveyData = surveys.get(id);
-              }
-              surveyData.clear();
-              logger.debug("Added: {}/{}", externalId, id);
-              identifiers.add(id);
-            }
-
-            for(int i = 1; i < lines.size(); i++)
-            {
-              logger.debug("Extracting answer: {}", i);
-              ArrayList<String> answersLine = lines.get(i);
-              String questionID = answersLine.get(0);
-              logger.debug("Question {}", questionID);
-
-              if(questionID != null && !questionID.equals(""))
-              {
-                for(int j = 2; j < answersLine.size(); j++)
-                {
-                  String id = identifiers.get(j - 2);
-                  String answer = answersLine.get(j);
-                  SurveyData sd = surveys.get(id);
-                  logger.debug("{}: {}={}", id, questionID, answer);
-                  sd.addQuestion(questionID, answer);
-                }
-              }
-            }
-            totalNewSurveys += identifiers.size();
-          }
-        }
-      }
-      catch (IOException e)
-      {
-        logger.error("Error scanning directory", e);
-      }
-    }
-
-
-    saveMap();
-    synchronized(surveys)
-    {
-      for(SurveyData surveyData : surveys.values())
-      {
-        surveyData.calculateResults();
-        surveyData.saveSurvey(FIImpactSettings.getFiImpactSettings().getSurveyRoot());
-      }
-      recalcResults();
-
-      logger.info("Added {} surveys, total {}.", totalNewSurveys, surveys.size());
-      json.key("total_added").value(totalNewSurveys);
-      json.key("total_after").value(surveys.size());
-      json.endObject();
-      w.flush();
-      w.close();
-    }
-
-  }
-
   public void list(ServletOutputStream outputStream, String groupQuestion, String groupAnswer) throws IOException
   {
     OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
@@ -635,11 +492,12 @@ public class SurveyManager
   //Highlights - a list of fields for the highlighting F1;F2;...
   public void listFilter(ServletOutputStream outputStream, String[] filter, String[] highlights, String referenceSurveyInternalID) throws IOException
   {
-    OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
     logger.info("Return {} surveys", surveys.size());
-    JSONWriter json = new JSONWriter(w);
-    json.object().key("total").value(surveys.size());
-    json.key("surveys").array();
+    JSONObject json = new JSONObject();
+    json.put("total", surveys.size());
+    JSONObject jsonSurveys = new JSONObject();
+    json.put("surveys", jsonSurveys);
+    Map<String, JSONArray> surveysByType = new TreeMap<>();
 
     Map<String, List<String>> mapFilter = new TreeMap<>();
     if(filter != null)
@@ -713,14 +571,9 @@ public class SurveyManager
 
       if(bInclude)
       {
-        json.object();
-
-        json.key("info").object();
-        addQuestionKey(json, "Q1_3", surveyData.questions);
-        addQuestionKey(json, "Q1_4", surveyData.questions);
-        json.endObject();
 
         String node_type = "normal";
+
         ProjectData pd = surveyData.getProject();
         if(pd != null)
         {
@@ -734,58 +587,96 @@ public class SurveyManager
         if(surveyData.getId().equals(referenceSurveyInternalID))
           node_type = "SELECTED";
 
-        json.key("type").value(node_type);
 
-        json.key("filters").object();
-
-        for(String s: highlights)
+        JSONArray jsonSurveysTypeArr = surveysByType.get(node_type);
+        if(jsonSurveysTypeArr == null)
         {
+          jsonSurveysTypeArr = new JSONArray();
+          surveysByType.put(node_type, jsonSurveysTypeArr);
+          jsonSurveys.put(node_type, jsonSurveysTypeArr);
 
-          IOListField ioListField = FIImpactSettings.getFiImpactSettings().getListFieldDefinition(s);
-          if(!ioListField.getListId().equals(FIImpactSettings.LIST_SURVEYS))
+        }
+        JSONObject jsonSurvey = new JSONObject();
+        jsonSurveysTypeArr.put(jsonSurvey);
+
+        JSONObject jsonInfo = new JSONObject();
+        jsonSurvey.put("info", jsonInfo);
+        addQuestionKey(jsonInfo, "Q1_3", surveyData.questions);
+        addQuestionKey(jsonInfo, "Q1_4", surveyData.questions);
+
+        JSONObject jsonFilters = new JSONObject();
+        jsonSurvey.put("filters", jsonFilters);
+
+        if(highlights.length > 0)
+        {
+          for(String s : highlights)
           {
-            if(pd != null)
+
+            IOListField ioListField = FIImpactSettings.getFiImpactSettings().getListFieldDefinition(s);
+            if(!ioListField.getListId().equals(FIImpactSettings.LIST_SURVEYS))
             {
-              if(ioListField.getListId().equals(FIImpactSettings.LIST_PROJECTS))
-                addQuestionKey(json, s, pd.getFields());
-              else if(ioListField.getListId().equals(FIImpactSettings.LIST_MATTERMARK))
-                addQuestionKey(json, s, pd.getMattermarkFields());
+              if(pd != null)
+              {
+                if(ioListField.getListId().equals(FIImpactSettings.LIST_PROJECTS))
+                  addQuestionKey(jsonFilters, s, pd.getFields());
+                else if(ioListField.getListId().equals(FIImpactSettings.LIST_MATTERMARK))
+                  addQuestionKey(jsonFilters, s, pd.getMattermarkFields());
+              }
+            }
+            else
+              addQuestionKey(jsonFilters, s, surveyData.questions);
+          }
+        }
+        else
+        {
+          for(IOListField ioListField: FIImpactSettings.getFiImpactSettings().getAllFields().values())
+          {
+            if (ioListField.getPlot().equals(FIImpactSettings.FIELD_PLOT_SELECTION))
+            {
+              if(!ioListField.getListId().equals(FIImpactSettings.LIST_SURVEYS))
+              {
+                if(pd != null)
+                {
+                  if(ioListField.getListId().equals(FIImpactSettings.LIST_PROJECTS))
+                    addQuestionKey(jsonFilters, ioListField, pd.getFields());
+                  else if(ioListField.getListId().equals(FIImpactSettings.LIST_MATTERMARK))
+                    addQuestionKey(jsonFilters, ioListField, pd.getMattermarkFields());
+                }
+              }
+              else
+              {
+                addQuestionKey(jsonFilters, ioListField, surveyData.questions);
+              }
             }
           }
-          else
-            addQuestionKey(json, s, surveyData.questions);
+
         }
 
-        json.endObject();
+        JSONObject jsonKPI = new JSONObject();
+        jsonSurvey.put("KPI", jsonKPI);
+        addResultKey(jsonKPI, "INNOVATION", surveyData.results);
+        addResultKey(jsonKPI, "MARKET", surveyData.results);
+        addResultKey(jsonKPI, "FEASIBILITY", surveyData.results);
+        addResultKey(jsonKPI, "MARKET_NEEDS", surveyData.results);
+        addResultKey(jsonKPI, "MATTERMARK_GROWTH", surveyData.results);
 
-        json.key("KPI").object();
-        addResultKey(json, "INNOVATION", surveyData.results);
-        addResultKey(json, "MARKET", surveyData.results);
-        addResultKey(json, "FEASIBILITY", surveyData.results);
-        addResultKey(json, "MARKET_NEEDS", surveyData.results);
-        ArrayList<IOListField> mattermarkIndicators = FIImpactSettings.getFiImpactSettings().getMattermarkIndicators();
-        for(IOListField indicator : mattermarkIndicators)
-          addResultKey(json, indicator.getFieldid(), surveyData.results);
+        jsonKPI = new JSONObject();
+        jsonSurvey.put("KPI_percent", jsonKPI);
 
-        json.endObject();
-        json.key("KPI_percent").object();
+        addResultKey(jsonKPI, "INNOVATION_GRAPH_PERCENT", surveyData.resultDerivatives);
+        addResultKey(jsonKPI, "MARKET_GRAPH_PERCENT", surveyData.resultDerivatives);
+        addResultKey(jsonKPI, "FEASIBILITY_GRAPH_PERCENT", surveyData.resultDerivatives);
+        addResultKey(jsonKPI, "MARKET_NEEDS_GRAPH_PERCENT", surveyData.resultDerivatives);
+        addResultKey(jsonKPI, "MATTERMARK_GROWTH_GRAPH_PERCENT", surveyData.resultDerivatives);
 
-        addResultKey(json, "INNOVATION_GRAPH_PERCENT", surveyData.resultDerivatives);
-        addResultKey(json, "MARKET_GRAPH_PERCENT", surveyData.resultDerivatives);
-        addResultKey(json, "FEASIBILITY_GRAPH_PERCENT", surveyData.resultDerivatives);
-        addResultKey(json, "MARKET_NEEDS_GRAPH_PERCENT", surveyData.resultDerivatives);
-
-        //add results for all mattermark indicators
-        for(IOListField indicator : mattermarkIndicators)
-          addResultKey(json, indicator.getFieldid()+"_GRAPH_PERCENT", surveyData.resultDerivatives);
-        json.endObject();
-        json.endObject();
       }
     }
-    json.endArray();
-    json.endObject();
+
+    OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
+    json.write(w);
     w.flush();
     w.close();
+
     logger.info("Returned {} surveys", surveys.size());
 
   }
@@ -796,7 +687,7 @@ public class SurveyManager
     return (mask & flag) != 0;
   }
 
-  public void exportJson(ServletOutputStream outputStream) throws IOException
+  public void exportJson(OutputStream outputStream) throws IOException
   {
     logger.info("Export {} surveys to JSON (for QMiner analysys)", surveys.size());
     OutputStreamWriter writer = new OutputStreamWriter(outputStream, "utf-8");
@@ -825,6 +716,7 @@ public class SurveyManager
     json.key("usage").value("node_type");
     json.key("type").value("text");
     json.endObject();
+
 
     for(IOListField ioListField : listSurveysDef.getFields())
     {
@@ -957,7 +849,7 @@ public class SurveyManager
     writer.flush();
     writer.close();
 
-    logger.info("Saved {} surveys", surveys.size());
+    logger.info("Exported {} surveys", surveys.size());
   }
 
   public void exportText(ServletOutputStream outputStream, String groupQuestion, String groupAnswer, int exportSettings) throws IOException
@@ -1209,6 +1101,60 @@ public class SurveyManager
     Double val = results.get(qID);
     if(val != null)
       json.key(qID).value(FIImpactSettings.getDecimalFormatter4().format(val));
+  }
+
+  private void addQuestionKey(JSONObject json, String qID, Map<String, String> questions)
+  {
+    String val = questions.get(qID);
+    if(val != null)
+      json.put(qID, val);
+  }
+
+  private void addQuestionKey(JSONObject json, IOListField ioListField, Map<String, String> questions)
+  {
+    if(ioListField.getCalculatedFrom().size() > 0)
+    {
+      StringBuilder sb = new StringBuilder();
+      for(String s: ioListField.getCalculatedFrom())
+      {
+        String val = questions.get(s);
+        if(val != null)
+        {
+          String lookupval = s.substring(s.lastIndexOf("_")+1) + val;
+          String lookuplabel = ioListField.getLookup().get(lookupval);
+          if(lookuplabel != null)
+          {
+            if(sb.length() > 0)
+              sb.append(",");
+            sb.append(lookupval);
+            //logger.debug("appended {}", lookupval);
+          }
+        }
+      }
+      if(sb.length() > 0) //!!FF Hack!!!
+        json.put(ioListField.getFieldid(), sb.toString());
+      else
+        json.put(ioListField.getFieldid(), "B");
+    }
+    else
+      addQuestionKey(json, ioListField.getFieldid(), questions);
+
+  }
+
+
+
+  private void addResultKey(JSONObject json, String qID, Map<String, Double> results)
+  {
+    Double val = results.get(qID);
+    if(val != null)
+    {
+      json.put("LABEL_"+qID, FIImpactSettings.getDecimalFormatter4().format(val));
+
+      if(FIImpactSettings.RANDOM_VARIANCE_PLOT)
+        val = val +(0.1*(Math.random()*2.0-1.0));
+
+      json.put(qID, FIImpactSettings.getDecimalFormatter4().format(val));
+    }
   }
 
   synchronized public void clearAll(ServletOutputStream outputStream) throws IOException

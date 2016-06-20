@@ -15,41 +15,7 @@
 		}, {
 			"id" : "1",
 			"questions" : [{
-					"id" : "1",
-					"lookup" : [{
-							"A" : "Ceedtech"
-						}, {
-							"B" : "Creatifi"
-						}, {
-							"C" : "European Pioneers"
-						}, {
-							"D" : "Fabulous"
-						}, {
-							"E" : "FI-Adopt"
-						}, {
-							"F" : "FI-C3"
-						}, {
-							"G" : "Fiche"
-						}, {
-							"H" : "Finish"
-						}, {
-							"I" : "Finodex"
-						}, {
-							"J" : "Fractals"
-						}, {
-							"K" : "FrontierCities"
-						}, {
-							"L" : "Impact"
-						}, {
-							"M" : "Incense"
-						}, {
-							"N" : "Smart Agri-food"
-						}, {
-							"O" : "Soul-fi"
-						}, {
-							"P" : "Speedup Europe"
-						}
-					]
+					"id" : "1"
 				}, {
 					"id" : "2",
 					"merge" : [{
@@ -66,6 +32,8 @@
 					"id" : "5"
 				}, {
 					"id" : "6",
+					"calculated" : "true",
+					"label": "Organisation type",
 					"merge" : [{
 							"id" : "6a",
 							"lookup" : [{
@@ -435,6 +403,8 @@
 						}, {
 							"E" : "Construction"
 						}, {
+							"F" : "Consumer"
+						}, {
 							"G" : "Education"
 						}, {
 							"H" : "Financial Services"
@@ -471,6 +441,9 @@
 							"D" : "Business Services"
 						}, {
 							"E" : "Construction"
+						}, {
+							"F" : "Consumer"
+						}, {
 						}, {
 							"G" : "Education"
 						}, {
@@ -522,11 +495,11 @@
 					"id" : "5",
 					"custom" : "Q3_5",
 					"lookup" : [{
-							"A" : "Q1_17"
+							"A" : "My City or Region"
 						}, {
-							"B" : "Q1_2"
+							"B" : "My country"
 						}, {
-							"C" : "Q3_5c"
+							"C" : "Multiple Countries"
 						}, {
 							"D" : "Global"
 						}, {

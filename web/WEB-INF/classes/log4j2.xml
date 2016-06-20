@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration status="error">
  <properties>
-	<property name="appCode">FI-IMPACT-TEST</property>
+	<property name="appCode">FI-IMPACT</property>
 </properties>
 	<appenders>
 		<RollingFile name="log" fileName="${sys:catalina.base}/ailog/${appCode}.log" filePattern="${sys:catalina.base}/ailog/${appCode}-%i.log">

@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import si.ijs.ailab.fiimpact.pdf.PDFManager;
+import si.ijs.ailab.fiimpact.qminer.QMinerManager;
 import si.ijs.ailab.fiimpact.settings.FIImpactSettings;
 
 /**
@@ -26,7 +27,7 @@ public class FIImpactRequestHandler extends HttpServlet
   @Override
   public void init(ServletConfig config) throws ServletException
   {
-    FIImpactSettings.createSettings(new File(config.getServletContext().getRealPath("/")).toPath());
+    FIImpactSettings.createSettings(config.getServletContext());
     pdfManager = pdfManager.getPDFManager(config.getServletContext().getRealPath("/"));
   }
 
@@ -42,6 +43,7 @@ public class FIImpactRequestHandler extends HttpServlet
     ALLOWED_ACTIONS.add("allpdf");
     ALLOWED_ACTIONS.add("plot");
     ALLOWED_ACTIONS.add("plot-legend");
+    ALLOWED_ACTIONS.add(QMinerManager.ACTION_GET_GRAPH);
 
   }
   @Override
@@ -164,12 +166,18 @@ public class FIImpactRequestHandler extends HttpServlet
       response.setContentType("application/json");
       response.setCharacterEncoding("utf-8");
 
-      if(arrSelections.length == 0)
+      /*if(arrSelections.length == 0)
       {
         logger.info("default to standard plot selections");
         arrSelections = new String[] {"Q1_1", "Q1_2"};
-      }
+      }*/
       FIImpactSettings.getFiImpactSettings().getSurveyManager().listFilter(response.getOutputStream(), arrQuestions, arrSelections, sId);
+    }
+    else if(sAction.equals(QMinerManager.ACTION_GET_GRAPH))
+    {
+      response.setContentType("application/json");
+      response.setCharacterEncoding("utf-8");
+      FIImpactSettings.getFiImpactSettings().getQMinerManager().actionGetGraph(response.getOutputStream(), sId);
     }
     else if (sAction.equals("plot-legend"))
     {
