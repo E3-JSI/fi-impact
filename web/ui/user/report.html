@@ -23,7 +23,7 @@
 
 </head>
 
-<body id="page-top" class="index" ng-controller="fiCtrl">
+<body id="page-top" class="index" ng-controller="fiCtrl" ng-cloak>
 
     <!-- Navigation -->
     <nav class="navbar navbar-default navbar-fixed-top">
@@ -47,8 +47,9 @@
                     <li><a class="page-scroll" href="#feasibility">Feasibility</a></li>
                     <li><a class="page-scroll" href="#business">Market Needs</a></li>
 					<li><a class="page-scroll" href="#socialImpact">Social Impact</a></li>
+					<li><a class="page-scroll" href="#mattermark">Mattermark</a></li>
 					<li><a class="page-scroll" href="#overview">Overview</a></li>
-					<li><a id="pdfDownload"><i class="fa fa-download"></i> PDF</a></li>
+					<li><a id="pdfDownload" ng-click='download()'><i class="fa fa-download"></i> PDF</a></li>
                 </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
@@ -233,13 +234,26 @@
     <section id="mattermark"><div class="container onBg">
 		<div class="row"><div class="col-lg-12 text-center">
 			<h2 class="section-heading">Mattermark scores summary</h2>
-			<p class="text-muted">
+			<p class="text-muted">Mattermark collects & organizes comprehensive information on the world’s fastest growing companies. In minutes, get actionable data that lets you pinpoint the companies and people you need to know or do business with.</p>
 		</div></div>
 		<div class="row">
 			<div class="col-md-6">
 				<h3 class="section-subheading">Growth Score</h3>
 				<div id="growthGauge" class="pull-right"></div>
+				<p class="text-muted">Mattermark's Growth Score is the default ranking for all companies in Mattermark. It measures how quickly a company is gaining traction at a given point in time.</p>
 				<p class="text-muted">{{d.growth.interpretation}}</p>
+			</div>
+			<div class="col-md-6">
+				<h3 class="section-subheading">Total Funding</h3>
+				<div id="fundingGauge" class="pull-right"></div>
+				<p class="text-muted">{{d.funding.interpretation}}</p>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<h3 class="section-subheading">Employee Count</h3>
+				<div id="employeesGauge" class="pull-right"></div>
+				<p class="text-muted">{{d.employees.interpretation}}</p>
 			</div>
 			<div class="col-md-6">
 				<h3 class="section-subheading">Est. Monthly Uniques</h3>
@@ -249,15 +263,23 @@
 		</div>
 		<div class="row">
 			<div class="col-md-6">
-				<h3 class="section-subheading">Total Funding</h3>
-				<div id="fundingGauge" class="pull-right"></div>
-				<p class="text-muted">{{d.funding.interpretation}}</p>
+				<h3 class="section-subheading">Twitter Followers</h3>
+				<div id="twitterGauge" class="pull-right"></div>
+				<p class="text-muted">{{d.twitter.interpretation}}</p>
 			</div>
 			<div class="col-md-6">
-				<h3 class="section-subheading">New funding employee growth</h3>
-				<div id="employeesGauge" class="pull-right"></div>
-				<p class="text-muted">{{d.employees.interpretation}}</p>
+				<h3 class="section-subheading">Facebook Likes</h3>
+				<div id="facebookGauge" class="pull-right"></div>
+				<p class="text-muted">{{d.facebook.interpretation}}</p>
 			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<h3 class="section-subheading">LinkedIn Follows</h3>
+				<div id="linkedinGauge" class="pull-right"></div>
+				<p class="text-muted">{{d.linkedin.interpretation}}</p>
+			</div>
+			
 		</div>
     </div></section>
 	
@@ -304,27 +326,8 @@
 	<script src="../../js/fiRadar.js"></script>
 	<script src="../../js/Speedometer2.js"></script>
 	<!-- FI JavaScript -->
-	<script src="../../js/fi.js"></script>
-	<script>
-	$(document).ready( function() {
-		$.each(fi.json.speedometers, function(i, v) { d3Speedometer('#' + v + 'Gauge', fi.json[v].speedometer); });
-		window.radar = {
-			Overview: new fiRadar("bodyOverview", fi.json.radarOverview),
-			SocialA: new fiRadar("bodySocialA", fi.json.radarSocialA, {w: 400, h: 400, levels: 5}, fi.model.radarLevelsSocial),
-			SocialB: new fiRadar("bodySocialB", fi.json.radarSocialB, {w: 400, h: 400, levels: 5}, fi.model.radarLevelsSocial)
-		};
-		$.each(window.radar, function(i, v) { v.draw("#radar" + i) });
-		
-		$("#pdfDownload").click(function() {
-			$.get( "http://aidemo.ijs.si/fi-impact/service?action=pdf&id=" + fi.id, function(data) {
-				if ($(data).find('status').attr('status') == "OK") {
-					var win = window.open('http://aidemo.ijs.si/fi-impact/pdf/survey-' + fi.id + '.pdf', '_blank');
-					if (win) { win.focus(); }
-				}
-			});
-		});
-	});
-	</script>
+	<script src="../../js/fiReport.js"></script>
+
 </body>
 
 </html>

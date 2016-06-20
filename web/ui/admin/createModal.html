@@ -1,0 +1,32 @@
+<div class="modal-header"><h4 class="modal-title">Create user</h4></div>
+<div class="modal-body">
+	<form class="form-horizontal" enctype="application/x-www-form-urlencoded">
+		<div class="form-group">
+			<label for="userName" class="col-sm-3 control-label">User name</label>
+			<div class="col-sm-9"><input type="text" ng-model="vm.create.user" class="form-control" ng-change="vm.hideAlerts()"></div>
+		</div>
+		<div class="alert alert-danger" ng-show="vm.alert.enterUser" role="alert">Please enter an username</div>
+		<div class="form-group">
+			<label for="userPassword" class="col-sm-3 control-label">Password</label>
+			<div class="col-sm-9"><input type="password" ng-model="vm.create.password" class="form-control" ng-change="vm.hideAlerts()"></div>
+		</div>
+		<div class="alert alert-danger" ng-show="vm.alert.enterPassword" role="alert">Please enter a password</div>
+		<div class="form-group">
+			<label for="userDescription" class="col-sm-3 control-label">Description</label>
+			<div class="col-sm-9"><input type="text" ng-model="vm.create.description" class="form-control" ng-change="vm.hideAlerts()"></div>
+		</div>
+		<div class="alert alert-danger" ng-show="vm.alert.enterDescription" role="alert">Please enter a description</div>
+		<div class="form-group">
+			<label for="userAccelerator" class="col-sm-3 control-label">Accelerator</label>
+			<div class="col-sm-9"><select class="form-control" ng-model="vm.create.accelerator" ng-disabled="profile.accelerator != ''">
+				<option value="">-</option>
+				<option ng-repeat="a in accelerators">{{a}}</option>
+			</select></div>
+		</div>
+		<div class="alert alert-success" ng-show="vm.alert.successCreate" role="alert">User <strong>{{vm.create.user}}</strong> created</div>
+	</form>
+</div>
+<div class="modal-footer">
+	<button class="btn btn-default cancel" ng-click="vm.dismiss()">Cancel</button>
+	<button class="btn btn-primary" type="submit" ng-click="vm.createUser()">Create</button>
+</div>

@@ -1,3 +1,23 @@
+.fiUpload { height: 400px; }
+.fiUpload .fa-spinner { color: #1F71AB; margin: 50px 0; }
+.fiModal form { margin: 20px 0; }
+.modal-footer .cancel { margin-right: 10px; }
+.fiModal ul { margin: 20px 0; }
+
+.fa-building-o { margin-left: 10px }
+.fa-trash-o { color: red }
+.fa-pencil-square-o { color: green }
+
+.btn-group .dropdown-menu .disabled {
+	font-variant: small-caps;
+	font-weight: bold;
+	font-size: 1em;
+	margin-top: -10px;
+	margin-bottom: 5px;
+	padding-left: 20px;
+	color: #666;
+}
+
 .tablesorter-blue {
 	text-align: left;
 }
@@ -215,3 +235,4 @@ caption {
 	cursor: pointer;
 	background-color: #e6bf99;
 }
+
