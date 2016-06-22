@@ -1,12 +1,6 @@
 FI-IMPACT Assessment and Benchmarking Webapp
 ======
-
-QMiner is an analytics platform for large-scale real-time streams containing structured and
-unstructured data. It is designed for scaling to millions of instances on high-end commodity 
-hardware, providing efficient storage, retrieval and analytics mechanisms with real-time response.
-
-
-This on-line self-assessment tool was developed as part of FI-IMPACT, an EU funded research project under 
+This on-line self-assessment tool was developed as part of FI-IMPACT, an EU funded research project under
 the Future Internet PPP programme. Based on questionnaires and external performance indicators a set of 
 KPIs (Key Performance Indicators) is calculated in order to guide  SMEs and Entrepreneurs. 
 This tool, when integrated into a corporate environment, gives SMEs and Entrepreneurs the ability to monitor 
@@ -15,7 +9,7 @@ In addition to the self-assessment, we have developed a possibility to integrate
  in our Assessment system. This tool also encompasses an advanced dynamic benchmarking tool that helps sub 
  grantees to understand their performance in the FI PPP ecosystem through sub-sets of aggregate attributes, 
  performance indicators and high-performing project. 
- Sub grantees, or their mentors, can thus perform a gap analysis comparing “my” performance against other initiatives.
+ Sub grantees, or their mentors, can thus perform a gap analysis comparing ï¿½myï¿½ performance against other initiatives.
 
 
 **[Project homepage](http://www.fi-impact.eu/)**
