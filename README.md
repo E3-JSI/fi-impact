@@ -9,7 +9,7 @@ In addition to the self-assessment, we have developed a possibility to integrate
  in our Assessment system. This tool also encompasses an advanced dynamic benchmarking tool that helps sub 
  grantees to understand their performance in the FI PPP ecosystem through sub-sets of aggregate attributes, 
  performance indicators and high-performing project. 
- Sub grantees, or their mentors, can thus perform a gap analysis comparing �my� performance against other initiatives.
+ Sub grantees, or their mentors, can thus perform a gap analysis comparing "my" performance against other initiatives.
 
 
 **[Project homepage](http://www.fi-impact.eu/)**
@@ -34,7 +34,6 @@ This webapp has been tested on Windows 7 with Java 1.7.0.13 and Tomcat 7.x.
 ### Compile from source
 
 ### Documentation
-
 
 ## Acknowledgments
 
