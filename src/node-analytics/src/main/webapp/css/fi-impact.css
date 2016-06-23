@@ -1,0 +1,80 @@
+.navbar .nav .summary { color: #00f0f0; }
+.navbar .nav .summary:hover { color: #00b0b0; }	
+.navbar .nav #pdfDownload { color: #00f0f0; cursor: pointer; }
+.navbar .nav #pdfDownload:hover { color: #00b0b0; }
+.navbar-right { font-size: .9em; }
+.nav>li>a { padding: 20px 10px 10px 10px; }
+.nav>li>span { padding: 20px 10px 10px 10px; }
+
+header .intro-text .intro-heading { text-transform: none; }
+.linkMore { text-align: right; }
+.intro-lead-in img { height: 2em; width: auto; vertical-align: text-bottom; background: transparent; }
+
+#project, #innovation, #feasibility, #market, #business {
+	background-repeat: none;
+	background-attachment: scroll;
+	background-position: center center;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	background-size: cover;
+	-o-background-size: cover;
+	text-align: center;
+	border-bottom: 1px solid #555;
+}
+#project .container, #overview .container  {
+	padding-top: 1em;
+	border-radius: 5px;
+}
+#project .container  { background-color: #E3EAFF; }
+#project .table-striped { background: rgba(220, 220, 220, .3); }
+#project .table-striped > tbody > tr:nth-of-type(odd) { background: rgba(250, 250, 250, .7); }
+#innovation { background-image:url('../img/lightbulbs.jpg'); }
+#feasibility { background-image:url('../img/currency.jpg'); }
+#overview { background-color: #000; margin-bottom: 50px; }
+#overview .container  { color: #fff; background-color: rgba(250, 250, 250, .3) }
+#overview .text-muted  { color: #bbb; }
+#overview .section-subheading { color: #fff; }
+#overview text { fill: #ccc; }
+#overview .axis text { fill: #fff; }
+#market, #business { background-color: #93A8C4; }
+.onBg { background-color: rgba(250, 250, 250, .7); padding: 2em 3em; border-radius: 5px; }
+
+
+#business table { font-size: 0.9em; }
+#business td { padding-top: 2px; padding-bottom: 2px; color: #555; }
+.mnScore {
+	background-color: rgba(249, 249, 249, .5); 
+	border-radius: 5px;
+	text-align: center;
+	padding: 10px;
+}
+.mnSector h3 { margin-top: 1em; color: #1F71AB; }
+section .onBg .mnSector  p { text-align: center; }
+.mnSector .theScore { font-size: 3em; color: #36abfe; font-family: "Kaushan Script","Helvetica Neue",Helvetica,Arial,cursive; }
+.topNeeds .section-subheading { text-align: left; }
+.topNeeds .mnSource { font-size: .8em; text-align: right; }
+#socialImpact { background-image:url('../img/people.jpg'); }
+
+section h3.section-subheading { font-size: 1.2em; margin-bottom: 5px; }
+section .onBg p {text-align: left; line-height: 1.3em; }
+section ol { margin-top: 10px; padding-left: 10px; text-align: left; }
+.tableMargin { margin-top: 20px; }
+.table-striped { background: rgba(249, 249, 249, .5); text-align: left; }
+
+.radarBody { float: left; position: relative; }
+.radarLegend { position: absolute; right: 0; width: 130px; text-align: left; padding: 1em; }
+.radarLegend .fa { margin-right: 10px; }
+.radarLegend .color0 { color: #1f3e6f; }
+.radarLegend .color1 { color: #6baed6; }
+.axisLegend h3.section-subheading { margin-bottom: 10px; padding-left: 20px; }
+.axisLegend p { margin: 5px 0; padding-left: 20px; }
+.axisLegend span { font-weight: bold; margin-right: 5px; }
+
+hr#partners {
+	padding: 0; border: none; border-top: 1px solid #ccc; color: #ccc; text-align: center;
+	font-family: "Kaushan Script","Helvetica Neue",Helvetica,Arial,cursive;
+}
+hr#partners:after {
+	content: "Partners";
+	display: inline-block; position: relative;  top: -0.7em; font-size: 1.5em; padding: 0 1em; background: white;
+}

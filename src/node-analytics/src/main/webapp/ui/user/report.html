@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="fiReportApp"><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<meta name="description" content="">
+	<meta name="author" content="JSI">
+	<link rel="shortcut icon" href="../../img/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
+
+    <title>FI-Impact Report</title>
+		
+    <!-- Bootstrap Core CSS -->
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="../../css/agency.css" rel="stylesheet">
+	<link href="../../css/fi-impact.css" rel="stylesheet">
+	<link href="../../css/visualisations.css" rel="stylesheet">
+    <!-- Custom Fonts -->
+    <link rel="stylesheet" href="../../css/font-awesome.min.css">
+    <link href="../../css/googlefonts.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body id="page-top" class="index" ng-controller="fiCtrl" ng-cloak>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" href="#page-top">FI-IMPACT Report</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="hidden"><a href="#page-top"></a></li>
+                    <li><a class="page-scroll summary" href="#project">Summary</a></li>
+                    <li><a class="page-scroll" href="#innovation">Innovation</a></li>
+                    <li><a class="page-scroll" href="#market">Market</a></li>
+                    <li><a class="page-scroll" href="#feasibility">Feasibility</a></li>
+                    <li><a class="page-scroll" href="#business">Market Needs</a></li>
+					<li><a class="page-scroll" href="#socialImpact">Social Impact</a></li>
+					<li><a class="page-scroll" href="#mattermark">Mattermark</a></li>
+					<li><a class="page-scroll" href="#overview">Overview</a></li>
+					<li><a id="pdfDownload" ng-click='download()'><i class="fa fa-download"></i> PDF</a></li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+
+    <!-- Header -->
+    <header><div class="container"><div class="intro-text">
+		<div class="intro-lead-in">This is your <img src="../../img/logo.png"> <span ng-if="d.impact">Impact</span><span ng-if="d.self">Self</span> Assessment Report for project</div><div class="intro-heading">{{d.Q1_4}}</div>
+	</div></div></header>
+
+    <!-- Project Section -->
+    <section id="project"><div class="container">
+		<div class="row"><div class="col-lg-12 text-center">
+			<h2 class="section-heading">Project summary</h2>
+		</div></div>
+		<div class="row"><div class="col-md-6"><table class="table table-striped"><tbody>
+			<tr ng-if="d.impact"><td width="25%"><strong>Organisation</strong></td>
+				<td><strong>{{d.Q1_3}}</strong> <span ng-if='d.Q1_16 != ""'>(operational {{d.Q1_16}} year<span ng-if="d.Q1_16 != 1">s</span>)</span><br><i>{{d.Q1_6}}</i><br>{{d.Q1_5}}<br>{{d.Q1_2}}</td></tr>
+			<tr><td><strong>Employees</strong></td><td>Implementing team size: {{d.Q1_7}}<br>Full time employees: {{d.Q1_8}}</td></tr>
+			<tr ng-if="d.impact"><td width="25%"><strong>Accelerator</strong></td><td><strong>{{d.Q1_1}}</strong> ({{d.Q1_13}}&euro;)<span ng-if='d.Q1_14 != ""'><br>{{d.Q1_14}}</span></td></tr>
+			<tr><td><strong>Solution Type</strong></td><td>{{d.Q1_10}}<br>{{d.Q1_11}}</td></tr>
+			<tr ng-if="d.self"><td><strong>Project</strong></td><td>{{d.Q1_19}}</td></tr>
+			<tr ng-if="d.self"><td><strong>FIWARE enablers use</strong></td><td>{{d.Q1_20}}</td></tr>
+		</tbody></table></div>
+		<div class="col-md-6 text-left"><strong>FIWARE enablers</strong><p><span ng-repeat="E in d.enablers"><a target="_blank" href="{{E.link}}">{{E.label}}</a>{{$last ? '' : ', '}}</span></p>
+			<table class="table table-striped"><tbody>
+				<tr ng-repeat="E in d.enablersSpecific"><td><strong>{{E.label}}</strong></td><td>{{E.value}}</td></tr>
+			</tbody></table>
+			<p class="linkMore"><a target="_blank" href="http://catalogue.fiware.org/enablers">learn more about FIWARE Enablers <i class="fa fa-arrow-right"></i></a></p>
+		</div></div>
+		<div class="row" ng-if="d.self"><div class="col-md-12" style="text-align: left">
+			<table class="table table-striped"><tbody><tr><td>
+				<p><strong>Focus and benefits of your project</strong></p>
+				{{d.Q1_21}}
+			</td></tr></tbody></table>
+		</div></div>
+	</div></section>
+
+    <!-- Innovation Section -->
+    <section id="innovation" class="bg-light-gray"><div class="container onBg">
+		<div class="row"><div class="col-lg-12 text-center">
+			<h2 class="section-heading">Innovation</h2><div id="innovationGauge" class="pull-right"></div>
+			<p class="text-muted">The Innovation indicator expresses the level of originality, maturity and sustainability of innovation to a 
+			product or service in an organization’s go to market strategy. The single measures are used to create the innovation indicator 
+			but are also used in the calculation of Market Attractiveness and Feasibility Indicators. Several conditions affect the innovation 
+			Indicator. An innovative product or service can make a significant Impact in the market if you are ready to implement it, but can 
+			conceal substantial engineering, business planning, development, testing and marketing effort if the product or service is still 
+			in the planning phases. If the innovation is being developed and validated among colleagues and potential clients the innovation’s 
+			real market potential is increased. Innovation is quite healthy in organizations if it is part of a strategy but can be quite resource 
+			consuming where stand-alone.</p>
+			<h3 class="section-subheading">{{d.innovation.interpretation}}</h3>
+			<h3 class="section-subheading" ng-repeat="x in d.innovation.bottomHalf">
+			Please visit the FI-IMPACT Library to access reading material that may be useful.</h3>
+		</div></div>
+		<div class="row tableMargin"><div class="col-md-6"><table class="table table-striped"><tbody>
+			<tr><td width="25%"><strong>Concept</strong></td>
+				<td><strong>Concept developed by:</strong> {{d.Q2_4}}<br><strong>TRL Level:</strong> {{d.Q2_1}}</td></tr>
+		</tbody></table></div>
+		<div class="col-md-6"><table class="table table-striped"><tbody>
+			<tr><td width="25%"><strong>Business idea</strong></td>
+				<td><strong>Innovation Type:</strong> {{d.Q2_2}}<br><strong>Existence of similar solution:</strong> {{d.Q2_3}}<br><strong>Strategy:</strong> {{d.Q2_5}}</td></tr>
+		</tbody></table></div></div>
+	</div></section>
+
+    <!-- Market Section -->
+    <section id="market"><div class="container onBg">
+		<div class="row"><div class="col-lg-12 text-center">
+			<h2 class="section-heading">Market</h2>
+			<div id="marketGauge" class="pull-right"></div>
+			<!-- <p class="text-muted">The Market Focus indicator assesses to what extent you have gathered knowledge about customers in the
+			target market, and if your initiative has a strategy and plan to reach the target market. This indicator
+			measures the level of your “customer development” activities: whether you have already approached customers
+			to collect feedback on your product, and to what extent you have developed a strategy to acquire them.</p> -->
+			<p class="text-muted">The Market Focus indicator reflects the quality and relevance of your knowledge of customer needs 
+			in your target market(s), the extent to which you have gathered knowledge about customers in the target market, and if your 
+			initiative has a strategy and plan to reach the target market. This indicator measures the level of your “customer development” 
+			activities: whether you have already approached customers to collect feedback on your product, and to what extent you have 
+			developed a strategy to acquire them.</p>
+			<h3 class="section-subheading">{{d.market.interpretation}}</h3>
+			<h3 class="section-subheading" ng-repeat="x in d.market.bottomHalf">
+			Please visit the FI-IMPACT Library to access reading material that may be useful.</h3>
+		</div></div>
+		<div class="row tableMargin"><div class="col-md-6"><table class="table table-striped"><tbody>
+			<tr><td width="25%"><strong>Business model</strong></td>
+				<td><strong>Model:</strong> {{d.Q3_1}}<br><strong>Revenue Division:</strong> <span ng-repeat="R in d.revenue">{{R.value}}% {{R.label}}{{$last ? '' : ', '}}</span></td></tr>
+			<tr><td><strong>Customers</strong></td>
+				<td><strong>Value Proposition Verification:</strong> {{d.Q3_8}}<br><strong>Commercial Strategy Status: </strong>{{d.Q3_9}}</td></tr>
+			</tbody></table></div>
+			<div class="col-md-6"><table class="table table-striped"><tbody>
+			<tr ng-if="d.primaryMarketSector"><td width="25%"><strong>Primary Market Sector</strong></td>
+				<td>{{d.Q3_3a}}<br><strong>Reasons for targeting:</strong>  {{d.Q3_3b}}</td></tr>
+			<tr><td width="25%"><strong>Secondary Market Sectors</strong></td>
+				<td>{{d.Q3_3}}<span ng-if="d.Q3_3c"><br><strong>Reasons for targeting:</strong>  {{d.Q3_3c}}<span></td></tr>
+			<tr><td width="25%"><strong>Market</strong></td>
+				<td><strong>Channel:</strong> {{d.Q3_4}}<br>
+					<strong>Target Market in Three Years:</strong> {{d.Q3_5}}<br><strong>Entry into the Open Market:</strong> {{d.Q3_6}}<br>
+					<strong>Level of competition:</strong> {{d.Q3_7}}<br><strong>Market Strategy Status:</strong> {{d.Q3_10}}, {{d.Q3_11}}</td></tr>
+		</tbody></table></div></div>
+	</div></section>
+
+    <!-- Feasibility Section -->
+    <section id="feasibility" class="bg-light-gray"><div class="container onBg">
+		<div class="row"><div class="col-lg-12 text-center">
+			<h2 class="section-heading">Feasibility</h2>
+			<div id="feasibilityGauge" class="pull-right"></div>
+			<p class="text-muted">The Feasibility indicator assesses to what extent you have assessed the 
+			economic viability of your business, and if you have already provided for the necessary funds for the startup phase.
+			This indicator assesses whether you are aware of the funds required to start and grow your business, and whether you
+			have secured sources for these funds.</p>
+			<h3 class="section-subheading">{{d.feasibility.interpretation}}</h3>
+			<h3 class="section-subheading" ng-repeat="x in d.feasibility.bottomHalf">
+			Please visit the FI-IMPACT Library to access reading material that may be useful.</h3>
+		</div></div>
+		<div class="row tableMargin">
+			<div class="col-md-6"><table class="table table-striped"><tbody>
+				<tr><td width="25%"><strong>Capital</strong></td>
+					<td><strong>Required investments until sustainable:</strong> {{d.Q4_1}}<br><strong>Secured funding:</strong> {{d.Q4_6}}%</td></tr>
+				<tr><td><strong>Growth rate</strong></td>
+					<td><strong>Sales:</strong> {{d.Q4_2}}<br><strong>Revenue (4 years):</strong> {{d.Q4_3}}</td></tr>
+				</tbody></table></div>
+			<div class="col-md-6"><table class="table table-striped"><tbody>
+				<tr><td width="25%"><strong>Customer acquisition</strong></td><td>{{d.Q4_4}}</td></tr>
+				<tr><td width="25%"><strong>Sales and marketing expansion</strong></td><td>{{d.Q4_5}}</td></tr>
+			</tbody></table></div>
+		</div>
+    </div></section>
+	
+	<!-- Market Needs Section -->
+    <section id="business"><div class="container onBg">
+		<div class="row"><div class="col-lg-12 text-center">
+			<h2 class="section-heading">Market Needs</h2>
+			<p class="text-muted">The Market Needs Indicator reflects the extent to which perceived user benefits associated with a product 
+			or service are aligned with real-market needs, based on an analysis of IDC Vertical Market Survey results. One set of indicators 
+			are outlined for business and government sectors (B2B and B2G) and a second set of indicators are outlined for consumer markets (B2C), 
+			based on different market needs.
+		</div></div>
+		<div class="row mnSector" ng-repeat="MN in d.marketNeeds">
+			<h3>{{MN.label}}</h3>
+			<div class="col-md-6"><table class="table table-striped"><tbody>
+				<tr ng-repeat="score in MN.answers"><td>{{score.label}}</td><td><i class="fa fa-star" ng-repeat="st in score.stars"></i></td></tr>
+			</tbody></table></div>
+			<div class="col-md-3"><div class="mnScore">
+				<p style="font-variant: small-caps">Target Market Needs Understanding</p>
+				<h3 style="font-variant: small-caps">your score</h3>
+				<p class="theScore">{{MN.score}}/{{MN.max}}</p>
+			</div></div>
+			<div class="col-md-3 topNeeds">
+				<h3 class="section-subheading text-muted">TOP 5 business needs</h3>
+				<h3 class="section-subheading text-muted mnSource">(Source: IDC Vertical Market Survey)</h3>
+				<ol><li ng-repeat="BN in MN.top">{{BN.label}}</li></ol>
+			</div></div>
+    </div></section>
+
+    <!-- Social Impact Section -->
+    <section id="socialImpact" class="bg-light-gray"><div class="container onBg">
+		<div class="row"><div class="col-lg-12 text-center">
+			<h2 class="section-heading">Social Impact</h2>
+			<p class="text-muted">The Social Impact Indicator reflects the extent to which the project has social impact in 11 key areas. 
+			It focuses on identifying specific social benefits that your project will support and the contribution to quality of life for 
+			specific social groups. It also contextualises the impact of your project against the average social impact of all surveyed 
+			projects in these areas.</p>
+		</div></div>
+		<h3>Social Benefits</h3>
+		<div class="row"><div class="col-md-6 text-center">
+				<div id="bodySocialA" class="radarBody"><div class="radarLegend" class="radarLegend">
+					<p><i class="fa fa-square color0"></i> Your Score<br>
+						<i class="fa fa-square color1"></i> Average</p>
+				</div><div id="radarSocialA"></div></div>
+			</div><div class="col-md-6 axisLegend">
+				<h3 class="section-subheading text-muted">Axis legend</h3>
+				<p ng-repeat="SB in d.socialBenefits"><span>{{SB.id}}:</span> {{SB.label}}</p>
+		</div></div>
+		<h3>Quality of life improvement for certain social groups</h3>
+		<div class="row"><div class="col-md-6 text-center">
+			<div id="bodySocialB" class="radarBody"><div class="radarLegend" class="radarLegend">
+				<p><i class="fa fa-square color0"></i> Your Score<br><i class="fa fa-square color1"></i> Average</p>
+			</div><div id="radarSocialB"></div></div>
+		</div><div class="col-md-6"></div></div>
+    </div></section>
+
+	<!-- Mattermark Section -->
+    <section id="mattermark"><div class="container onBg">
+		<div class="row"><div class="col-lg-12 text-center">
+			<h2 class="section-heading">Mattermark scores summary</h2>
+			<p class="text-muted">Mattermark collects & organizes comprehensive information on the world’s fastest growing companies. In minutes, get actionable data that lets you pinpoint the companies and people you need to know or do business with.</p>
+		</div></div>
+		<div class="row">
+			<div class="col-md-6">
+				<h3 class="section-subheading">Growth Score</h3>
+				<div id="growthGauge" class="pull-right"></div>
+				<p class="text-muted">Mattermark's Growth Score is the default ranking for all companies in Mattermark. It measures how quickly a company is gaining traction at a given point in time.</p>
+				<p class="text-muted">{{d.growth.interpretation}}</p>
+			</div>
+			<div class="col-md-6">
+				<h3 class="section-subheading">Total Funding</h3>
+				<div id="fundingGauge" class="pull-right"></div>
+				<p class="text-muted">{{d.funding.interpretation}}</p>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<h3 class="section-subheading">Employee Count</h3>
+				<div id="employeesGauge" class="pull-right"></div>
+				<p class="text-muted">{{d.employees.interpretation}}</p>
+			</div>
+			<div class="col-md-6">
+				<h3 class="section-subheading">Est. Monthly Uniques</h3>
+				<div id="uniquesGauge" class="pull-right"></div>
+				<p class="text-muted">{{d.uniques.interpretation}}</p>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<h3 class="section-subheading">Twitter Followers</h3>
+				<div id="twitterGauge" class="pull-right"></div>
+				<p class="text-muted">{{d.twitter.interpretation}}</p>
+			</div>
+			<div class="col-md-6">
+				<h3 class="section-subheading">Facebook Likes</h3>
+				<div id="facebookGauge" class="pull-right"></div>
+				<p class="text-muted">{{d.facebook.interpretation}}</p>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<h3 class="section-subheading">LinkedIn Follows</h3>
+				<div id="linkedinGauge" class="pull-right"></div>
+				<p class="text-muted">{{d.linkedin.interpretation}}</p>
+			</div>
+			
+		</div>
+    </div></section>
+	
+	<section id="overview" class="bg-light-gray"><div class="container onBg">
+		<div class="row"><div class="col-lg-12 text-center">
+			<h2 class="section-heading">Overview</h2>
+			<p class="text-muted">In this section you can evaluate your Impact Assessment scores against the average score calculated from all 
+			completed surveys to date. Scores are represented in a spider diagram so that you can easily identify your strengths or weaknessess 
+			compared to the average score. Details about a specific section of the report can be accessed by clicking on the node on the axis 
+			representing the respective section.</p>
+		</div></div>
+		<div id="bodyOverview" class="radarBody"><div class="radarLegend">
+			<p><i class="fa fa-square color0"></i> Your Score<br><i class="fa fa-square color1"></i> Average</p>
+		</div><div id="radarOverview"></div></div>
+	</div></section>
+	
+    <!-- Partners -->
+	<aside class="clients"><div class="container"><hr id="partners"><div class="row">
+		<div class="col-md-2 col-sm-6"><a href="http://idcitalia.com/ita/" target="_blank"><img style="margin-left: 0px; margin-right: 10px;" src="../../css/IDC_logo_4.png" alt="" width="120" height="57" /></a></div>
+		<div class="col-md-2 col-sm-6"><a href="http://www.idg.co.uk/" target="_blank"><img style="margin-left: 10px; margin-right: 10px;" src="../../css/IDG_Communications1_3.jpg" alt="" width="120" height="35" /></a></div>
+		<div class="col-md-2 col-sm-6"><a href="http://www.bluegreenstrategy.com/" target="_blank"><img style="margin-left: 10px; margin-right: 10px;" src="../../css/logotipo_bluegreen_04_v02_small_3.png" alt="" width="150" height="34" /></a></div>
+		<div class="col-md-2 col-sm-6"><a href="http://www.iimg.com" target="_blank"><img style="margin-left: 10px; margin-right: 10px;" src="../../css/iimc.gif" alt="" width="138" height="36" /></a></div>
+		<div class="col-md-2 col-sm-6"><img style="margin-left: 10px; margin-right: 10px;" src="../../css/SFC_2.jpg" alt="" width="150" height="50" /></div>
+		<div class="col-md-2 col-sm-6"><a href="http://ailab.ijs.si/" target="_blank"><img style="margin-left: 10px; margin-right: 0px;" src="../../css/jsi_logo_2.png" alt="" width="150" height="43" /></a></div>
+	</div></div></aside>
+    <footer><div class="container"><div class="row"><div class="col-md-12">
+		<span class="copyright">Copyright &copy; FI-Impact 2015</span>
+	</div></div></div></footer>
+
+	<!-- Core JavaScript -->
+    <script src="../../js/jquery.min.js"></script>
+    <script src="../../js/bootstrap.min.js"></script>
+	<script src="../../js/angular.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../js/ie10-viewport-bug-workaround.js"></script>
+    <!-- Plugin JavaScript -->
+    <script src="../..//js/jquery.easing.min.js"></script>
+    <script src="../../js/classie.js"></script>
+    <script src="../../js/cbpAnimatedHeader.min.js"></script>
+    <!-- Custom Theme JavaScript -->
+    <script src="../../js/agency.js"></script>
+	<!-- D3 JavaScript -->
+	<script src="../../js/d3.min.js"></script>
+	<script src="../../js/fiRadar.js"></script>
+	<script src="../../js/Speedometer2.js"></script>
+	<!-- FI JavaScript -->
+	<script src="../../js/fiReport.js"></script>
+
+</body>
+
+</html>

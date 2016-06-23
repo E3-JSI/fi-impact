@@ -1,0 +1,17 @@
+<html>
+<head>
+    <script src="http://code.jquery.com/jquery-1.7.2.min.js" type="text/javascript"></script>
+    <script src="test/sigma.min.js" type="text/javascript"></script>
+    <script src="test/sigma.forceatlas2.js" type="text/javascript"></script>
+    <script src="test/viz.js" type="text/javascript"></script>
+    <script>
+        $.getJSON( "./output/custom_graph.json", function( data ) {
+            console.log(data);
+            drawSimilarityGraph(data); 
+        });
+    </script>
+</head>
+<body>
+    <div id="similarityGraph" style="width:600px; height:400px;"></div>
+</body>
+</html>

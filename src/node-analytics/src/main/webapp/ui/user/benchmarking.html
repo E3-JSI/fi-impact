@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="fiBenchmarkApp">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<link rel="shortcut icon" href="../../img/favicon.ico" type="image/x-icon">
+		<link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
+
+		<title>FI-Impact Benchmarking</title>
+		
+		<!-- Bootstrap CSS -->
+		<link rel="stylesheet" href="../../css/bootstrap.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="../../css/bootstrap-theme.min.css" rel="stylesheet">
+		<!-- Optional includes -->
+		<link href="../../css/nv.d3.min.css" rel="stylesheet" type="text/css">
+		<!-- Custom styles for this template -->
+		<link rel="stylesheet" href="../../css/theme.css" rel="stylesheet">
+		<link rel="stylesheet" href="../../css/theme.blue.css" rel="stylesheet">
+		<!-- External CSS -->
+		<link rel="stylesheet" href="../../css/font-awesome.min.css">
+
+		<!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+		<!--[if lt IE 9]><script src="../../assets../../js/ie8-responsive-file-warning.js"></script><![endif]-->
+		<!-- <script src="../../js/ie-emulation-modes-warning.js"></script> -->
+		<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+		<!--[if lt IE 9]>
+		  <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+		  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+	</head>
+
+	<body role="document" ng-controller="fiGraphs as vm">
+
+		<div class="container theme-showcase" role="main">
+			<div class="col-md-8" id="scatterplot">
+				<form>
+					<div class="form-group">
+						<label for="chooseSlice" class="col-sm-2 control-label">Slice</label>
+						<div class="col-sm-10"><select class="form-control" ng-model="vm.scatter.slice" ng-options="slice.abscissa.label + ' - ' + slice.ordinate.label for (index, slice) in vm.legend.slices track by index" ng-change="vm.plotChart()"></select></div>
+					</div>
+					<div class="form-group">
+						<label for="chooseFilter" class="col-sm-2 control-label">Filter</label>
+						<div class="col-sm-10"><select class="form-control" ng-model="vm.scatter.filter" ng-options="selection.label for selection in vm.legend.selections track by selection.field" ng-change="vm.plotChart()"></select></div></div>
+				</form>
+				<svg viewBox="0 0 700 700" style="margin: 0px; padding: 0px; height: 95%; width: 95%"></svg>
+				<div id="similarityGraph" style="width:1200px; height:600px;"></div>
+			</div>
+			<div class="col-md-4">
+				<div class="checkbox" ng-repeat="(type, object) in vm.legend.type">
+					<label><input type="checkbox" ng-model="object.checked" ng-change="vm.plotChart()"> {{type}}: {{vm.symbols[object.index]}}</label>
+				</div>
+				<ul ng-if="vm.scatter.filter.displayType == 'list'">
+					<li ng-repeat="(option, object) in vm.scatter.filter.dictionary">{{object.label}}: <i class="fa fa-square" aria-hidden="true" ng-style="{'color': vm.colors[object.index]}"></i></li>
+				</ul>
+				<ul ng-if="vm.scatter.filter.displayType == 'checkbox'">
+					<li ng-repeat="(option, object) in vm.scatter.filter.dictionary">
+						<div class="checkbox"><label><input type="checkbox" ng-model="object.checked" ng-change="vm.plotChart()"> {{object.label}}
+						</label></div>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		<!-- Core JavaScript -->
+		<script type="text/javascript" src="../../js/jquery.min.js"></script>
+		<script type="text/javascript" src="../../js/angular.min.js"></script>
+		<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+		<script src="../../js/ie10-viewport-bug-workaround.js"></script>
+		<!-- Optional includes -->
+		<script type="text/javascript" src="../../js/d3.min.js"></script>
+		<script type="text/javascript" src="../../js/nv.d3.min.js"></script>
+		<script type="text/javascript" src="../../js/sigma.min.js"></script>
+		<script type="text/javascript" src="../../js/sigma.forceatlas2.js"></script>
+		<script type="text/javascript" src="../../js/viz.js"></script>
+		<!-- FI-Impact JavaScript -->
+		<script type="text/javascript" src="../../js/fiBenchmarking.js"></script>
+	</body>
+</html>

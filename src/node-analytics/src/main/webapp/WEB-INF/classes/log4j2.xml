@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="error">
+ <properties>
+	<property name="appCode">FI-IMPACT</property>
+</properties>
+	<appenders>
+		<RollingFile name="log" fileName="${sys:catalina.base}/ailog/${appCode}.log" filePattern="${sys:catalina.base}/ailog/${appCode}-%i.log">
+			<PatternLayout pattern="%d{ISO8601} %-5level %class{36} %L %M - %t - %msg%xEx%n"/>
+			<Policies>
+				<SizeBasedTriggeringPolicy size="5 MB"/>
+			</Policies>
+			<DefaultRolloverStrategy max="10"/>
+		</RollingFile>
+
+	</appenders>
+	<loggers>
+		<root level="debug">
+			<appender-ref ref="log"/>
+		</root>
+	</loggers>
+</configuration>
