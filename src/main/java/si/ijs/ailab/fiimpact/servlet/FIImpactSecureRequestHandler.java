@@ -76,7 +76,12 @@ public class FIImpactSecureRequestHandler extends HttpServlet
 
 
     webappRoot = new File (config.getServletContext().getRealPath("/")).toPath();
-    usersManager=UsersManager.getUsersManager(webappRoot);
+    String sDigest = config.getServletContext().getInitParameter("digest");
+    if(sDigest.equals(""))
+      sDigest = null;
+    logger.info("digest={}", sDigest);
+
+    usersManager=UsersManager.getUsersManager(webappRoot, sDigest);
   }
 
 
