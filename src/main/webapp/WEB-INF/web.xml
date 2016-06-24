@@ -9,6 +9,10 @@
 		<param-value>E:\server\Tomcat7\webapps\fi-impact\WEB-INF\upload</param-value>
 	</context-param>
 	<context-param>
+		<param-name>digest</param-name>
+		<param-value>MD5</param-value>
+	</context-param>
+	<context-param>
 		<param-name>temp-upload-dir</param-name>
 		<param-value>E:\server\Tomcat7\webapps\fi-impact\WEB-INF\tmp</param-value>
 	</context-param>
