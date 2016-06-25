@@ -32,6 +32,8 @@
 					"id" : "5"
 				}, {
 					"id" : "6",
+					"calculated" : "true",
+					"label": "Organisation type",
 					"merge" : [{
 							"id" : "6a",
 							"lookup" : [{
@@ -401,6 +403,8 @@
 						}, {
 							"E" : "Construction"
 						}, {
+							"F" : "Consumer"
+						}, {
 							"G" : "Education"
 						}, {
 							"H" : "Financial Services"
@@ -437,6 +441,9 @@
 							"D" : "Business Services"
 						}, {
 							"E" : "Construction"
+						}, {
+							"F" : "Consumer"
+						}, {
 						}, {
 							"G" : "Education"
 						}, {

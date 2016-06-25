@@ -37,6 +37,8 @@
 				vm.raw[data.type] = data.list
 				vm.legend.type[data.type] = { index: Object.keys(vm.legend.type).length, checked: true }
 			})
+			vm.selected = vm.raw.SELECTED[0]
+			console.log(vm.selected)
 			vm.plotChart()
 		})
 		
@@ -99,7 +101,7 @@
 			var filtering = (vm.scatter.filter != '')
 			// build the dictionary if it does not exist yet
 			if (filtering) {
-				var selectedValue = vm.raw.SELECTED[0].filters[vm.scatter.filter.field]
+				var selectedValue = vm.selected.filters[vm.scatter.filter.field]
 				vm.scatter.filter.displayType = ( vm.scatter.filter.lookup.length > 3 ? 'checkbox' : 'list' )
 				if (vm.scatter.filter.displayType == 'checkbox') $.each(['checked', 'unchecked'], function(i, cat) {vm.data.push({ key: cat, values: [] })})
 				if (!('dictionary' in vm.scatter.filter)) {
