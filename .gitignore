@@ -1,6 +1,7 @@
-/out/
 /.idea/workspace.xml
 web/css/Thumbs.db
 qminer/db/
 qminer/export_2015_12_02_test.txt
 qminer/monitor.js
+/target/
+/.idea/libraries

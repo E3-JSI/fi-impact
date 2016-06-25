@@ -1,0 +1,7 @@
+{
+    "MDS_time_sec": 100,
+	"MDS_similarity_measure": "Cos",
+	"MDS_max_steps": 100,
+	"prj_data_fn": "fi-impact-export.json",
+	"main_graph_fn": "main_graph.json"
+}

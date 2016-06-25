@@ -1,0 +1,32 @@
+<html>
+<head>
+    <script src="http://code.jquery.com/jquery-1.7.2.min.js" type="text/javascript"></script>
+    <script src="test/sigma.min.js" type="text/javascript"></script>
+    <script src="test/sigma.forceatlas2.js" type="text/javascript"></script>
+    <script src="test/viz.js" type="text/javascript"></script>
+    <script>
+        $.getJSON( "./output/main_graph.json", function( data ) {
+            drawSimilarityGraph(data); 
+        });
+		
+		function testPost() {
+			$.getJSON( "./data/post_data.json", function( data ) {
+			    console.log("data: "+data);
+				
+				$.ajax({
+					type: 'POST',
+					url: 'post_data',
+					data: data,
+					success: function(msg){
+						alert('wow' + msg);
+					}
+				});
+				
+			});
+		}
+    </script>
+</head>
+<body>
+    <div id="button" style="width:20px; height:100px;" onclick="javascript:testPost();">POST</div>
+</body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "prj": [
+    { "name": "id_internal", "type": "string", "primary": true },
+    { "name": "node_type", "type": "string", "primary": false },
+    { "name": "desc", "type": "string", "primary": false }
+  ]
+}
