@@ -1,3 +1,18 @@
+.vspace { padding: 1em 0; }
+
+.legend-checkboxes { padding-left: 0px; }
+.legend-checkboxes .symbol { 
+    float: left;
+	font-size: 1.3em;
+	margin-top: -3px;
+	margin-left: -40px;
+	text-align: center;
+    width: 40px;
+}
+.legend-checkboxes .legend-checkbox { 
+	padding-left: 20px;
+}
+
 .navbar .nav .summary { color: #00f0f0; }
 .navbar .nav .summary:hover { color: #00b0b0; }	
 .navbar .nav #pdfDownload { color: #00f0f0; cursor: pointer; }

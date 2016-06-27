@@ -5,6 +5,7 @@ import javax.servlet.ServletOutputStream;
 import javax.xml.parsers.*;
 import java.io.*;
 import java.nio.file.*;
+import java.security.MessageDigest;
 import java.util.*;
 import java.lang.*;
 
@@ -19,6 +20,7 @@ public class UsersManager
 {
   private static final  String ROLE_TOMCAT = "fiimpact";
   private static final  String ROLE_DEFAULT_FI = "admin";
+  private final String digest;
 
   private Map<String, UserInfo> users;
 
@@ -30,9 +32,11 @@ public class UsersManager
   private UserInfo deniedUserInfo;
   private File usersDefFile;
 
-  private UsersManager(Path _webappRoot)
+  private UsersManager(Path _webappRoot, String _digest)
   {
     logger.info("Root: {}", _webappRoot);
+    logger.info("Digest: {}", _digest);
+    digest = _digest;
 
     users = Collections.synchronizedMap(new TreeMap<String , UserInfo>());
     roles = Collections.synchronizedMap(new TreeMap<String , String>());
@@ -147,6 +151,7 @@ public class UsersManager
     return userInfo;
   }
 
+  /*
   private void logMbeanInfo(MBeanInfo info)
   {
     logger.debug("{}: {}", info.getClassName(), info.getDescription());
@@ -163,7 +168,7 @@ public class UsersManager
       logger.debug(mBeanOperationInfo.toString());
     }
   }
-
+*/
   private void getTomcatUserInfo(UserInfo userInfo)
   {
     try
@@ -187,7 +192,7 @@ public class UsersManager
         else
         {
           ObjectName onUser = new ObjectName(userIDString);
-          MBeanInfo info = mbeanServer.getMBeanInfo(onUser);
+          //MBeanInfo info = mbeanServer.getMBeanInfo(onUser);
           //logMbeanInfo(info);
           String[] tomcatRoles = (String[]) mbeanServer.getAttribute(onUser, "roles");
           boolean bFoundRole = false;
@@ -214,12 +219,39 @@ public class UsersManager
         }
       }
     }
-      catch (IntrospectionException|AttributeNotFoundException|MalformedObjectNameException|ReflectionException|InstanceNotFoundException|MBeanException e)
+      catch (AttributeNotFoundException|MalformedObjectNameException|ReflectionException|InstanceNotFoundException|MBeanException e)
       {
         logger.error("Error getting user info", e);
         userInfo.setDeniedUser(true);
 
       }
+  }
+
+  private String getPasswordHash(String plainTextPassword)
+  {
+      if(digest != null)
+      {
+        logger.debug("Digest is "+digest);
+        try
+        {
+          MessageDigest md = MessageDigest.getInstance(digest);
+          byte[] array = md.digest(plainTextPassword.getBytes("UTF-8"));
+          StringBuilder sb = new StringBuilder();
+          for (byte anArray : array)
+          {
+            sb.append(Integer.toHexString((anArray & 0xFF) | 0x100).substring(1, 3));
+          }
+          plainTextPassword = sb.toString();
+        }
+        catch (UnsupportedEncodingException | java.security.NoSuchAlgorithmException ex)
+        {
+          logger.error("Error creating password hash", ex);
+        }
+      }
+      else
+        logger.info("Digest is empty");
+
+    return plainTextPassword;
   }
 
   synchronized public void addUser(ServletOutputStream outputStream, String userName, String password, String accelerator, String description, UserInfo adminUserInfo) throws IOException
@@ -250,12 +282,13 @@ public class UsersManager
       }
       else
       {
+        password = getPasswordHash(password);
 
         userIDString = (String) mbeanServer.invoke(onUserDatabase, "createUser", new String[]{userName, password, description}, new String[]{String.class.getName(), String.class.getName(), String.class.getName()});
 
         //"Users:type=User,username=\""+userName+"\",database=UserDatabase";
         ObjectName onUser = new ObjectName(userIDString);
-        MBeanInfo info = mbeanServer.getMBeanInfo(onUser);
+        //MBeanInfo info = mbeanServer.getMBeanInfo(onUser);
         //logMbeanInfo(info);
         String addResult = (String) mbeanServer.invoke(onUser, "addRole", new String[]{ROLE_TOMCAT}, new String[]{String.class.getName()});
         mbeanServer.invoke(onUserDatabase, "save", new Object[0], new String[0]);
@@ -269,24 +302,19 @@ public class UsersManager
         logger.info("FI-IMPACT user created: {}/{}", userName, description);
       }
     }
-    catch (IntrospectionException|MalformedObjectNameException|ReflectionException|InstanceNotFoundException|MBeanException e)
+    catch (MalformedObjectNameException|ReflectionException|InstanceNotFoundException|MBeanException e)
     {
       writeUserErrorResult(outputStream, userName, "user-create", e.getMessage());
       logger.error("Error adding user", e);
     }
   }
 
-  public static synchronized UsersManager getUsersManager(Path _webappRoot)
+  public static synchronized UsersManager getUsersManager(Path _webappRoot, String _digest)
   {
     if(usersManager == null)
     {
-      usersManager = new UsersManager(_webappRoot);
+      usersManager = new UsersManager(_webappRoot, _digest);
     }
-    return usersManager;
-  }
-
-  public static UsersManager getUsersManager()
-  {
     return usersManager;
   }
 
@@ -379,53 +407,46 @@ public class UsersManager
     try
     {
       logger.info("Change password {}", userInfo.getName());
-      if(userInfo == null)
+      ArrayList list = MBeanServerFactory.findMBeanServer(null);
+      MBeanServer mbeanServer = (MBeanServer) list.get(0);
+      ObjectName onUserDatabase = new ObjectName("Users:type=UserDatabase,database=UserDatabase");
+
+      String userIDString = (String) mbeanServer.invoke(onUserDatabase, "findUser", new String[]{userInfo.getName()}, new String[]{String.class.getName()});
+      if(userIDString == null)
       {
         writeUserErrorResult(outputStream, userInfo.getName(), "user-my-password", "User not defined");
-        logger.error("Error changing password - FI user does not exist");
+        logger.error("Error changing password - Tomcat user does not exist");
       }
       else
       {
-        ArrayList list = MBeanServerFactory.findMBeanServer(null);
-        MBeanServer mbeanServer = (MBeanServer) list.get(0);
-        ObjectName onUserDatabase = new ObjectName("Users:type=UserDatabase,database=UserDatabase");
-
-        String userIDString = (String) mbeanServer.invoke(onUserDatabase, "findUser", new String[]{userInfo.getName()}, new String[]{String.class.getName()});
-        if(userIDString == null)
+        logger.info("Change password for {}", userIDString);
+        ObjectName onUser = new ObjectName(userIDString);
+        //MBeanInfo info = mbeanServer.getMBeanInfo(onUser);
+        //logMbeanInfo(info);
+        String currentPassword = (String)mbeanServer.getAttribute(onUser, "password");
+        oldPassword = getPasswordHash(oldPassword);
+        if(!oldPassword.equals(currentPassword))
         {
-          writeUserErrorResult(outputStream, userInfo.getName(), "user-my-password", "User not defined");
-          logger.error("Error changing password - Tomcat user does not exist");
+          writeUserErrorResult(outputStream, userInfo.getName(), "user-my-password", "Please enter old password");
+          logger.error("Error changing password - old password does not match.");
         }
         else
         {
-          logger.info("Change password for {}", userIDString);
-          ObjectName onUser = new ObjectName(userIDString);
-          MBeanInfo info = mbeanServer.getMBeanInfo(onUser);
-          //logMbeanInfo(info);
-          String currentPassword = (String)mbeanServer.getAttribute(onUser, "password");
-          logger.debug("old: {}");
-          if(!oldPassword.equals(currentPassword))
+          newPassword = getPasswordHash(newPassword);
+          mbeanServer.setAttribute(onUser, new Attribute("password", newPassword ));
+          mbeanServer.invoke(onUserDatabase, "save", new Object[0], new String[0]);
+          logger.info("Tomcat user password changed: {}", userIDString);
+          if(userInfo.isFirstLogin())
           {
-            writeUserErrorResult(outputStream, userInfo.getName(), "user-my-password", "Please enter old password");
-            logger.error("Error changing password - old password does not match.");
+            userInfo.setFirstLogin(false);
+            saveUsersDef();
           }
-          else
-          {
-            mbeanServer.setAttribute(onUser, new Attribute("password", newPassword ));
-            mbeanServer.invoke(onUserDatabase, "save", new Object[0], new String[0]);
-            logger.info("Tomcat user password changed: {}", userIDString);
-            if(userInfo.isFirstLogin())
-            {
-              userInfo.setFirstLogin(false);
-              saveUsersDef();
-            }
-            userInfo.getProfile(outputStream, "user-my-password");
-            logger.info("FI-IMPACT user password changedset: {}", userInfo.getName());
-          }
+          userInfo.getProfile(outputStream, "user-my-password");
+          logger.info("FI-IMPACT user password changedset: {}", userInfo.getName());
         }
       }
     }
-    catch (InvalidAttributeValueException|AttributeNotFoundException|IntrospectionException|MalformedObjectNameException|ReflectionException|InstanceNotFoundException|MBeanException e)
+    catch (InvalidAttributeValueException|AttributeNotFoundException|MalformedObjectNameException|ReflectionException|InstanceNotFoundException|MBeanException e)
     {
       writeUserErrorResult(outputStream, userInfo.getName(), "user-my-password", e.getMessage());
       logger.error("Error adding user", e);
@@ -467,11 +488,12 @@ public class UsersManager
         {
           logger.info("Edit user {}", userIDString);
           ObjectName onUser = new ObjectName(userIDString);
-          MBeanInfo info = mbeanServer.getMBeanInfo(onUser);
+          //MBeanInfo info = mbeanServer.getMBeanInfo(onUser);
           boolean bSaveTomcat = false;
           boolean bSaveFI = false;
           if(password != null)
           {
+            password = getPasswordHash(password);
             mbeanServer.setAttribute(onUser, new Attribute("password", password));
             logger.info("User password reset: {}", userName);
             bSaveTomcat = true;
@@ -492,7 +514,7 @@ public class UsersManager
 
           if(roles != null && roles.length > 0)
           {
-            ArrayList<String> cleanRoles = new ArrayList();
+            ArrayList<String> cleanRoles = new ArrayList<>();
             for(String newRole : roles)
             {
               if (newRole != null && !newRole.equals(""))
@@ -535,7 +557,7 @@ public class UsersManager
         }
       }
     }
-    catch (InvalidAttributeValueException|AttributeNotFoundException|IntrospectionException|MalformedObjectNameException|ReflectionException|InstanceNotFoundException|MBeanException e)
+    catch (InvalidAttributeValueException|AttributeNotFoundException|MalformedObjectNameException|ReflectionException|InstanceNotFoundException|MBeanException e)
     {
       writeUserErrorResult(outputStream, userName, "user-edit", e.getMessage());
       logger.error("Error editing user", e);

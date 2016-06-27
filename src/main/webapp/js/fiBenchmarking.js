@@ -1,6 +1,6 @@
 (function () {
 	'use strict';
-	angular.module('fiBenchmarkApp', []);
+	angular.module('fiBenchmarkApp', ['ngSanitize']);
 }());
 
 (function () {
@@ -12,7 +12,13 @@
 		vm.legend = {}
 		
 		vm.scatter = { abscissa: '', ordinate: '', filter: '' }
-		vm.symbols = ['circle', 'diamond', 'square', 'cross', 'triangle-down', 'triangle-up']
+		vm.symbols = ['circle', 'diamond', 'square', 'cross']
+		vm.symbolLegend = {
+			'circle': { 'code': '&#9679;', 'color': '' },
+			'diamond': { 'code': '&#9830;', 'color': '' },
+			'square': { 'code': '&#9632;', 'color': '' },
+			'cross': { 'code': '&#10010;', 'color': '' }
+		}
 		vm.colors = ['#cccccc', '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5', '#c49c94', '#f7b6d2', '#c7c7c7', '#dbdb8d', '#9edae5']
 		
 		vm.raw = {}
@@ -37,6 +43,7 @@
 				vm.raw[data.type] = data.list
 				vm.legend.type[data.type] = { index: Object.keys(vm.legend.type).length, checked: true }
 			})
+			vm.selected = vm.raw.SELECTED[0]
 			vm.plotChart()
 		})
 		
@@ -50,13 +57,19 @@
 			var filtering = getFilterGroups()
 			// dataLengths()
 			$.each(vm.raw, function(type, list) {
-				if (!filtering) vm.data.push({ key: type, values: [] })
-				if (vm.legend.type[type].checked) $.each(list, function(i, value) {
-					var ind = ( filtering ? getOptionIndex(value) : 1+vm.legend.type[type].index )
+				var thisType = vm.legend.type[type]
+				var typeIndex = thisType.index
+				var typeShape = ( (type == 'SELECTED') ? 'circle' : vm.symbols[typeIndex] )
+				if (!filtering) {
+					vm.data.push({ key: type, values: [] })
+					vm.symbolLegend[typeShape].color = vm.colors[1+typeIndex]
+				}
+				if (thisType.checked) $.each(list, function(i, value) {
+					var ind = ( filtering ? getOptionIndex(value) : 1+typeIndex )
 					vm.data[( vm.data[ind] ? ind : 0 )].values.push({
 						label: value.info.Q1_3,
 						size: typeSize(type),
-						shape: vm.symbols[vm.legend.type[type].index],
+						shape: typeShape,
 						indicatorX: Math.round(value.KPI[vm.scatter.slice.abscissa.field]*100)/100,
 						indicatorY: Math.round(value.KPI[vm.scatter.slice.ordinate.field]*100)/100,
 						x: Math.round(value.KPI[vm.scatter.slice.abscissa.field]*100)/100,
@@ -99,7 +112,7 @@
 			var filtering = (vm.scatter.filter != '')
 			// build the dictionary if it does not exist yet
 			if (filtering) {
-				var selectedValue = vm.raw.SELECTED[0].filters[vm.scatter.filter.field]
+				var selectedValue = vm.selected.filters[vm.scatter.filter.field]
 				vm.scatter.filter.displayType = ( vm.scatter.filter.lookup.length > 3 ? 'checkbox' : 'list' )
 				if (vm.scatter.filter.displayType == 'checkbox') $.each(['checked', 'unchecked'], function(i, cat) {vm.data.push({ key: cat, values: [] })})
 				if (!('dictionary' in vm.scatter.filter)) {
