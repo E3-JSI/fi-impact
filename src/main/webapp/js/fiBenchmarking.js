@@ -1,32 +1,43 @@
 (function () {
 	'use strict';
-	angular.module('fiBenchmarkApp', ['ngSanitize']);
+	angular.module('fiBenchmarkApp', ['ngSanitize', 'ui.bootstrap']);
 }());
 
 (function () {
 	'use strict';
 	angular.module('fiBenchmarkApp').controller('fiGraphs', ['$scope', 'getData', function($scope, getData) {
-		
+	
 		var vm = this;
 		
 		vm.legend = {}
 		
-		vm.scatter = { abscissa: '', ordinate: '', filter: '' }
+		vm.scatter = { abscissa: '', ordinate: '' }
+		vm.filter = ''
 		vm.symbols = ['circle', 'diamond', 'square', 'cross']
 		vm.symbolLegend = {
-			'circle': { 'code': '&#9679;', 'color': '' },
-			'diamond': { 'code': '&#9830;', 'color': '' },
-			'square': { 'code': '&#9632;', 'color': '' },
-			'cross': { 'code': '&#10010;', 'color': '' }
+			'circle': { 'code': '&#9679;', 'color': '', 'size': 0.1 },
+			'diamond': { 'code': '&#9830;', 'color': '', 'size': 0.2 },
+			'square': { 'code': '&#9632;', 'color': '', 'size': 0.3 },
+			'cross': { 'code': '&#10010;', 'color': '', 'size': 0.4 }
 		}
 		vm.colors = ['#cccccc', '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5', '#c49c94', '#f7b6d2', '#c7c7c7', '#dbdb8d', '#9edae5']
 		
 		vm.raw = {}
 		vm.total = 0
 		vm.showNA = false
+		vm.tabs = []
+		
+		var checkboxDisplayCategories = ['checked', 'unchecked']
 		
 		getData.async('legend', function(response) {
 			vm.legend = response.data
+			vm.legend.selections.unshift({
+				'field': 'none',
+				'label': 'None',
+				'lookup': [],
+				'type': 'none'
+			})
+			vm.filter = vm.legend.selections[0]
 			vm.legend.slices = []
 			for (var i = 0; i < vm.legend.KPI.length; i++) for (var j = i+1; j < vm.legend.KPI.length; j++) 
 				(vm.legend.slices).push({abscissa: vm.legend.KPI[i], ordinate: vm.legend.KPI[j]})
@@ -47,7 +58,7 @@
 			vm.plotChart()
 		})
 		
-		$.getJSON( "../../service?id=" + location.search.split('id=')[1] + "&action=q-get-graph", function(data) { drawSimilarityGraph(data); });
+		// $.getJSON( "../../service?id=" + location.search.split('id=')[1] + "&action=q-get-graph", function(data) { drawSimilarityGraph(data); });
 		
 		/* 
 			Fill data groups.
@@ -82,24 +93,38 @@
 			drawGraph(vm.data)
 		}
 		
-		var typeSize = function(type) { return ( type=='normal' ? 0.1 : ( type=='SELECTED' ? 1 : 0.4 ) ) }
+		vm.getColor = function(obj) {
+			if (obj.key == 'NA') return vm.colors[0]
+			else return ( (obj.checked) ? vm.colors[1] : vm.colors[2] )
+		}
+		vm.getTypeColor = function(obj) {
+			if (vm.filter.field == 'none' && (obj.index < vm.symbols.length)) return vm.symbolLegend[vm.symbols[obj.index]].color
+			else return '#999999'
+		}
+		vm.showPlot = function(tab) {
+			$('.fi-plot').hide()
+			$('#' + tab + 'plot').show()
+		}
+		
+		var typeSymbol = function(type) { return ( (type == 'SELECTED') ? 'circle' : vm.symbols[vm.legend.type[type].index] ) }
+		var typeSize = function(type) { return ( type=='SELECTED' ? 1 : vm.symbolLegend[typeSymbol(type)].size ) }
 		
 		// Determine the index of a group a value should go into
 		var getOptionIndex = function(value) {
-			var option = value.filters[vm.scatter.filter.field]
+			var option = value.filters[vm.filter.field]
 			if (!option) return false
-			if (vm.scatter.filter.displayType == 'checkbox') {
+			if (vm.filter.displayType == 'checkbox') {
 				var options = []
 				var checked = false
-				if (vm.scatter.filter.type == 'multi') $.each(option.split(','), function(i, opt) { options.push(opt) })
+				if (vm.filter.type == 'multi') $.each(option.split(','), function(i, opt) { options.push(opt) })
 				else options.push(option)
 				$.each(options, function(i, opt) {
-					if (!vm.scatter.filter.dictionary[option]) return false
-					checked = checked || vm.scatter.filter.dictionary[option].checked
+					if (!vm.filter.dictionary[option]) return false
+					checked = checked || vm.filter.dictionary[option].checked
 				})
 				return ( checked ? 1 : 2 )
 			}
-			else return vm.scatter.filter.dictionary[option].index
+			else return vm.filter.dictionary[option].index
 		}
 		
 		/* 
@@ -109,23 +134,23 @@
 		*/
 		var getFilterGroups = function() {
 			vm.data = [{ key: 'NA', values: [] }]
-			var filtering = (vm.scatter.filter != '')
+			var filtering = (vm.filter.field != 'none')
 			// build the dictionary if it does not exist yet
 			if (filtering) {
-				var selectedValue = vm.selected.filters[vm.scatter.filter.field]
-				vm.scatter.filter.displayType = ( vm.scatter.filter.lookup.length > 3 ? 'checkbox' : 'list' )
-				if (vm.scatter.filter.displayType == 'checkbox') $.each(['checked', 'unchecked'], function(i, cat) {vm.data.push({ key: cat, values: [] })})
-				if (!('dictionary' in vm.scatter.filter)) {
-					vm.scatter.filter.dictionary = { NA: { key: 'NA', label: 'NA', index: 0 } }
-					$.each(vm.scatter.filter.lookup, function(i, obj) {
+				var selectedValue = vm.selected.filters[vm.filter.field]
+				vm.filter.displayType = ( vm.filter.lookup.length > 3 ? 'checkbox' : 'list' )
+				if (vm.filter.displayType == 'checkbox') $.each(checkboxDisplayCategories, function(i, cat) {vm.data.push({ key: cat, values: [] })})
+				if (!('dictionary' in vm.filter)) {
+					vm.filter.dictionary = { NA: { key: 'NA', label: 'NA', index: 0 } }
+					$.each(vm.filter.lookup, function(i, obj) {
 						$.each(obj, function(option, name) {
-							if (vm.scatter.filter.displayType == 'list') vm.data.push({ key: option, values: [] })
-							vm.scatter.filter.dictionary[option] = { key: option, label: name, index: Object.keys(vm.scatter.filter.dictionary).length }
-							if (vm.scatter.filter.displayType == 'checkbox') {
+							if (vm.filter.displayType == 'list') vm.data.push({ key: option, values: [] })
+							vm.filter.dictionary[option] = { key: option, label: name, index: Object.keys(vm.filter.dictionary).length }
+							if (vm.filter.displayType == 'checkbox') {
 								var isChecked = false
-								if (vm.scatter.filter.type == 'multi') isChecked = (selectedValue.split(',').indexOf(option) >= 0)
-								else isChecked = ( selectedValue == (vm.scatter.filter.type=='lookup' ? option : name) )
-								vm.scatter.filter.dictionary[option].checked = isChecked
+								if (vm.filter.type == 'multi') isChecked = (selectedValue.split(',').indexOf(option) >= 0)
+								else isChecked = ( selectedValue == (vm.filter.type=='lookup' ? option : name) )
+								vm.filter.dictionary[option].checked = isChecked
 							}
 						})
 					})
@@ -208,7 +233,7 @@
 				}
 			});
 
-			var html = '<p style="text-align: left; font-weight: bold;">' + d.point.label + "</p>";
+			var html = ( (d.point.label) ? '<p style="text-align: left; font-weight: bold;">' + d.point.label + "</p>" : '' );
 				html += table.node().outerHTML;
 			return html;
 

@@ -55,8 +55,8 @@
 	</div></div></header>
 
 	<!-- Filters -->
-    <section id="filters">
-		<div class="container theme-showcase" role="main">
+    <section id="filters"><div class="container">
+		<div class="row">
 			<div class="col-md-6">
 				<div class="form-group vspace">
 					<label for="chooseSlice" class="col-sm-4 control-label text-right">Slice</label>
@@ -71,49 +71,44 @@
 					<label for="chooseFilter" class="col-sm-4 control-label text-right">Filter</label>
 					<div class="col-sm-8">
 						<select class="form-control"
-							ng-model="vm.scatter.filter"
+							ng-model="vm.filter"
 							ng-options="selection.label for selection in vm.legend.selections track by selection.field"
 							ng-change="vm.plotChart()"></select>
 					</div>
 				</div>
 			</div>
 			<div class="col-md-4 col-md-offset-2">
-				<div class="checkbox" ng-repeat="(type, object) in vm.legend.type">
+				<div class="checkbox" ng-repeat="(type, object) in vm.legend.type" ng-hide="type == 'SELECTED'">
 					<label class="legend-checkboxes">
-						<span class="symbol" ng-style="{'color': vm.symbolLegend[vm.symbols[object.index]].color}" ng-bind-html="vm.symbolLegend[vm.symbols[object.index]].code"></span>
+						<span class="symbol" ng-style="{'color': vm.getTypeColor(object)}" ng-bind-html="vm.symbolLegend[vm.symbols[object.index]].code"></span>
 						<span class="legend-checkbox"><input type="checkbox" ng-model="object.checked" ng-change="vm.plotChart()"> {{type}}</span>
 					</label>
 				</div>
-				<ul ng-if="vm.scatter.filter.displayType == 'list'">
-					<li ng-repeat="(option, object) in vm.scatter.filter.dictionary">{{object.label}}: <i class="fa fa-square" aria-hidden="true" ng-style="{'color': vm.colors[object.index]}"></i></li>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-8">
+				<uib-tabset active="active" justified="true">
+					<uib-tab index="0" heading="Scatterplot" select="vm.showPlot('scatter')"></uib-tab>
+					<uib-tab index="1" heading="Similarity graph" id="similarity" select="vm.showPlot('similarity')"></uib-tab>
+				</uib-tabset>
+				<div class="fi-plot" id="scatterplot"><svg viewBox="0 0 700 700" style="margin: 0px; padding: 0px; height: 95%; width: 95%"></svg></div>
+				<div class="fi-plot" id="similarityplot" style="width:800px; height:600px;"></div>
+			</div>
+			<div class="col-md-4" >
+				<ul class="legend-list" ng-if="vm.filter.displayType == 'list'">
+					<li ng-repeat="(option, object) in vm.filter.dictionary"><i class="fa fa-square" aria-hidden="true" ng-style="{'color': vm.colors[object.index]}"></i> {{object.label}}</li>
 				</ul>
-				<ul ng-if="vm.scatter.filter.displayType == 'checkbox'">
-					<li ng-repeat="(option, object) in vm.scatter.filter.dictionary">
-						<div class="checkbox"><label><input type="checkbox" ng-model="object.checked" ng-change="vm.plotChart()"> {{object.label}}
-						</label></div>
+				<ul class="legend-list-checkbox" ng-if="vm.filter.displayType == 'checkbox'">
+					<li ng-repeat="(option, object) in vm.filter.dictionary">
+						<div class="checkbox">
+							<label><i class="fa fa-square" aria-hidden="true" ng-style="{'color': vm.getColor(object)}"></i> <span><input type="checkbox" ng-disabled="object.label == 'NA'" ng-model="object.checked" ng-change="vm.plotChart()"> {{object.label}}</span></label>
+						</div>
 					</li>
 				</ul>
 			</div>
 		</div>
-	</section>
-	
-    <!-- Scatter plot -->
-    <section id="scatter">
-		<div class="container theme-showcase" role="main">
-			<div class="col-md-8" id="scatterplot">
-				<svg viewBox="0 0 700 700" style="margin: 0px; padding: 0px; height: 95%; width: 95%"></svg>
-			</div>
-		</div>
-	</section>
-	
-	<!-- Similarity plot -->
-	<section id="similarity">
-		<div class="container theme-showcase" role="main">
-			<div class="col-md-8" id="similarityplot">
-				<div id="similarityGraph" style="width:1200px; height:600px;"></div>
-			</div>
-		</div>
-	</section>
+	</div></section>
 	
     <!-- Partners -->
 	<aside class="clients"><div class="container"><hr id="partners"><div class="row">
@@ -129,58 +124,58 @@
 	</div></div></div></footer>
 
 	<!-- START SIGMA IMPORTS -->
-<script src="sigmajs/src/sigma.core.js"></script>
-<script src="sigmajs/src/conrad.js"></script>
-<script src="sigmajs/src/utils/sigma.utils.js"></script>
-<script src="sigmajs/src/utils/sigma.polyfills.js"></script>
-<script src="sigmajs/src/sigma.settings.js"></script>
-<script src="sigmajs/src/classes/sigma.classes.dispatcher.js"></script>
-<script src="sigmajs/src/classes/sigma.classes.configurable.js"></script>
-<script src="sigmajs/src/classes/sigma.classes.graph.js"></script>
-<script src="sigmajs/src/classes/sigma.classes.camera.js"></script>
-<script src="sigmajs/src/classes/sigma.classes.quad.js"></script>
-<script src="sigmajs/src/classes/sigma.classes.edgequad.js"></script>
-<script src="sigmajs/src/captors/sigma.captors.mouse.js"></script>
-<script src="sigmajs/src/captors/sigma.captors.touch.js"></script>
-<script src="sigmajs/src/renderers/sigma.renderers.canvas.js"></script>
-<script src="sigmajs/src/renderers/sigma.renderers.webgl.js"></script>
-<script src="sigmajs/src/renderers/sigma.renderers.svg.js"></script>
-<script src="sigmajs/src/renderers/sigma.renderers.def.js"></script>
-<script src="sigmajs/src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
-<script src="sigmajs/src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
-<script src="sigmajs/src/renderers/webgl/sigma.webgl.edges.def.js"></script>
-<script src="sigmajs/src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
-<script src="sigmajs/src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
-<script src="sigmajs/src/renderers/canvas/sigma.canvas.labels.def.js"></script>
-<script src="sigmajs/src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
-<script src="sigmajs/src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
-<script src="sigmajs/src/renderers/canvas/sigma.canvas.edges.def.js"></script>
-<script src="sigmajs/src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
-<script src="sigmajs/src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
-<script src="sigmajs/src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
-<script src="sigmajs/src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
-<script src="sigmajs/src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
-<script src="sigmajs/src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
-<script src="sigmajs/src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
-<script src="sigmajs/src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
-<script src="sigmajs/src/renderers/svg/sigma.svg.utils.js"></script>
-<script src="sigmajs/src/renderers/svg/sigma.svg.nodes.def.js"></script>
-<script src="sigmajs/src/renderers/svg/sigma.svg.edges.def.js"></script>
-<script src="sigmajs/src/renderers/svg/sigma.svg.edges.curve.js"></script>
-<script src="sigmajs/src/renderers/svg/sigma.svg.labels.def.js"></script>
-<script src="sigmajs/src/renderers/svg/sigma.svg.hovers.def.js"></script>
-<script src="sigmajs/src/middlewares/sigma.middlewares.rescale.js"></script>
-<script src="sigmajs/src/middlewares/sigma.middlewares.copy.js"></script>
-<script src="sigmajs/src/misc/sigma.misc.animation.js"></script>
-<script src="sigmajs/src/misc/sigma.misc.bindEvents.js"></script>
-<script src="sigmajs/src/misc/sigma.misc.bindDOMEvents.js"></script>
-<script src="sigmajs/src/misc/sigma.misc.drawHovers.js"></script>
-<!-- END SIGMA IMPORTS -->
-<script src="sigmajs/plugins/sigma.renderers.customShapes/shape-library.js"></script>
-<script src="sigmajs/plugins/sigma.renderers.customShapes/sigma.renderers.customShapes.js"></script>
-<script src="sigmajs/plugins/sigma.layout.forceAtlas2/worker.js"></script>
-<script src="sigmajs/plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
-	
+	<script src="../../sigmajs/src/sigma.core.js"></script>
+	<script src="../../sigmajs/src/conrad.js"></script>
+	<script src="../../sigmajs/src/utils/sigma.utils.js"></script>
+	<script src="../../sigmajs/src/utils/sigma.polyfills.js"></script>
+	<script src="../../sigmajs/src/sigma.settings.js"></script>
+	<script src="../../sigmajs/src/classes/sigma.classes.dispatcher.js"></script>
+	<script src="../../sigmajs/src/classes/sigma.classes.configurable.js"></script>
+	<script src="../../sigmajs/src/classes/sigma.classes.graph.js"></script>
+	<script src="../../sigmajs/src/classes/sigma.classes.camera.js"></script>
+	<script src="../../sigmajs/src/classes/sigma.classes.quad.js"></script>
+	<script src="../../sigmajs/src/classes/sigma.classes.edgequad.js"></script>
+	<script src="../../sigmajs/src/captors/sigma.captors.mouse.js"></script>
+	<script src="../../sigmajs/src/captors/sigma.captors.touch.js"></script>
+	<script src="../../sigmajs/src/renderers/sigma.renderers.canvas.js"></script>
+	<script src="../../sigmajs/src/renderers/sigma.renderers.webgl.js"></script>
+	<script src="../../sigmajs/src/renderers/sigma.renderers.svg.js"></script>
+	<script src="../../sigmajs/src/renderers/sigma.renderers.def.js"></script>
+	<script src="../../sigmajs/src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
+	<script src="../../sigmajs/src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
+	<script src="../../sigmajs/src/renderers/webgl/sigma.webgl.edges.def.js"></script>
+	<script src="../../sigmajs/src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
+	<script src="../../sigmajs/src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
+	<script src="../../sigmajs/src/renderers/canvas/sigma.canvas.labels.def.js"></script>
+	<script src="../../sigmajs/src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
+	<script src="../../sigmajs/src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
+	<script src="../../sigmajs/src/renderers/canvas/sigma.canvas.edges.def.js"></script>
+	<script src="../../sigmajs/src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+	<script src="../../sigmajs/src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+	<script src="../../sigmajs/src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+	<script src="../../sigmajs/src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+	<script src="../../sigmajs/src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+	<script src="../../sigmajs/src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+	<script src="../../sigmajs/src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+	<script src="../../sigmajs/src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
+	<script src="../../sigmajs/src/renderers/svg/sigma.svg.utils.js"></script>
+	<script src="../../sigmajs/src/renderers/svg/sigma.svg.nodes.def.js"></script>
+	<script src="../../sigmajs/src/renderers/svg/sigma.svg.edges.def.js"></script>
+	<script src="../../sigmajs/src/renderers/svg/sigma.svg.edges.curve.js"></script>
+	<script src="../../sigmajs/src/renderers/svg/sigma.svg.labels.def.js"></script>
+	<script src="../../sigmajs/src/renderers/svg/sigma.svg.hovers.def.js"></script>
+	<script src="../../sigmajs/src/middlewares/sigma.middlewares.rescale.js"></script>
+	<script src="../../sigmajs/src/middlewares/sigma.middlewares.copy.js"></script>
+	<script src="../../sigmajs/src/misc/sigma.misc.animation.js"></script>
+	<script src="../../sigmajs/src/misc/sigma.misc.bindEvents.js"></script>
+	<script src="../../sigmajs/src/misc/sigma.misc.bindDOMEvents.js"></script>
+	<script src="../../sigmajs/src/misc/sigma.misc.drawHovers.js"></script>
+	<!-- END SIGMA IMPORTS -->
+	<script src="../../sigmajs/plugins/sigma.renderers.customShapes/shape-library.js"></script>
+	<script src="../../sigmajs/plugins/sigma.renderers.customShapes/sigma.renderers.customShapes.js"></script>
+	<script src="../../sigmajs/plugins/sigma.layout.forceAtlas2/worker.js"></script>
+	<script src="../../sigmajs/plugins/sigma.layout.forceAtlas2/supervisor.js"></script>
+
 	<!-- Core JavaScript -->
     <script src="../../js/jquery.min.js"></script>
 	<script src="../../js/angular.min.js"></script>
@@ -195,11 +190,64 @@
 	<!-- Optional includes -->
 	<script type="text/javascript" src="../../js/d3.min.js"></script>
 	<script type="text/javascript" src="../../js/nv.d3.min.js"></script>
-	<script type="text/javascript" src="../../js/sigma.min.js"></script>
-	<script type="text/javascript" src="../../js/sigma.forceatlas2.js"></script>
-	<script type="text/javascript" src="../../js/viz.js"></script>
 	<!-- FI-Impact JavaScript -->
 	<script type="text/javascript" src="../../js/fiBenchmarking.js"></script>
+	
+	<script>
+
+	 $.getJSON( "../../service?id=efd387a5-ae68-4c7d-9ee5-6f1136084f98&action=q-get-graph", function( data ) {
+			console.log(data);
+			var dict = {};
+			var uniqEdges = [];
+			for (var i=0; i<data.edges.length; i++) {
+				if (!dict.hasOwnProperty(data.edges[i].id)) {
+					dict[data.edges[i].id] = 1;
+					uniqEdges.push(data.edges[i]);
+				}
+			}
+			for (var i=0; i<data.nodes.length; i++) {
+				if (data.nodes[i].node_type == "HPI") {
+					data.nodes[i].type = "equilateral"; //square, equilateral, star, square, diamond
+				}
+				else if (data.nodes[i].node_type == "normal") {
+					data.nodes[i].type = "square";
+				}
+				else if (data.nodes[i].node_type == "normal") {
+					data.nodes[i].type = "cross";
+				}
+				else {
+					data.nodes[i].type = "circle";
+				}
+				data.nodes[i].color = "#123456";
+				data.nodes[i].borderColor = "red";
+				data.nodes[i].label = data.nodes[i].extra_data.Q1_1;
+				data.nodes[i].size = data.nodes[i].deg;
+			}
+			sigma.utils.pkg('sigma.canvas.nodes');
+		
+
+		s = new sigma({
+			graph: {nodes: data.nodes, edges: uniqEdges},
+			renderer: {
+			// IMPORTANT:
+			// This works only with the canvas renderer, so the
+			// renderer type set as "canvas" is necessary here.
+			container: document.getElementById('similarityplot'),
+			type: 'canvas'
+			},
+			settings: {
+				minNodeSize: 4,
+				maxNodeSize: 16,
+				labelThreshold: 12 
+			}
+	});
+
+	CustomShapes.init(s);
+	s.startForceAtlas2({worker: true, barnesHutOptimize: false, gravity: 5, strongGravityMode: false});
+	setTimeout(function(){ s.stopForceAtlas2(); }, 3000);    
+	});
+
+	</script>
 
 </body>
 
