@@ -192,62 +192,6 @@
 	<script type="text/javascript" src="../../js/nv.d3.min.js"></script>
 	<!-- FI-Impact JavaScript -->
 	<script type="text/javascript" src="../../js/fiBenchmarking.js"></script>
-	
-	<script>
-
-	 $.getJSON( "../../service?id=efd387a5-ae68-4c7d-9ee5-6f1136084f98&action=q-get-graph", function( data ) {
-			console.log(data);
-			var dict = {};
-			var uniqEdges = [];
-			for (var i=0; i<data.edges.length; i++) {
-				if (!dict.hasOwnProperty(data.edges[i].id)) {
-					dict[data.edges[i].id] = 1;
-					uniqEdges.push(data.edges[i]);
-				}
-			}
-			for (var i=0; i<data.nodes.length; i++) {
-				if (data.nodes[i].node_type == "HPI") {
-					data.nodes[i].type = "equilateral"; //square, equilateral, star, square, diamond
-				}
-				else if (data.nodes[i].node_type == "normal") {
-					data.nodes[i].type = "square";
-				}
-				else if (data.nodes[i].node_type == "normal") {
-					data.nodes[i].type = "cross";
-				}
-				else {
-					data.nodes[i].type = "circle";
-				}
-				data.nodes[i].color = "#123456";
-				data.nodes[i].borderColor = "red";
-				data.nodes[i].label = data.nodes[i].extra_data.Q1_1;
-				data.nodes[i].size = data.nodes[i].deg;
-			}
-			sigma.utils.pkg('sigma.canvas.nodes');
-		
-
-		s = new sigma({
-			graph: {nodes: data.nodes, edges: uniqEdges},
-			renderer: {
-			// IMPORTANT:
-			// This works only with the canvas renderer, so the
-			// renderer type set as "canvas" is necessary here.
-			container: document.getElementById('similarityplot'),
-			type: 'canvas'
-			},
-			settings: {
-				minNodeSize: 4,
-				maxNodeSize: 16,
-				labelThreshold: 12 
-			}
-	});
-
-	CustomShapes.init(s);
-	s.startForceAtlas2({worker: true, barnesHutOptimize: false, gravity: 5, strongGravityMode: false});
-	setTimeout(function(){ s.stopForceAtlas2(); }, 3000);    
-	});
-
-	</script>
 
 </body>
 
