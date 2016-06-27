@@ -584,6 +584,7 @@ public class SurveyManager
           else if(pd.getValue("SUCCESS_VIP") != null && pd.getValue("SUCCESS_HPI").equals("X"))
             node_type = "HPI";
         }
+        String node_type_success = node_type;
         if(surveyData.getId().equals(referenceSurveyInternalID))
           node_type = "SELECTED";
 
@@ -603,6 +604,7 @@ public class SurveyManager
         jsonSurvey.put("info", jsonInfo);
         addQuestionKey(jsonInfo, "Q1_3", surveyData.questions);
         addQuestionKey(jsonInfo, "Q1_4", surveyData.questions);
+        jsonInfo.put("node_type", node_type_success);
 
         JSONObject jsonFilters = new JSONObject();
         jsonSurvey.put("filters", jsonFilters);
