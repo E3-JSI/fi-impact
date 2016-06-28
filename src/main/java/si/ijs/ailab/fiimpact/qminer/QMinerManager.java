@@ -38,6 +38,7 @@ public class QMinerManager extends TimerTask
   private final String QMINER_ENDPOINT_CALC_DATASET = "main_graph_async";
   private final String QMINER_ENDPOINT_STATUS = "status";
   private final String QMINER_ENDPOINT_GRAPH = "custom_graph";
+  private final String QMINER_ENDPOINT_POST_GET_GRAPH = "custom_graph_full_record";
 
   private final static Logger logger = LogManager.getLogger(QMinerManager.class.getName());
   private final int HTTP_TIMEOUT = 60 * 1000; // one minute timeout
@@ -139,6 +140,61 @@ public class QMinerManager extends TimerTask
           logger.debug("cleared response entity.");
         }
 
+      }
+    }
+    catch (IOException e)
+    {
+      status = "Error calling QMiner service: " + e.getLocalizedMessage();
+      logger.error("Error calling QMiner service", e);
+    }
+    finally
+    {
+      if(httpClient != null)
+        httpClient.getConnectionManager().shutdown();
+    }
+    logger.debug("Done.");
+    return status;
+
+  }
+
+  private String getGraphForFullRecord(OutputStream os, String id)
+  {
+    String status = null;
+    HttpClient httpClient = null;
+    try
+    {
+      logger.info("Prepare qMiner get graph for full record");
+
+      httpClient = createHttpClient();
+
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      FIImpactSettings.getFiImpactSettings().getSurveyManager().exportQMinerJsonSurvey(out, id);
+      logger.debug("Prepare post entity");
+      ByteArrayEntity ent = new ByteArrayEntity(out.toByteArray());
+      ent.setContentEncoding(new BasicHeader("Content-Type", "application/json"));
+      String sUrl = qMinerRootURL + QMINER_ENDPOINT_POST_GET_GRAPH;
+      HttpPost post = new HttpPost(sUrl);
+      post.setEntity(ent);
+      logger.debug("About to call qMiner: {}", sUrl);
+      HttpResponse response = httpClient.execute(post);
+      logger.debug("Service returned {}", response.getStatusLine().getStatusCode());
+      if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+      {
+        logger.info("QMiner post status OK: {}", response.getStatusLine());
+        HttpEntity entity = response.getEntity();
+        if(entity != null)
+        {
+          //parse result....
+          byte[] responseData = readAll(entity.getContent());
+          AIUtils.streamCopy(new ByteArrayInputStream(responseData), os);
+        }
+      }
+      else
+      {
+        status = "Error executing service: " + response.getStatusLine();
+        logger.error("Error executing service: {}", response.getStatusLine());
+        EntityUtils.consumeQuietly(response.getEntity());
+        logger.debug("cleared response entity.");
       }
     }
     catch (IOException e)
@@ -358,15 +414,22 @@ public class QMinerManager extends TimerTask
 
     if(status != null)
     {
-      OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
-      JSONWriter json = new JSONWriter(w);
-      json.object();
-      json.key("action").value(ACTION_GET_GRAPH);
-      json.key("success").value("false");
-      json.key("error").value(status);
-      json.endObject();
-      w.flush();
-      w.close();
+      logger.warn("Project with id {} does not exist in qMiner. About to post the full record.");
+      //TODO  Wait for Mario
+      //status = getGraphForFullRecord(outputStream, internalSurveyId);
+      if(status != null)
+      {
+        logger.error("Error calling get graph for {}: {}", internalSurveyId, status);
+        OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
+        JSONWriter json = new JSONWriter(w);
+        json.object();
+        json.key("action").value(ACTION_GET_GRAPH);
+        json.key("success").value("false");
+        json.key("error").value(status);
+        json.endObject();
+        w.flush();
+        w.close();
+      }
     }
   }
 

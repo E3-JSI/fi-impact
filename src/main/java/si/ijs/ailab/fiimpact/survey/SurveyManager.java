@@ -763,85 +763,7 @@ public class SurveyManager
 
       for(SurveyData surveyData : surveys.values())
       {
-        json.object();
-        json.key("id_internal").value(surveyData.getId());
-        StringBuilder fullText = new StringBuilder();
-
-        String node_type = "normal";
-        ProjectData pd = surveyData.getProject();
-        if(pd != null)
-        {
-          if(pd.getValue("SUCCESS_VIP") != null && pd.getValue("SUCCESS_VIP").equals("X"))
-            node_type = "VIP";
-          else if(pd.getValue("SUCCESS_IDG") != null && pd.getValue("SUCCESS_IDG").equals("X"))
-            node_type = "IDG";
-          else if(pd.getValue("SUCCESS_VIP") != null && pd.getValue("SUCCESS_HPI").equals("X"))
-            node_type = "HPI";
-        }
-
-        json.key("node_type").value(node_type);
-
-
-        for(IOListField ioListField : listSurveysDef.getFields())
-        {
-          if(!ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_IGNORE))
-          {
-            String answer = surveyData.questions.get(ioListField.getFieldid());
-            if(answer != null)
-            {
-              answer = FIImpactSettings.normaliseCSVString(answer);
-              if(ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_FEATURE_TEXT))
-                fullText.append(answer).append(" ");
-              else
-                json.key(ioListField.getFieldid()).value(answer);
-            }
-          }
-
-
-        }
-
-        ProjectData projectData = surveyData.getProject();
-        for(IOListField ioListField : listMattermarkDef.getFields())
-        {
-          if(projectData != null)
-          {
-            if(!ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_IGNORE))
-            {
-              String answer = projectData.getMattermarkValue(ioListField.getFieldid());
-              if(answer != null)
-              {
-                answer = FIImpactSettings.normaliseCSVString(answer);
-                if(ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_FEATURE_TEXT))
-                  fullText.append(answer).append(" ");
-                else
-                  json.key(ioListField.getFieldid()).value(answer);
-              }
-            }
-          }
-        }
-
-        for(IOListField ioListField : listProjectsDef.getFields())
-        {
-
-          if(projectData != null)
-          {
-            if(!ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_IGNORE))
-            {
-              String answer = projectData.getValue(ioListField.getFieldid());
-              if(answer != null)
-              {
-                answer = FIImpactSettings.normaliseCSVString(answer);
-                if(ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_FEATURE_TEXT))
-                  fullText.append(answer).append(" ");
-                else
-                  json.key(ioListField.getFieldid()).value(answer);
-              }
-            }
-          }
-
-        }
-        json.key("full_text").value(fullText.toString());
-        json.endObject();
+        exportQMinerJsonSurvey(json, surveyData);
       }
 
       json.endArray();
@@ -852,6 +774,108 @@ public class SurveyManager
     writer.close();
 
     logger.info("Exported {} surveys", surveys.size());
+  }
+
+  public void exportQMinerJsonSurvey(OutputStream outputStream, String surveyId) throws IOException
+  {
+    logger.info("Export {} surveys to JSON (for QMiner analysys)", surveys.size());
+    OutputStreamWriter writer = new OutputStreamWriter(outputStream, "utf-8");
+    JSONWriter json = new JSONWriter(writer);
+    SurveyData surveyData = surveys.get(surveyId);
+    exportQMinerJsonSurvey(json, surveyData);
+    writer.flush();
+    writer.close();
+
+  }
+
+  private void exportQMinerJsonSurvey(JSONWriter json, SurveyData surveyData)
+  {
+    IOListDefinition listMattermarkDef = FIImpactSettings.getFiImpactSettings().getListDefinition(FIImpactSettings.LIST_MATTERMARK);
+    IOListDefinition listProjectsDef = FIImpactSettings.getFiImpactSettings().getListDefinition(FIImpactSettings.LIST_PROJECTS);
+    IOListDefinition listSurveysDef = FIImpactSettings.getFiImpactSettings().getListDefinition(FIImpactSettings.LIST_SURVEYS);
+
+    json.object();
+    if(surveyData != null)
+    {
+      json.key("id_internal").value(surveyData.getId());
+      StringBuilder fullText = new StringBuilder();
+
+      String node_type = "normal";
+      ProjectData pd = surveyData.getProject();
+      if(pd != null)
+      {
+        if(pd.getValue("SUCCESS_VIP") != null && pd.getValue("SUCCESS_VIP").equals("X"))
+          node_type = "VIP";
+        else if(pd.getValue("SUCCESS_IDG") != null && pd.getValue("SUCCESS_IDG").equals("X"))
+          node_type = "IDG";
+        else if(pd.getValue("SUCCESS_VIP") != null && pd.getValue("SUCCESS_HPI").equals("X"))
+          node_type = "HPI";
+      }
+
+      json.key("node_type").value(node_type);
+
+
+      for(IOListField ioListField : listSurveysDef.getFields())
+      {
+        if(!ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_IGNORE))
+        {
+          String answer = surveyData.questions.get(ioListField.getFieldid());
+          if(answer != null)
+          {
+            answer = FIImpactSettings.normaliseCSVString(answer);
+            if(ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_FEATURE_TEXT))
+              fullText.append(answer).append(" ");
+            else
+              json.key(ioListField.getFieldid()).value(answer);
+          }
+        }
+
+
+      }
+
+      ProjectData projectData = surveyData.getProject();
+      for(IOListField ioListField : listMattermarkDef.getFields())
+      {
+        if(projectData != null)
+        {
+          if(!ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_IGNORE))
+          {
+            String answer = projectData.getMattermarkValue(ioListField.getFieldid());
+            if(answer != null)
+            {
+              answer = FIImpactSettings.normaliseCSVString(answer);
+              if(ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_FEATURE_TEXT))
+                fullText.append(answer).append(" ");
+              else
+                json.key(ioListField.getFieldid()).value(answer);
+            }
+          }
+        }
+      }
+
+      for(IOListField ioListField : listProjectsDef.getFields())
+      {
+
+        if(projectData != null)
+        {
+          if(!ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_IGNORE))
+          {
+            String answer = projectData.getValue(ioListField.getFieldid());
+            if(answer != null)
+            {
+              answer = FIImpactSettings.normaliseCSVString(answer);
+              if(ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_FEATURE_TEXT))
+                fullText.append(answer).append(" ");
+              else
+                json.key(ioListField.getFieldid()).value(answer);
+            }
+          }
+        }
+
+      }
+      json.key("full_text").value(fullText.toString());
+    }
+    json.endObject();
   }
 
   public void exportText(ServletOutputStream outputStream, String groupQuestion, String groupAnswer, int exportSettings) throws IOException
