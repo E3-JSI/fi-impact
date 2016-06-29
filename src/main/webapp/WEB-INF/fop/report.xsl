@@ -16,6 +16,7 @@
 	<fo:page-sequence master-reference="A4-portrait">
 		<fo:flow flow-name="xsl-region-body">
 			<fo:block>
+				<fo:block text-align="right" font-size="8pt" color="#666">This report was generated on <xsl:value-of select="survey/timestamp_report_display"/></fo:block>
 				<fo:external-graphic height="50pt" width="auto" content-height="50pt" content-width="auto" src="url('logo1.png')" />
             	<fo:block xsl:use-attribute-sets="fi-title"><xsl:value-of select="survey/sections/S_1/answers/Q1_4/value"/></fo:block>
 				<fo:block xsl:use-attribute-sets="fi-heading">Project Summary</fo:block>
@@ -336,7 +337,7 @@
 	<fo:block xsl:use-attribute-sets="fi-heading">Market Needs</fo:block>
 	<fo:block xsl:use-attribute-sets="fi-subtext">The Market Needs Indicator reflects the extent to which perceived user benefits associated with a product or service are aligned with real-market needs, based on an analysis of IDC Vertical Market Survey results. One set of indicators are outlined for business and government sectors (B2B and B2G) and a second set of indicators are outlined for consumer markets (B2C), based on different market needs.</fo:block>
 	
-	<xsl:for-each select="survey/sections/S_5A/answers/list_Q5A_1/Q5A_1">
+	<xsl:for-each select="survey/sections/S_5/answers/list_Q5_1/Q5_1">
 		<fo:block xsl:use-attribute-sets="fi-marketneeds-subtitle"><xsl:value-of select="label"/></fo:block>
 		<fo:block>Your score in Target Market Needs Understanding is <fo:inline xsl:use-attribute-sets="fi-marketneeds-score"><xsl:value-of select="result"/></fo:inline>.</fo:block>
 		<fo:table xsl:use-attribute-sets="fi-marketneeds">

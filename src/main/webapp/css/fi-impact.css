@@ -9,8 +9,31 @@
 	text-align: center;
     width: 40px;
 }
-.legend-checkboxes .legend-checkbox { 
+.legend-checkboxes .legend-checkbox, .legend-list-checkbox span { 
 	padding-left: 20px;
+}
+
+.legend-list, .legend-list-checkbox {
+	list-style: none;
+	padding-left: 0px;
+}
+.legend-list { margin: 50px 0 0 45px; }
+.legend-list li { padding: 2px 0; }
+.legend-list i { 
+    float: left;
+	font-size: 1.3em;
+	margin-left: -40px;
+	text-align: center;
+    width: 40px;
+}
+
+.legend-list-checkbox { margin: 50px 0 0 0; }
+.legend-list-checkbox i { 
+    float: left;
+	font-size: 1.3em;
+	margin: 2px 0 0 -40px;
+	text-align: center;
+    width: 40px;
 }
 
 .navbar .nav .summary { color: #00f0f0; }
