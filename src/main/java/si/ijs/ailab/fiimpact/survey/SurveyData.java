@@ -887,6 +887,126 @@ public class SurveyData
     logger.info("Saved survey {}/{} with {} questions and {} results", externalId, id, questions.size(), results.size());
   }
 
+  public void writeProfileUI(OutputStream os) throws IOException
+  {
+
+    JSONObject jsonProfile = new JSONObject();
+    jsonProfile.put("id", id);
+    jsonProfile.put("external_id", externalId);
+    SimpleDateFormat format = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
+
+    Date curDate = new Date();
+    jsonProfile.put("timestamp_report_display", format.format(curDate));
+
+
+    JSONObject answersOut = new JSONObject();
+    jsonProfile.put("answers", answersOut);
+
+    JSONArray questionsDef = FIImpactSettings.getFiImpactSettings().getFiImpactModel().getJSONArray("profile");
+    profileUIQuestions(answersOut, questionsDef);
+
+
+    OutputStreamWriter w = new OutputStreamWriter(os, "utf-8");
+    jsonProfile.write(w);
+    w.flush();
+    w.close();
+    logger.info("Got survey profile {}/{} with {} questions and {} results", externalId, id, questions.size(), results.size());
+  }
+
+  private void profileUIQuestions(JSONObject answersOut, JSONArray questionsDef)
+  {
+    for(int j = 0; j < questionsDef.length(); j++)
+    {
+      JSONObject questionDef = questionsDef.getJSONObject(j);
+      String questionID = questionDef.optString("id");
+      String sLabel = questionDef.optString("label", null);
+      JSONArray tableDef = questionDef.optJSONArray("table");
+      logger.debug("Profile filed {}", questionID);
+      if(tableDef != null)
+      {
+        logger.debug("Profile table begin {}", questionID);
+        JSONObject table = new JSONObject();
+        answersOut.put(questionID, table);
+        if(sLabel != null)
+          table.put("label", sLabel);
+        profileUIQuestions(table, tableDef);
+        logger.debug("Profile table done {}", questionID);
+      }
+      else
+      {
+        String defaultAnswer = questionDef.optString("default", null);
+
+        StringBuilder sbAnswer = new StringBuilder();
+        IOListField ioListField = FIImpactSettings.getFiImpactSettings().getAllFields().get(questionID);
+        String sValue = null;
+        if(!ioListField.getListId().equals(FIImpactSettings.LIST_SURVEYS))
+        {
+          ProjectData pd = getProject();
+          if(pd != null)
+          {
+            if(ioListField.getListId().equals(FIImpactSettings.LIST_PROJECTS))
+              sValue = pd.getValue(questionID);
+            else if(ioListField.getListId().equals(FIImpactSettings.LIST_MATTERMARK))
+              sValue = pd.getMattermarkValue(questionID);
+          }
+        }
+        else
+          sValue = questions.get(questionID);
+
+        if(sValue == null || sValue.equals(""))
+          if(defaultAnswer != null)
+            sValue = defaultAnswer;
+          else
+            sValue = "";
+
+        if(ioListField.getType().equals(FIImpactSettings.FIELD_TYPE_LOOKUP) || ioListField.getType().equals(FIImpactSettings.FIELD_TYPE_MULTI))
+        {
+          logger.debug("Solve lookup {} for with {} values in lookup", sValue, ioListField.getLookup().size());
+          if(!sValue.equals(""))
+          {
+            String[] sArr = sValue.split(",");
+            for(String sSegmentID : sArr)
+            {
+              sSegmentID = sSegmentID.trim();
+              String sSegment = ioListField.getLookup().get(sSegmentID);
+              if(sSegment == null)
+                sSegment = "";
+              if(!sSegment.equals(""))
+              {
+                if(sbAnswer.length() != 0)
+                  sbAnswer.append(", ").append(sSegment);
+                else
+                  sbAnswer.append(sSegment);
+              }
+            }
+          }
+        }
+        else
+        {
+          logger.debug("Solve as text: {}", sValue);
+          if(!sValue.equals(""))
+          {
+            sbAnswer.append(sValue);
+          }
+        }
+
+        if(sbAnswer.length() != 0)
+        {
+          String sAnswer = truncateDecimals(questionID, sbAnswer.toString());
+          if(!sAnswer.equals(""))
+          {
+            JSONObject answer = new JSONObject();
+            answersOut.put(questionID, answer);
+            answer.put("value", sAnswer);
+            if(sLabel != null)
+              answer.put("label", sLabel);
+          }
+        }
+      }
+    }
+
+  }
+
   private String truncateDecimals(String id, String sAnswer)
   {
     if (FIImpactSettings.JSON_TRUNCATE_DECIMALS.contains(id))

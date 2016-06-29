@@ -686,6 +686,9 @@ public class FIImpactSettings
       JSONArray jsonQuestions = jsonSection.getJSONArray("questions");
       parseQuestions(sectionID, jsonQuestions, null);
     }
+    JSONArray jsonAdditionalLookups = FIImpactSettings.getFiImpactSettings().getFiImpactModel().optJSONArray("additional_lookups");
+    parseQuestions(jsonAdditionalLookups);
+
     logger.info("Parse lookups done");
   }
 
@@ -698,6 +701,7 @@ public class FIImpactSettings
       JSONObject jsonQuestion = jsonQuestions.getJSONObject(iQuestion);
       String questionID = jsonQuestion.getString("id");
       String fullQuestionID = "Q" + sectionID + "_" + questionID;
+      String sDefaultAnswer = jsonQuestion.optString("default", null);
       //logger.debug("Parse question: {}", fullQuestionID);
       boolean bLookupFound = false;
       IOListDefinition ioListDefinition = getListDefinition(LIST_SURVEYS);
@@ -709,6 +713,8 @@ public class FIImpactSettings
 
       if(ioListField != null)
       {
+        if(sDefaultAnswer != null)
+          ioListField.setDefaultAnswer(sDefaultAnswer);
         //logger.info("Found : {}", ioListField.getFieldid());
         JSONArray jsonLookups = jsonQuestion.optJSONArray("lookup");
         if(parentQuestion != null)
@@ -760,6 +766,39 @@ public class FIImpactSettings
 
   }
 
+  private void parseQuestions(JSONArray jsonLookups)
+  {
+    if(jsonLookups == null)
+    {
+      logger.warn("No additional lookups");
+      return;
+    }
+    for(int iQuestion = 0; iQuestion < jsonLookups.length(); iQuestion++)
+    {
+      JSONObject jsonQuestion = jsonLookups.getJSONObject(iQuestion);
+      String questionID = jsonQuestion.getString("id");
+      String sDefaultAnswer = jsonQuestion.optString("default", null);
+      IOListField ioListField = getAllFields().get(questionID);
+      if(ioListField != null)
+      {
+        if(sDefaultAnswer != null)
+          ioListField.setDefaultAnswer(sDefaultAnswer);
+        //logger.info("Found : {}", ioListField.getFieldid());
+        JSONArray jsonLookup = jsonQuestion.optJSONArray("lookup");
+        if(jsonLookup != null)
+        {
+          for(int iLookup = 0; iLookup < jsonLookup.length(); iLookup++)
+          {
+            JSONObject jsonLookupEntry = jsonLookup.getJSONObject(iLookup);
+            String key = jsonLookupEntry.keys().next();
+            String value = jsonLookupEntry.getString(key);
+            ioListField.addLookup(key, value);
+          }
+        }
+
+      }
+    }
+  }
 
   public void exportLegendTxt(ServletOutputStream outputStream) throws IOException
   {

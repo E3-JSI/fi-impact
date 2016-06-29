@@ -891,6 +891,160 @@
 		}
 	],
 
+	"additional_lookups":[
+        {
+            "id" : "ICT_TOOLS_SMART_CITY",
+            "default": "N",
+            "lookup" : [{
+                "X" : "Yes"
+                }, {
+                "N" : "No"
+                }
+            ]
+        },
+        {
+            "id" : "ICT_TOOLS_CLOUD",
+            "default": "N",
+            "lookup" : [{
+                "X" : "Yes"
+                }, {
+                "N" : "No"
+                }
+            ]
+        },
+        {
+            "id" : "ICT_TOOLS_SOCIAL_MEDIA",
+            "default": "N",
+            "lookup" : [{
+                "X" : "Yes"
+                }, {
+                "N" : "No"
+                }
+            ]
+        },
+        {
+            "id" : "ICT_TOOLS_MOBILE",
+            "default": "N",
+            "lookup" : [{
+                "X" : "Yes"
+                }, {
+                "N" : "No"
+                }
+            ]
+        },
+        {
+            "id" : "ICT_TOOLS_BIG_DATA",
+            "default": "N",
+            "lookup" : [{
+                "X" : "Yes"
+                }, {
+                "N" : "No"
+                }
+            ]
+        },
+        {
+            "id" : "ICT_TOOLS_IOT",
+            "default": "N",
+            "lookup" : [{
+                "X" : "Yes"
+                }, {
+                "N" : "No"
+                }
+            ]
+        },
+        {
+            "id" : "ICT_TOOLS_3D_PRINTING",
+            "default": "N",
+            "lookup" : [{
+                "X" : "Yes"
+                }, {
+                "N" : "No"
+                }
+            ]
+        },
+        {
+            "id" : "ICT_TOOLS_WEARABLES",
+            "default": "N",
+            "lookup" : [{
+                "X" : "Yes"
+                }, {
+                "N" : "No"
+                }
+            ]
+        },
+        {
+            "id" : "ICT_TOOLS_ROBOTICS",
+            "default": "N",
+            "lookup" : [{
+                "X" : "Yes"
+                }, {
+                "N" : "No"
+                }
+            ]
+        },
+        {
+            "id" : "ICT_TOOLS_DRONES",
+            "default": "N",
+            "lookup" : [{
+                "X" : "Yes"
+                }, {
+                "N" : "No"
+                }
+            ]
+        }
+     ],
+	"profile":[
+        {"id": "Q1_1",
+        "label": "Accelerator"
+        },
+       {"id": "Q1_3",
+        "label": "Organisation"
+        },
+       {"id": "Q1_4",
+        "label": "Project"
+        },
+       {"id": "Q1_2",
+        "label": "Country"
+        },
+       {"id": "ABSTRACT",
+        "label": "Project abstract"
+        },
+       {"id": "Q3_3a",
+        "label": "Primary market sector"
+        },
+       {"id": "Q3_3",
+        "label": "Secondary market sector(s)"
+        },
+       {"id": "Q3_12",
+        "label": "Primary consumer market"
+        },
+       {"id": "Q3_13",
+        "label": "Secondary consumer market(s)"
+        },
+       {"id": "B2B_B2C",
+        "label": "Business model"
+        },
+       {"label": "Solution Types",
+       "id": "solution_types",
+        "table": [
+  		{"label":"SMART CITY", "id":"ICT_TOOLS_SMART_CITY"},
+  		{"label":"CLOUD", "id":"ICT_TOOLS_CLOUD"},
+  		{"label":"SOCIAL MEDIA", "id":"ICT_TOOLS_SOCIAL_MEDIA"},
+  		{"label":"MOBILE", "id":"ICT_TOOLS_MOBILE"},
+  		{"label":"BIG DATA/ANALYTICS", "id":"ICT_TOOLS_BIG_DATA"},
+  		{"label":"IOT", "id":"ICT_TOOLS_IOT"},
+  		{"label":"3D PRINTING", "id":"ICT_TOOLS_3D_PRINTING"},
+  		{"label":"WEARABLES", "id":"ICT_TOOLS_WEARABLES"},
+  		{"label":"ROBOTICS", "id":"ICT_TOOLS_ROBOTICS"},
+  		{"label":"DRONES", "id":"ICT_TOOLS_DRONES"},
+  		{"label":"SOFTWARE/HARDWARE", "id":"SW_HW"}
+      ]
+      },
+       {"id": "MAP_WEBSITE",
+        "label": "Website"
+        }
+	],
+
 	"tooltips" : ["Low", "Medium", "High"],
 	"radarLevelsSocial" : {
 		"1" : "No Impact",

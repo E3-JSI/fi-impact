@@ -43,6 +43,7 @@ public class FIImpactRequestHandler extends HttpServlet
     ALLOWED_ACTIONS.add("allpdf");
     ALLOWED_ACTIONS.add("plot");
     ALLOWED_ACTIONS.add("plot-legend");
+    ALLOWED_ACTIONS.add("profile");
     ALLOWED_ACTIONS.add(QMinerManager.ACTION_GET_GRAPH);
 
   }
@@ -132,6 +133,19 @@ public class FIImpactRequestHandler extends HttpServlet
         response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");
         FIImpactSettings.getFiImpactSettings().getSurveyManager().getJSONSurvey(response.getOutputStream(), sId);
+      }
+
+    }
+    else if(sAction.equals("profile"))
+    {
+      if (sId == null || sId.equals(""))
+        setBadRequest(response, "Parameter 'id' not defined.");
+      else
+      {
+        //id is internal
+        response.setContentType("application/json");
+        response.setCharacterEncoding("utf-8");
+        FIImpactSettings.getFiImpactSettings().getSurveyManager().getJSONProjectProfile(response.getOutputStream(), sId);
       }
 
     }

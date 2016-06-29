@@ -198,7 +198,21 @@ public class SurveyManager
 
         for(IOListField ioListField: categoryFields)
         {
-          String answer = sd.questions.get(ioListField.getFieldid());
+          String answer = null;
+          if(!ioListField.getListId().equals(FIImpactSettings.LIST_SURVEYS))
+          {
+            ProjectData pd = sd.getProject();
+            if(pd != null)
+            {
+              if(ioListField.getListId().equals(FIImpactSettings.LIST_PROJECTS))
+                answer = pd.getValue(ioListField.getFieldid());
+              else if(ioListField.getListId().equals(FIImpactSettings.LIST_MATTERMARK))
+                answer = pd.getMattermarkValue(ioListField.getFieldid());
+            }
+          }
+          else
+            answer = sd.questions.get(ioListField.getFieldid());
+
           if(answer != null && !answer.equals(""))
             ioListField.addLookup(answer, answer);
         }
@@ -365,6 +379,23 @@ public class SurveyManager
     else
     {
       surveyData.writeUIJSON(outputStream);
+    }
+  }
+
+  public void getJSONProjectProfile(OutputStream outputStream, String id) throws IOException
+  {
+    SurveyData surveyData = surveys.get(id);
+    if(surveyData == null)
+    {
+      OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
+      JSONWriter jsonSurvey = new JSONWriter(w);
+      jsonSurvey.object().key("id").value(id).key("error").value("Survey not found.").endObject();
+      w.flush();
+      w.close();
+    }
+    else
+    {
+      surveyData.writeProfileUI(outputStream);
     }
   }
 
@@ -602,8 +633,8 @@ public class SurveyManager
 
         JSONObject jsonInfo = new JSONObject();
         jsonSurvey.put("info", jsonInfo);
-        addQuestionKey(jsonInfo, "Q1_3", surveyData.questions);
-        addQuestionKey(jsonInfo, "Q1_4", surveyData.questions);
+        addQuestionKey(jsonInfo, FIImpactSettings.getFiImpactSettings().getAllFields().get("Q1_3"), surveyData.questions);
+        addQuestionKey(jsonInfo, FIImpactSettings.getFiImpactSettings().getAllFields().get("Q1_4"), surveyData.questions);
         jsonInfo.put("node_type", node_type_success);
 
         JSONObject jsonFilters = new JSONObject();
@@ -620,13 +651,13 @@ public class SurveyManager
               if(pd != null)
               {
                 if(ioListField.getListId().equals(FIImpactSettings.LIST_PROJECTS))
-                  addQuestionKey(jsonFilters, s, pd.getFields());
+                  addQuestionKey(jsonFilters, ioListField, pd.getFields());
                 else if(ioListField.getListId().equals(FIImpactSettings.LIST_MATTERMARK))
-                  addQuestionKey(jsonFilters, s, pd.getMattermarkFields());
+                  addQuestionKey(jsonFilters, ioListField, pd.getMattermarkFields());
               }
             }
             else
-              addQuestionKey(jsonFilters, s, surveyData.questions);
+              addQuestionKey(jsonFilters, ioListField, surveyData.questions);
           }
         }
         else
@@ -763,85 +794,7 @@ public class SurveyManager
 
       for(SurveyData surveyData : surveys.values())
       {
-        json.object();
-        json.key("id_internal").value(surveyData.getId());
-        StringBuilder fullText = new StringBuilder();
-
-        String node_type = "normal";
-        ProjectData pd = surveyData.getProject();
-        if(pd != null)
-        {
-          if(pd.getValue("SUCCESS_VIP") != null && pd.getValue("SUCCESS_VIP").equals("X"))
-            node_type = "VIP";
-          else if(pd.getValue("SUCCESS_IDG") != null && pd.getValue("SUCCESS_IDG").equals("X"))
-            node_type = "IDG";
-          else if(pd.getValue("SUCCESS_VIP") != null && pd.getValue("SUCCESS_HPI").equals("X"))
-            node_type = "HPI";
-        }
-
-        json.key("node_type").value(node_type);
-
-
-        for(IOListField ioListField : listSurveysDef.getFields())
-        {
-          if(!ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_IGNORE))
-          {
-            String answer = surveyData.questions.get(ioListField.getFieldid());
-            if(answer != null)
-            {
-              answer = FIImpactSettings.normaliseCSVString(answer);
-              if(ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_FEATURE_TEXT))
-                fullText.append(answer).append(" ");
-              else
-                json.key(ioListField.getFieldid()).value(answer);
-            }
-          }
-
-
-        }
-
-        ProjectData projectData = surveyData.getProject();
-        for(IOListField ioListField : listMattermarkDef.getFields())
-        {
-          if(projectData != null)
-          {
-            if(!ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_IGNORE))
-            {
-              String answer = projectData.getMattermarkValue(ioListField.getFieldid());
-              if(answer != null)
-              {
-                answer = FIImpactSettings.normaliseCSVString(answer);
-                if(ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_FEATURE_TEXT))
-                  fullText.append(answer).append(" ");
-                else
-                  json.key(ioListField.getFieldid()).value(answer);
-              }
-            }
-          }
-        }
-
-        for(IOListField ioListField : listProjectsDef.getFields())
-        {
-
-          if(projectData != null)
-          {
-            if(!ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_IGNORE))
-            {
-              String answer = projectData.getValue(ioListField.getFieldid());
-              if(answer != null)
-              {
-                answer = FIImpactSettings.normaliseCSVString(answer);
-                if(ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_FEATURE_TEXT))
-                  fullText.append(answer).append(" ");
-                else
-                  json.key(ioListField.getFieldid()).value(answer);
-              }
-            }
-          }
-
-        }
-        json.key("full_text").value(fullText.toString());
-        json.endObject();
+        exportQMinerJsonSurvey(json, surveyData);
       }
 
       json.endArray();
@@ -852,6 +805,108 @@ public class SurveyManager
     writer.close();
 
     logger.info("Exported {} surveys", surveys.size());
+  }
+
+  public void exportQMinerJsonSurvey(OutputStream outputStream, String surveyId) throws IOException
+  {
+    logger.info("Export {} surveys to JSON (for QMiner analysys)", surveys.size());
+    OutputStreamWriter writer = new OutputStreamWriter(outputStream, "utf-8");
+    JSONWriter json = new JSONWriter(writer);
+    SurveyData surveyData = surveys.get(surveyId);
+    exportQMinerJsonSurvey(json, surveyData);
+    writer.flush();
+    writer.close();
+
+  }
+
+  private void exportQMinerJsonSurvey(JSONWriter json, SurveyData surveyData)
+  {
+    IOListDefinition listMattermarkDef = FIImpactSettings.getFiImpactSettings().getListDefinition(FIImpactSettings.LIST_MATTERMARK);
+    IOListDefinition listProjectsDef = FIImpactSettings.getFiImpactSettings().getListDefinition(FIImpactSettings.LIST_PROJECTS);
+    IOListDefinition listSurveysDef = FIImpactSettings.getFiImpactSettings().getListDefinition(FIImpactSettings.LIST_SURVEYS);
+
+    json.object();
+    if(surveyData != null)
+    {
+      json.key("id_internal").value(surveyData.getId());
+      StringBuilder fullText = new StringBuilder();
+
+      String node_type = "normal";
+      ProjectData pd = surveyData.getProject();
+      if(pd != null)
+      {
+        if(pd.getValue("SUCCESS_VIP") != null && pd.getValue("SUCCESS_VIP").equals("X"))
+          node_type = "VIP";
+        else if(pd.getValue("SUCCESS_IDG") != null && pd.getValue("SUCCESS_IDG").equals("X"))
+          node_type = "IDG";
+        else if(pd.getValue("SUCCESS_VIP") != null && pd.getValue("SUCCESS_HPI").equals("X"))
+          node_type = "HPI";
+      }
+
+      json.key("node_type").value(node_type);
+
+
+      for(IOListField ioListField : listSurveysDef.getFields())
+      {
+        if(!ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_IGNORE))
+        {
+          String answer = surveyData.questions.get(ioListField.getFieldid());
+          if(answer != null)
+          {
+            answer = FIImpactSettings.normaliseCSVString(answer);
+            if(ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_FEATURE_TEXT))
+              fullText.append(answer).append(" ");
+            else
+              json.key(ioListField.getFieldid()).value(answer);
+          }
+        }
+
+
+      }
+
+      ProjectData projectData = surveyData.getProject();
+      for(IOListField ioListField : listMattermarkDef.getFields())
+      {
+        if(projectData != null)
+        {
+          if(!ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_IGNORE))
+          {
+            String answer = projectData.getMattermarkValue(ioListField.getFieldid());
+            if(answer != null)
+            {
+              answer = FIImpactSettings.normaliseCSVString(answer);
+              if(ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_FEATURE_TEXT))
+                fullText.append(answer).append(" ");
+              else
+                json.key(ioListField.getFieldid()).value(answer);
+            }
+          }
+        }
+      }
+
+      for(IOListField ioListField : listProjectsDef.getFields())
+      {
+
+        if(projectData != null)
+        {
+          if(!ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_IGNORE))
+          {
+            String answer = projectData.getValue(ioListField.getFieldid());
+            if(answer != null)
+            {
+              answer = FIImpactSettings.normaliseCSVString(answer);
+              if(ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_FEATURE_TEXT))
+                fullText.append(answer).append(" ");
+              else
+                json.key(ioListField.getFieldid()).value(answer);
+            }
+          }
+        }
+
+      }
+      json.key("full_text").value(fullText.toString());
+    }
+    json.endObject();
   }
 
   public void exportText(ServletOutputStream outputStream, String groupQuestion, String groupAnswer, int exportSettings) throws IOException
@@ -1105,14 +1160,7 @@ public class SurveyManager
       json.key(qID).value(FIImpactSettings.getDecimalFormatter4().format(val));
   }
 
-  private void addQuestionKey(JSONObject json, String qID, Map<String, String> questions)
-  {
-    String val = questions.get(qID);
-    if(val != null)
-      json.put(qID, val);
-  }
-
-  private void addQuestionKey(JSONObject json, IOListField ioListField, Map<String, String> questions)
+   private void addQuestionKey(JSONObject json, IOListField ioListField, Map<String, String> questions)
   {
     if(ioListField.getCalculatedFrom().size() > 0)
     {
@@ -1139,8 +1187,17 @@ public class SurveyManager
         json.put(ioListField.getFieldid(), "B");
     }
     else
-      addQuestionKey(json, ioListField.getFieldid(), questions);
+    {
+      String val = questions.get(ioListField.getFieldid());
+      if(val == null || val.equals(""))
+      {
+        if(ioListField.getDefaultAnswer() != null)
+          val = ioListField.getDefaultAnswer();
+      }
 
+      if(val != null)
+        json.put(ioListField.getFieldid(), val);
+    }
   }
 
 

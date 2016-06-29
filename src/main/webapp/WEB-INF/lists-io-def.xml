@@ -10,14 +10,14 @@
 		<filed column="PROJECT NAME" label="PROJECT NAME" fieldid="PROJECT_NAME" plot="ignore" graph="ignore" missing="0" type="text"/>
 		<filed column="ADDRESS" label="ADDRESS" fieldid="ADDRESS" plot="ignore" graph="ignore" missing="0;-" type="text"/>
 		<filed column="VERTICAL MARKET (IDC ANALYSIS)" label="VERTICAL MARKET" fieldid="VERTICAL_MARKET" plot="ignore" graph="feature-selection" missing="0" type="multi"/>
-		<filed column="B2B/B2C" label="B2B/B2C" fieldid="B2B_B2C" plot="selection" graph="feature-selection" missing="0" type="lookup"/>
+		<filed column="B2B/B2C" label="B2B/B2C" fieldid="B2B_B2C" plot="selection" graph="feature-selection" missing="0" type="category"/>
 		<filed column="N. OF TEAM MEMBERS" label="N. OF TEAM MEMBERS" fieldid="TEAM_MEMBERS" plot="ignore" graph="ignore" missing="#N/A;N/A;Not available" type="int"/>
 		<filed column="N. OF YEARS OF EXPERIENCE" label="YEARS OF EXPERIENCE" fieldid="YEARS_OF_EXPERIENCE" plot="ignore" graph="ignore" missing="#N/A;N/A;Not available;-" type="int"/>
 		<filed column="SELECTED (YES/NO)" label="SELECTED" fieldid="SELECTED" plot="ignore" graph="ignore" include-record-when="YES" type="lookup"/>
 		<filed column="STATUS" label="STATUS" fieldid="STATUS" plot="ignore" graph="ignore" missing="0" type="lookup"/>
 		<filed column="NAME OF PROJECT COORDINATOR" label="PROJECT COORDINATOR" fieldid="PROJECT_COORDINATOR" plot="ignore" graph="ignore" missing="0;#N/A" type="text"/>
 		<filed column="ABSTRACT" label="ABSTRACT" fieldid="ABSTRACT" plot="ignore" graph="feature-text" missing="0" type="text"/>
-		<filed column="TECH PROVIDER OR SERVICE PROVIDER (NON-IT) IDC" label="PROVIDER TYPE" fieldid="PROVIDER_TYPE" plot="selection" graph="feature-selection" missing="0" type="lookup"/>
+		<filed column="TECH PROVIDER OR SERVICE PROVIDER (NON-IT) IDC" label="PROVIDER TYPE" fieldid="PROVIDER_TYPE" plot="selection" graph="feature-selection" missing="0" type="category"/>
 		<filed column="SMART CITY" label="SMART CITY" fieldid="ICT_TOOLS_SMART_CITY" plot="selection" graph="feature-selection" type="lookup"/>
 		<filed column="CLOUD" label="CLOUD" fieldid="ICT_TOOLS_CLOUD" plot="selection" graph="feature-selection" type="lookup"/>
 		<filed column="SOCIAL MEDIA" label="SOCIAL MEDIA" fieldid="ICT_TOOLS_SOCIAL_MEDIA" plot="selection" graph="feature-selection" type="lookup"/>
@@ -28,14 +28,14 @@
 		<filed column="WEARABLES" label="WEARABLES" fieldid="ICT_TOOLS_WEARABLES" plot="selection" graph="feature-selection" type="lookup"/>
 		<filed column="ROBOTICS" label="ROBOTICS" fieldid="ICT_TOOLS_ROBOTICS" plot="selection" graph="feature-selection" type="lookup"/>
 		<filed column="DRONES" label="DRONES" fieldid="ICT_TOOLS_DRONES" plot="selection" graph="feature-selection" type="lookup"/>
-		<filed column="SOFTWARE OR HARDWARE (ONLY FOR TECH PROVIDERS) IDC" label="SOFTWARE/HARDWARE" fieldid="SW_HW" plot="selection" graph="feature-selection" missing="0;#N/A;?" type="lookup"/>
-		<filed column="SOFTWARE INDIVIDUAL MARKET (ONLY SOFTWARE) IDC" label="SOFTWARE INDIVIDUAL MARKET" fieldid="SW_INDIVIDUAL_MARKET" plot="selection" graph="feature-selection" missing="0;#N/A;?" type="lookup"/>
-		<filed column="SOFTWARE PRIMARY MARKET" label="SOFTWARE PRIMARY MARKET" fieldid="SW_PRIMARY_MARKET" plot="selection" graph="feature-selection" missing="0;#N/A;?" type="lookup"/>
-		<filed column="SOFTWARE SECONDARY MARKET" label="SOFTWARE SECONDARY MARKET" fieldid="SW_SECONDARY_MARKET" plot="selection" graph="feature-selection" missing="0;#N/A;?" type="lookup"/>
+		<filed column="SOFTWARE OR HARDWARE (ONLY FOR TECH PROVIDERS) IDC" label="SOFTWARE/HARDWARE" fieldid="SW_HW" plot="selection" graph="feature-selection" missing="0;#N/A;?" type="category"/>
+		<filed column="SOFTWARE INDIVIDUAL MARKET (ONLY SOFTWARE) IDC" label="SOFTWARE INDIVIDUAL MARKET" fieldid="SW_INDIVIDUAL_MARKET" plot="selection" graph="feature-selection" missing="0;#N/A;?" type="category"/>
+		<filed column="SOFTWARE PRIMARY MARKET" label="SOFTWARE PRIMARY MARKET" fieldid="SW_PRIMARY_MARKET" plot="selection" graph="feature-selection" missing="0;#N/A;?" type="category"/>
+		<filed column="SOFTWARE SECONDARY MARKET" label="SOFTWARE SECONDARY MARKET" fieldid="SW_SECONDARY_MARKET" plot="selection" graph="feature-selection" missing="0;#N/A;?" type="category"/>
 		<filed column="CALL" label="CALL" fieldid="P29" plot="ignore" graph="ignore" type="int"/>
 		<filed column="RESPONDENT TO FIMPACT ASSESSMENT?" label="RESPONDED TO FIMPACT ASSESSMENT" fieldid="P_IGNORE_02" plot="ignore" graph="ignore" usage="ignore" type="lookup"/>
 		<filed column="WEBSITE URL" label="WEBSITE URL" fieldid="WEBSITE_URL" plot="ignore" graph="ignore" missing="0;#N/A;?" type="text"/>
-		<filed column="SME/STARTUP" label="SME/STARTUP" fieldid="SME_STARTUP" plot="selection" graph="feature-selection" missing="0;#N/A;?" type="lookup"/>
+		<filed column="SME/STARTUP" label="SME/STARTUP" fieldid="SME_STARTUP" plot="selection" graph="feature-selection" missing="0;#N/A;?" type="category"/>
 		<filed column="HPI" label="SUCCESS HPI" fieldid="SUCCESS_HPI" plot="ignore" graph="ignore" type="lookup"/>
 		<filed column="VIP" label="SUCCESS VIP" fieldid="SUCCESS_VIP" plot="ignore" graph="ignore" type="lookup"/>
 		<filed column="IDG Shortlist" label="SUCCESS IDG" fieldid="SUCCESS_IDG" plot="ignore" graph="ignore" type="lookup"/>
