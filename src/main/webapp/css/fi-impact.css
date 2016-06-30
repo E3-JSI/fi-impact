@@ -1,4 +1,17 @@
+header .intro-text {
+	padding-bottom: 30px;
+	font-size: 12px
+}
+@media (min-width: 768px) {
+	header .intro-text {
+		padding-top: 200px;
+		padding-bottom: 50px;
+	}
+}
+
 .vspace { padding: 1em 0; }
+.fi-switch { padding-left: 2em; }
+.fi-selected { font-size: 2em; }
 
 .legend-checkboxes { padding-left: 0px; }
 .legend-checkboxes .symbol { 
