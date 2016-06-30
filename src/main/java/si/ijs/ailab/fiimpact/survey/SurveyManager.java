@@ -518,10 +518,7 @@ public class SurveyManager
 
   }
 
-  //filter syntax: q=FIELD;a,b,c
-  // q=FIELD;x,y,z
-  //Highlights - a list of fields for the highlighting F1;F2;...
-  public void listFilter(ServletOutputStream outputStream, String[] filter, String[] highlights, String referenceSurveyInternalID) throws IOException
+  public void getPlotJSON(ServletOutputStream outputStream, String referenceSurveyInternalID) throws IOException
   {
     logger.info("Return {} surveys", surveys.size());
     JSONObject json = new JSONObject();
@@ -530,179 +527,88 @@ public class SurveyManager
     json.put("surveys", jsonSurveys);
     Map<String, JSONArray> surveysByType = new TreeMap<>();
 
-    Map<String, List<String>> mapFilter = new TreeMap<>();
-    if(filter != null)
-    {
-      for (String s : filter)
-      {
-        String[] arr = s.split(";");
-        if (arr.length == 1)
-          logger.error("Empty filter for: {}. Ignore.", arr[0]);
-        if (arr.length > 2)
-        {
-          int pos = s.indexOf(';');
-          String answer = s.substring(pos + 1);
-          logger.warn("Filter {} contains more than one semicolon. Ignore: {}", arr[0], answer);
-
-        }
-        else
-        {
-          List<String> values = Arrays.asList(arr[1].split("\\,"));
-          mapFilter.put(arr[0], values);
-        }
-      }
-    }
 
     for(SurveyData surveyData : surveys.values())
     {
 
-      boolean bInclude = true;
-      for(Map.Entry<String, List<String>> entryFilter: mapFilter.entrySet())
-      {
-        String key = entryFilter.getKey();
-        List<String> values = entryFilter.getValue();
-        String sAnswer = null;
-        IOListField ioListField = FIImpactSettings.getFiImpactSettings().getListFieldDefinition(key);
-        if(!ioListField.getListId().equals(FIImpactSettings.LIST_SURVEYS))
-        {
-          ProjectData pd = surveyData.getProject();
-          if(pd!=null)
-          {
-            if(ioListField.getListId().equals(FIImpactSettings.LIST_PROJECTS))
-              sAnswer = pd.getValue(key);
-            else if(ioListField.getListId().equals(FIImpactSettings.LIST_MATTERMARK))
-              sAnswer = pd.getMattermarkValue(key);
-          }
-        }
-        else
-          sAnswer = surveyData.questions.get(key);
 
-        if(sAnswer == null || sAnswer.equals(""))
-          sAnswer = "EMPTY";
-        boolean bOr = false;
-        //I assume everything is a multiple choice....
-        String[] arrAnswer = sAnswer.split("\\,");
-        for(String sSingleAnswer: arrAnswer)
-        {
-          if(sSingleAnswer == null || sSingleAnswer.equals(""))
-            sSingleAnswer = "EMPTY";
-          for(String filterValue : values)
-          {
-            bOr = sSingleAnswer.equals(filterValue);
-            if(bOr)
-              break;
-          }
-          if(bOr)
-            break;
-        }
-        bInclude = bOr;
-        if(!bInclude)
-          break;
+      String node_type = "normal";
+
+      ProjectData pd = surveyData.getProject();
+      if(pd != null)
+      {
+        if(pd.getValue("SUCCESS_VIP") != null && pd.getValue("SUCCESS_VIP").equals("X"))
+          node_type = "VIP";
+        else if(pd.getValue("SUCCESS_IDG") != null && pd.getValue("SUCCESS_IDG").equals("X"))
+          node_type = "IDG";
+        else if(pd.getValue("SUCCESS_VIP") != null && pd.getValue("SUCCESS_HPI").equals("X"))
+          node_type = "HPI";
       }
+      String node_type_success = node_type;
+      if(surveyData.getId().equals(referenceSurveyInternalID))
+        node_type = "SELECTED";
 
-      if(bInclude)
+
+      JSONArray jsonSurveysTypeArr = surveysByType.get(node_type);
+      if(jsonSurveysTypeArr == null)
       {
-
-        String node_type = "normal";
-
-        ProjectData pd = surveyData.getProject();
-        if(pd != null)
-        {
-          if(pd.getValue("SUCCESS_VIP") != null && pd.getValue("SUCCESS_VIP").equals("X"))
-            node_type = "VIP";
-          else if(pd.getValue("SUCCESS_IDG") != null && pd.getValue("SUCCESS_IDG").equals("X"))
-            node_type = "IDG";
-          else if(pd.getValue("SUCCESS_VIP") != null && pd.getValue("SUCCESS_HPI").equals("X"))
-            node_type = "HPI";
-        }
-        String node_type_success = node_type;
-        if(surveyData.getId().equals(referenceSurveyInternalID))
-          node_type = "SELECTED";
-
-
-        JSONArray jsonSurveysTypeArr = surveysByType.get(node_type);
-        if(jsonSurveysTypeArr == null)
-        {
-          jsonSurveysTypeArr = new JSONArray();
-          surveysByType.put(node_type, jsonSurveysTypeArr);
-          jsonSurveys.put(node_type, jsonSurveysTypeArr);
-
-        }
-        JSONObject jsonSurvey = new JSONObject();
-        jsonSurveysTypeArr.put(jsonSurvey);
-
-        JSONObject jsonInfo = new JSONObject();
-        jsonSurvey.put("info", jsonInfo);
-        addQuestionKey(jsonInfo, FIImpactSettings.getFiImpactSettings().getAllFields().get("Q1_3"), surveyData.questions);
-        addQuestionKey(jsonInfo, FIImpactSettings.getFiImpactSettings().getAllFields().get("Q1_4"), surveyData.questions);
-        jsonInfo.put("node_type", node_type_success);
-
-        JSONObject jsonFilters = new JSONObject();
-        jsonSurvey.put("filters", jsonFilters);
-
-        if(highlights.length > 0)
-        {
-          for(String s : highlights)
-          {
-
-            IOListField ioListField = FIImpactSettings.getFiImpactSettings().getListFieldDefinition(s);
-            if(!ioListField.getListId().equals(FIImpactSettings.LIST_SURVEYS))
-            {
-              if(pd != null)
-              {
-                if(ioListField.getListId().equals(FIImpactSettings.LIST_PROJECTS))
-                  addQuestionKey(jsonFilters, ioListField, pd.getFields());
-                else if(ioListField.getListId().equals(FIImpactSettings.LIST_MATTERMARK))
-                  addQuestionKey(jsonFilters, ioListField, pd.getMattermarkFields());
-              }
-            }
-            else
-              addQuestionKey(jsonFilters, ioListField, surveyData.questions);
-          }
-        }
-        else
-        {
-          for(IOListField ioListField: FIImpactSettings.getFiImpactSettings().getAllFields().values())
-          {
-            if (ioListField.getPlot().equals(FIImpactSettings.FIELD_PLOT_SELECTION))
-            {
-              if(!ioListField.getListId().equals(FIImpactSettings.LIST_SURVEYS))
-              {
-                if(pd != null)
-                {
-                  if(ioListField.getListId().equals(FIImpactSettings.LIST_PROJECTS))
-                    addQuestionKey(jsonFilters, ioListField, pd.getFields());
-                  else if(ioListField.getListId().equals(FIImpactSettings.LIST_MATTERMARK))
-                    addQuestionKey(jsonFilters, ioListField, pd.getMattermarkFields());
-                }
-              }
-              else
-              {
-                addQuestionKey(jsonFilters, ioListField, surveyData.questions);
-              }
-            }
-          }
-
-        }
-
-        JSONObject jsonKPI = new JSONObject();
-        jsonSurvey.put("KPI", jsonKPI);
-        addResultKey(jsonKPI, "INNOVATION", surveyData.results);
-        addResultKey(jsonKPI, "MARKET", surveyData.results);
-        addResultKey(jsonKPI, "FEASIBILITY", surveyData.results);
-        addResultKey(jsonKPI, "MARKET_NEEDS", surveyData.results);
-        addResultKey(jsonKPI, "MATTERMARK_GROWTH", surveyData.results);
-
-        jsonKPI = new JSONObject();
-        jsonSurvey.put("KPI_percent", jsonKPI);
-
-        addResultKey(jsonKPI, "INNOVATION_GRAPH_PERCENT", surveyData.resultDerivatives);
-        addResultKey(jsonKPI, "MARKET_GRAPH_PERCENT", surveyData.resultDerivatives);
-        addResultKey(jsonKPI, "FEASIBILITY_GRAPH_PERCENT", surveyData.resultDerivatives);
-        addResultKey(jsonKPI, "MARKET_NEEDS_GRAPH_PERCENT", surveyData.resultDerivatives);
-        addResultKey(jsonKPI, "MATTERMARK_GROWTH_GRAPH_PERCENT", surveyData.resultDerivatives);
+        jsonSurveysTypeArr = new JSONArray();
+        surveysByType.put(node_type, jsonSurveysTypeArr);
+        jsonSurveys.put(node_type, jsonSurveysTypeArr);
 
       }
+      JSONObject jsonSurvey = new JSONObject();
+      jsonSurveysTypeArr.put(jsonSurvey);
+
+      JSONObject jsonInfo = new JSONObject();
+      jsonSurvey.put("info", jsonInfo);
+      addQuestionKey(jsonInfo, FIImpactSettings.getFiImpactSettings().getAllFields().get("Q1_3"), surveyData.questions);
+      addQuestionKey(jsonInfo, FIImpactSettings.getFiImpactSettings().getAllFields().get("Q1_4"), surveyData.questions);
+      jsonInfo.put("node_type", node_type_success);
+      jsonInfo.put("id", surveyData.getId());
+
+      JSONObject jsonFilters = new JSONObject();
+      jsonSurvey.put("filters", jsonFilters);
+
+      for(IOListField ioListField: FIImpactSettings.getFiImpactSettings().getAllFields().values())
+      {
+        if (ioListField.getPlot().equals(FIImpactSettings.FIELD_PLOT_SELECTION))
+        {
+          if(!ioListField.getListId().equals(FIImpactSettings.LIST_SURVEYS))
+          {
+            if(pd != null)
+            {
+              if(ioListField.getListId().equals(FIImpactSettings.LIST_PROJECTS))
+                addQuestionKey(jsonFilters, ioListField, pd.getFields());
+              else if(ioListField.getListId().equals(FIImpactSettings.LIST_MATTERMARK))
+                addQuestionKey(jsonFilters, ioListField, pd.getMattermarkFields());
+            }
+          }
+          else
+          {
+            addQuestionKey(jsonFilters, ioListField, surveyData.questions);
+          }
+        }
+      }
+
+
+      JSONObject jsonKPI = new JSONObject();
+      jsonSurvey.put("KPI", jsonKPI);
+      addResultKey(jsonKPI, "INNOVATION", surveyData.results);
+      addResultKey(jsonKPI, "MARKET", surveyData.results);
+      addResultKey(jsonKPI, "FEASIBILITY", surveyData.results);
+      addResultKey(jsonKPI, "MARKET_NEEDS", surveyData.results);
+      addResultKey(jsonKPI, "MATTERMARK_GROWTH", surveyData.results);
+
+      jsonKPI = new JSONObject();
+      jsonSurvey.put("KPI_percent", jsonKPI);
+
+      addResultKey(jsonKPI, "INNOVATION_GRAPH_PERCENT", surveyData.resultDerivatives);
+      addResultKey(jsonKPI, "MARKET_GRAPH_PERCENT", surveyData.resultDerivatives);
+      addResultKey(jsonKPI, "FEASIBILITY_GRAPH_PERCENT", surveyData.resultDerivatives);
+      addResultKey(jsonKPI, "MARKET_NEEDS_GRAPH_PERCENT", surveyData.resultDerivatives);
+      addResultKey(jsonKPI, "MATTERMARK_GROWTH_GRAPH_PERCENT", surveyData.resultDerivatives);
+
     }
 
     OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
