@@ -835,7 +835,12 @@ public class FIImpactSettings
         {
           json.key("lookup").array();
           for(Map.Entry<String, String> lookupEntry: ioListField.getLookup().entrySet())
-            json.object().key(lookupEntry.getKey()).value(lookupEntry.getValue()).endObject();
+          {
+            String val = lookupEntry.getValue();
+            if(val == null || val.equals(""))
+              val = "Other";
+            json.object().key(lookupEntry.getKey()).value(val).endObject();
+          }
           json.endArray();
         }
         json.endObject();
@@ -853,7 +858,13 @@ public class FIImpactSettings
         {
           json.key("lookup").array();
           for(Map.Entry<String, String> lookupEntry: ioListField.getLookup().entrySet())
-            json.object().key(lookupEntry.getKey()).value(lookupEntry.getValue()).endObject();
+          {
+            String val = lookupEntry.getValue();
+            if(val == null || val.equals(""))
+              val = "Other";
+
+            json.object().key(lookupEntry.getKey()).value(val).endObject();
+          }
           json.endArray();
         }
         json.endObject();
