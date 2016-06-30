@@ -35,49 +35,21 @@
                     <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand page-scroll" href="#page-top">FI-IMPACT Report</a> <a class="navbar-brand page-scroll" href="#page-top">FI-IMPACT Benchmarking</a>
+                <a class="navbar-brand page-scroll" href="#page-top">FI-IMPACT Benchmarking</a> <a class="navbar-brand page-scroll fi-switch" ng-href="report.html?id={{vm.id}}"><i class="fa fa-arrow-right fa-sm" aria-hidden="true"></i> Report</a>
             </div>
-
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav navbar-right">
-                    <li class="hidden"><a href="#page-top"></a></li>
-                    <li><a class="page-scroll summary" href="#project">Scatter</a></li>
-                    <li><a class="page-scroll" href="#innovation">Clusters</a></li>
-                </ul>
-            </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
     </nav>
-
-    <!-- Header -->
-    <header><div class="container"><div class="intro-text">
-		<!-- <div class="intro-lead-in">This is your <img src="../../img/logo.png"> <span ng-if="d.impact">Impact</span><span ng-if="d.self">Self</span> Assessment Report for project</div><div class="intro-heading">{{d.Q1_4}}</div> -->
-	</div></div></header>
 
 	<!-- Filters -->
     <section id="filters"><div class="container">
 		<div class="row">
-			<div class="col-md-6">
-				<div class="form-group vspace">
-					<label for="chooseSlice" class="col-sm-4 control-label text-right">Slice</label>
-					<div class="col-sm-8">
-						<select class="form-control"
-							ng-model="vm.scatter.slice"
-							ng-options="slice.abscissa.label + ' - ' + slice.ordinate.label for (index, slice) in vm.legend.slices track by index"
-							ng-change="vm.plotChart()"></select>
-					</div>
-				</div>
-				<div class="form-group vspace">
-					<label for="chooseFilter" class="col-sm-4 control-label text-right">Filter</label>
-					<div class="col-sm-8">
-						<select class="form-control"
-							ng-model="vm.filter"
-							ng-options="selection.label for selection in vm.legend.selections track by selection.field"
-							ng-change="vm.plotChart()"></select>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-4 col-md-offset-2">
+			<div class="col-md-3">
+				<p><strong>Selected project</strong></p>
+				<span class="symbol fi-selected" ng-style="{'color': vm.selected.nodeColor}" ng-bind-html="vm.symbolLegend[vm.selected.nodeShape].code"></span> {{vm.selected.info.Q1_4}}
+					
+			</div>	
+			<div class="col-md-3">
+				<p><strong>Performance level</strong></p>
 				<div class="checkbox" ng-repeat="(type, object) in vm.legend.type" ng-hide="type == 'SELECTED'">
 					<label class="legend-checkboxes">
 						<span class="symbol" ng-style="{'color': vm.getTypeColor(object)}" ng-bind-html="vm.symbolLegend[vm.symbols[object.index]].code"></span>
@@ -85,14 +57,34 @@
 					</label>
 				</div>
 			</div>
+			<div class="col-md-6">
+				<p><strong>Subgrantee property</strong></p>
+				<select class="form-control"
+					ng-model="vm.filter"
+					ng-options="selection.label for selection in vm.legend.selections track by selection.field"
+					ng-change="vm.plotChart()"></select>
+			</div>
 		</div>
-		<div class="row">
+		<div class="row" style="padding-top: 2em;">
 			<div class="col-md-8">
 				<uib-tabset active="active" justified="true">
-					<uib-tab index="0" heading="Scatterplot" select="vm.showPlot('scatter')"></uib-tab>
-					<uib-tab index="1" heading="Similarity graph" id="similarity" select="vm.showPlot('similarity')"></uib-tab>
+					<uib-tab index="0" heading="Performance analysis" select="vm.showPlot('scatter')"></uib-tab>
+					<uib-tab index="1" heading="Analysis by similarity" id="similarity" select="vm.showPlot('similarity')"></uib-tab>
 				</uib-tabset>
-				<div class="fi-plot" id="scatterplot"><svg viewBox="0 0 700 700" style="margin: 0px; padding: 0px; height: 95%; width: 95%"></svg></div>
+				<p ng-if="vm.active == 'scatter'" class="vspace">This graph shows the selected project's position in relation to other projects (including HPI and use-cases) across a selection of performance indicators and questionnaire attributes.</p>
+				<p ng-if="vm.active == 'similarity'" class="vspace">This graph displays a fuzzy similarity of projects.  This similarity measure takes into account the project description (abstract), FI-WARE technology used, team competences, geographical distribution, market distribution/targeting, etc.</p>
+				<div class="fi-plot" id="scatterplot">
+					<div class="form-group vspace">
+						<label for="chooseSlice" class="col-sm-5 control-label text-right">Performance indicators</label>
+						<div class="col-sm-7">
+							<select class="form-control"
+								ng-model="vm.scatter.slice"
+								ng-options="slice.abscissa.label + ' - ' + slice.ordinate.label for slice in vm.legend.slices track by slice.index"
+								ng-change="vm.plotChart()"></select>
+						</div>
+					</div>
+					<svg viewBox="0 0 700 700" style="margin: 0px; padding: 0px; height: 95%; width: 95%"></svg>
+				</div>
 				<div class="fi-plot" id="similarityplot" style="width:800px; height:600px;"></div>
 			</div>
 			<div class="col-md-4" >

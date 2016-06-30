@@ -9,10 +9,11 @@
 	
 		var vm = this;
 		
+		vm.id = location.search.split('id=')[1]
 		vm.active = 'scatter'
 		vm.loaded = { 'scatter': false, 'similarity': false }
 		vm.legend = {}
-		vm.raw = {}
+		vm.raw = { scatter: {}, similarity: {} }
 		vm.similarity = {}
 		vm.filter = ''
 		vm.scatter = { abscissa: '', ordinate: '', data: '' }
@@ -23,7 +24,8 @@
 			'square': { code: '&#9632;', color: '', size: 0.3 },
 			'cross': { code: '&#10010;', color: '', size: 0.4 }
 		}
-		vm.colors = ['#cccccc', '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5', '#c49c94', '#f7b6d2', '#c7c7c7', '#dbdb8d', '#9edae5']
+		vm.colors = ['#cccccc', '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
+		vm.lights = ['#E6E6E6', '#3991CE', '#FF9928', '#46BA46', '#F04142', '#AE81D7', '#A67065']
 		
 		vm.getColor = function(obj) {
 			if (obj.key == 'NA') return vm.colors[0]
@@ -39,6 +41,11 @@
 			$('#' + tab + 'plot').show()
 			if (vm.loaded[tab]) drawGraph()
 		}
+		vm.plotChart = function() {
+			if (vm.active == 'scatter') updateScatter()
+			else vm.similarity = updateSimilarity()
+			drawGraph()
+		}
 		
 		var checkboxDisplayCategories = ['checked', 'unchecked']
 		
@@ -53,7 +60,7 @@
 			vm.filter = vm.legend.selections[0]
 			vm.legend.slices = []
 			for (var i = 0; i < vm.legend.KPI.length; i++) for (var j = i+1; j < vm.legend.KPI.length; j++) 
-				(vm.legend.slices).push({abscissa: vm.legend.KPI[i], ordinate: vm.legend.KPI[j]})
+				(vm.legend.slices).push({abscissa: vm.legend.KPI[i], ordinate: vm.legend.KPI[j], index: i + '-' + j })
 			vm.legend.type = {}
 			vm.scatter.slice = vm.legend.slices[0]
 			
@@ -62,10 +69,10 @@
 				$.each(response.data.surveys, function(type, list) { order.push( {type: type, list: list} ) })
 				order.sort(function(a, b) {return b.list.length - a.list.length})
 				$.each(order, function(index, data) {
-					vm.raw[data.type] = data.list
+					vm.raw.scatter[data.type] = data.list
 					vm.legend.type[data.type] = { index: Object.keys(vm.legend.type).length, checked: true }
 				})
-				vm.selected = vm.raw.SELECTED[0]
+				vm.selected = vm.raw.scatter.SELECTED[0]
 				vm.selected.nodeShape = vm.symbols[vm.legend.type[vm.selected.info.node_type].index]
 				vm.loaded.scatter = true
 				updateScatter()
@@ -74,7 +81,8 @@
 			
 			getData.async('q-get-graph', function(response) {
 				sigma.utils.pkg('sigma.canvas.nodes');
-				vm.similarity = updateSimilarity(response.data)			   
+				vm.raw.similarity = response.data
+				vm.similarity = updateSimilarity()			   
 				vm.loaded.similarity = true
 				drawGraph()
 			})
@@ -92,8 +100,11 @@
 			// build the dictionary if it does not exist yet
 			if (filtering) {
 				var selectedValue = vm.selected.filters[vm.filter.field]
-				vm.filter.displayType = ( vm.filter.lookup.length > 3 ? 'checkbox' : 'list' )
+				vm.filter.displayType = ( (vm.filter.lookup.length > 5) || (vm.filter.type == 'multi') ? 'checkbox' : 'list' )
 				if (vm.filter.displayType == 'checkbox') $.each(checkboxDisplayCategories, function(i, cat) {vm.scatter.data.push({ key: cat, values: [] })})
+				if (vm.filter.displayType == 'list') $.each(vm.filter.lookup, function(i, cat) {
+					$.each(cat, function(key, label) { vm.scatter.data.push({ key: key, values: [] }) })
+				})
 				if (!('dictionary' in vm.filter)) {
 					vm.filter.dictionary = { NA: { key: 'NA', label: 'NA', index: 0 } }
 					$.each(vm.filter.lookup, function(i, obj) {
@@ -110,16 +121,20 @@
 					})
 				}
 			}
-			$.each(vm.raw, function(type, list) {
+			// process the data
+			$.each(vm.raw.scatter, function(type, list) {
 				var thisType = vm.legend.type[type]
 				var typeIndex = thisType.index
 				var typeShape = ( (type == 'SELECTED') ? vm.selected.nodeShape : vm.symbols[typeIndex] )
+				if (type == 'SELECTED') vm.selected.nodeColor = vm.colors[1+typeIndex]
 				if (!filtering) {
 					vm.scatter.data.push({ key: type, values: [] })
 					if (type != 'SELECTED') vm.symbolLegend[typeShape].color = vm.colors[1+typeIndex]
+					if (type != 'SELECTED') vm.symbolLegend[typeShape].light = vm.lights[1+typeIndex]
 				}
 				if (thisType.checked) $.each(list, function(i, value) {
 					var ind = ( filtering ? getOptionIndex(value) : 1+typeIndex )
+					
 					vm.scatter.data[( vm.scatter.data[ind] ? ind : 0 )].values.push({
 						label: value.info.Q1_3,
 						size: typeSize(type),
@@ -133,7 +148,8 @@
 			});
 		}
 		
-		var updateSimilarity = function(data) {
+		var updateSimilarity = function() {
+			var data = vm.raw.similarity
 			var dict = {};
 			var uniqEdges = [];
 			for (var i = 0; i < data.edges.length; i++) {
@@ -143,12 +159,20 @@
 				}
 			}
 			for (var i = 0; i < data.nodes.length; i++) {
-				var thisType = typeSymbol(data.nodes[i].node_type)
-				data.nodes[i].type = thisType
-				data.nodes[i].color = vm.symbolLegend[thisType].color
-				// data.nodes[i].borderColor = "red"
-				data.nodes[i].label = data.nodes[i].extra_data.Q1_1
-				data.nodes[i].size = data.nodes[i].deg
+				var thisSymbol = typeSymbol(data.nodes[i].node_type)
+				var d = data.nodes[i].deg
+				data.nodes[i].type = thisSymbol
+				data.nodes[i].color = ( (data.nodes[i].node_type == 'SELECTED') ? '#000000' : vm.symbolLegend[thisSymbol].light)
+				data.nodes[i].borderColor = ( (data.nodes[i].node_type == 'SELECTED') ? '#000000' : vm.symbolLegend[thisSymbol].color)
+				data.nodes[i].label = data.nodes[i].extra_data.Q1_4
+				data.nodes[i].size = ( (data.nodes[i].node_type == 'SELECTED') ? 1 : d*d*d)
+				data.nodes[i].hidden = !vm.legend.type[data.nodes[i].node_type].checked
+				if (vm.filter.field != 'none') {
+					var ind = getOptionIndex(data.nodes[i].extra_data)
+					if (ind == false) ind = 0
+					data.nodes[i].color = vm.lights[ind]
+					data.nodes[i].borderColor = vm.colors[ind]
+				}
 			}
 			return {nodes: data.nodes, edges: uniqEdges}
 		}
@@ -158,7 +182,7 @@
 		
 		// Determine the index of a group a value should go into
 		var getOptionIndex = function(value) {
-			var option = value.filters[vm.filter.field]
+			var option = ( (value.filters) ? value.filters[vm.filter.field] : value[vm.filter.field] )
 			if (!option) return false
 			if (vm.filter.displayType == 'checkbox') {
 				var options = []
@@ -176,7 +200,7 @@
 		
 		var dataLengths = function() {
 			var sum = 0
-			$.each(vm.raw, function(key, list) {
+			$.each(vm.raw.scatter, function(key, list) {
 				// console.log(key + ': ' + list.length)
 				sum += list.length
 			})
@@ -209,6 +233,7 @@
 				});
 			}
 			if (vm.active == 'similarity') {
+				$('#similarityplot').empty()
 				var similarity = new sigma({
 					graph: vm.similarity,
 					renderer: { container: document.getElementById('similarityplot'), type: 'canvas' },
