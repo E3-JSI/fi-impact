@@ -9,6 +9,8 @@ header .intro-text {
 	}
 }
 
+.projectInfo td { padding: 1px 10px;}
+
 .vspace { padding: 1em 0; }
 .fi-switch { padding-left: 2em; }
 .fi-selected { font-size: 2em; }

@@ -5,13 +5,13 @@
 
 (function () {
 	'use strict';
-	angular.module('fiBenchmarkApp').controller('fiGraphs', ['$scope', 'getData', function($scope, getData) {
+	angular.module('fiBenchmarkApp').controller('fiGraphs', ['$uibModal', 'getData', function($uibModal, getData) {
 	
 		var vm = this;
 		
 		vm.id = location.search.split('id=')[1]
 		vm.active = 'scatter'
-		vm.loaded = { 'scatter': false, 'similarity': false }
+		vm.loaded = { scatter: false, similarity: false }
 		vm.legend = {}
 		vm.raw = { scatter: {}, similarity: {} }
 		vm.similarity = {}
@@ -45,11 +45,19 @@
 			if (vm.active == 'scatter') updateScatter()
 			else vm.similarity = updateSimilarity()
 			drawGraph()
+		}	
+		vm.open = function(project) {
+			var modalInstance = $uibModal.open({
+				backdrop: 'static',
+				templateUrl: '../../ui/user/modal.html',
+				controller: 'projectCtrl as vm',
+				resolve: { projectId: function () { return project; } }
+			});
 		}
-		
+
 		var checkboxDisplayCategories = ['checked', 'unchecked']
 		
-		getData.async('plot-legend', function(response) {
+		getData.async('plot-legend', vm.id, function(response) {
 			vm.legend = response.data
 			vm.legend.selections.unshift({
 				field: 'none',
@@ -64,7 +72,7 @@
 			vm.legend.type = {}
 			vm.scatter.slice = vm.legend.slices[0]
 			
-			getData.async('plot', function(response) {
+			getData.async('plot', vm.id, function(response) {
 				var order =  []
 				$.each(response.data.surveys, function(type, list) { order.push( {type: type, list: list} ) })
 				order.sort(function(a, b) {return b.list.length - a.list.length})
@@ -79,7 +87,7 @@
 				drawGraph()
 			})
 			
-			getData.async('q-get-graph', function(response) {
+			getData.async('q-get-graph', vm.id, function(response) {
 				sigma.utils.pkg('sigma.canvas.nodes');
 				vm.raw.similarity = response.data
 				vm.similarity = updateSimilarity()			   
@@ -134,7 +142,6 @@
 				}
 				if (thisType.checked) $.each(list, function(i, value) {
 					var ind = ( filtering ? getOptionIndex(value) : 1+typeIndex )
-					
 					vm.scatter.data[( vm.scatter.data[ind] ? ind : 0 )].values.push({
 						label: value.info.Q1_3,
 						size: typeSize(type),
@@ -142,7 +149,8 @@
 						indicatorX: Math.round(value.KPI[vm.scatter.slice.abscissa.field]*100)/100,
 						indicatorY: Math.round(value.KPI[vm.scatter.slice.ordinate.field]*100)/100,
 						x: Math.round(value.KPI[vm.scatter.slice.abscissa.field]*100)/100,
-						y: Math.round(value.KPI[vm.scatter.slice.ordinate.field]*100)/100
+						y: Math.round(value.KPI[vm.scatter.slice.ordinate.field]*100)/100,
+						id: value.info.id
 					})
 				})
 			});
@@ -227,6 +235,7 @@
 					chart.xAxis.tickFormat(d3.format('.02f')).axisLabel(vm.scatter.slice.abscissa.label)
 					chart.yAxis.tickFormat(d3.format('.02f')).axisLabel(vm.scatter.slice.ordinate.label)
 					chart.tooltip.contentGenerator(fiContentGenerator)
+					chart.scatter.dispatch.on('elementClick', function(e){ vm.open(e.point.id); });
 					d3.select('#scatterplot svg').datum(vm.scatter.data).call(chart);
 					nv.utils.windowResize(chart.update);
 					return chart;
@@ -296,10 +305,22 @@
 
 (function () {
 	'use strict';
+	angular.module('fiBenchmarkApp').controller('projectCtrl', ['$uibModalInstance', 'getData', 'projectId', function ($uibModalInstance, getData, projectId) {	
+		var vm = this
+		vm.title = projectId
+		getData.async('profile', projectId, function(response) {
+			vm.data = response.data.answers
+			console.log(vm.data)
+		})
+		vm.cancel = function () { $uibModalInstance.dismiss('cancel'); };
+	}]);
+}());
+
+(function () {
+	'use strict';
 	angular.module('fiBenchmarkApp').service('getData', ['$http', '$q',  function ($http, $q) {
-		var id = location.search.split('id=')[1]
 		return {
-			async: function(type, postprocess) {
+			async: function(type, id, postprocess) {
 				var url = '../../service?action=' + type + ( (type != 'legend') ? '&id='+id : '' )
 				$http.get(url).then(postprocess)
 			}
