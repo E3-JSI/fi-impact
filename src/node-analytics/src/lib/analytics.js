@@ -66,13 +66,61 @@ exports.buildEgoGraph = function(rec, mat, mat1, prj, graph) {
             var node = graph.nodes[i];
             graph1.nodes.push(node);
 	    if (dict[graph.nodes[i].idx] > 0.1) {
-                graph1.edges.push({"n1":egoNode.id,"n2":graph.nodes[i].id, "n1x": egoNode.idx, "n2x":graph.nodes[i].idx, "distance": dict[graph.nodes[i].idx]});
+                graph1.edges.push({"source":egoNode.id,"target":graph.nodes[i].id, "id":egoNode.id+"_"+graph.nodes[i].id, "id1x": egoNode.idx, "id2x":graph.nodes[i].idx, "distance": dict[graph.nodes[i].idx]});
 	    }
 	}
     }
 
     for (var i=0; i<graph.edges.length; i++) {
-        if (dict[graph.edges[i].n1x] > 0.01 && dict[graph.edges[i].n2x] > 0.01){
+        if (dict[graph.edges[i].sourcex] > 0.01 && dict[graph.edges[i].targetx] > 0.01){
+            graph1.edges.push(graph.edges[i]);
+        }
+    }
+
+    return graph1;
+}
+
+exports.buildEgoGraphNewRec = function(rec, dat, mat, mat1, prj, graph) {
+    
+    dict = {};
+	
+    for (var i=0; i<mat.length; i++) {
+        dict[prj[i].id_internal] = this.cosine(mat[i], mat1);
+    }
+
+    var graph1 = {};
+    graph1.nodes = [];
+    graph1.edges = [];
+
+    var newNode = true;
+    var egoNode;
+
+    for (var i=0; i<graph.nodes.length; i++) {
+        if (rec.id_internal == graph.nodes[i].idx) {
+            newNode = false;
+			graph.nodes[i].ego = 1;
+            egoNode = graph.nodes[i];
+        }
+    }
+
+    if (newNode) {
+        egoNode = {"id": graph.nodes.length, "idx": rec.id_internal, "x":0, "y":0, "deg": 0, "extra_data": dat};
+        graph1.nodes.push(egoNode);
+    }
+
+    for (var i=0; i<graph.nodes.length; i++) {
+        if (dict[graph.nodes[i].idx] > 0.01) {
+            var node = graph.nodes[i];
+            graph1.nodes.push(node);
+			if (dict[graph.nodes[i].idx] > 0.1) {
+                graph1.edges.push({"source":egoNode.id,"target":graph.nodes[i].id, "id":egoNode.id+"_"+graph.nodes[i].id, "id1x": egoNode.idx, "id2x":graph.nodes[i].idx, "distance": dict[graph.nodes[i].idx]});
+	            egoNode.deg += 1;
+			}
+		}
+    }
+
+    for (var i=0; i<graph.edges.length; i++) {
+        if (dict[graph.edges[i].sourcex] > 0.01 && dict[graph.edges[i].targetx] > 0.01){
             graph1.edges.push(graph.edges[i]);
         }
     }
@@ -89,20 +137,20 @@ exports.buildGraph = function(mat2d, triangles, prj) {
     // build edges json array
     var edges = [];
     for (var i=0; i<triangles.length; i++) {
-        edges.push({"n1": triangles[i][0], "n2": triangles[i][1]});
-        edges.push({"n1": triangles[i][0], "n2": triangles[i][2]});
-        edges.push({"n1": triangles[i][1], "n2": triangles[i][2]});
+        edges.push({"source": triangles[i][0], "target": triangles[i][1], "id": triangles[i][0]+"_"+triangles[i][1]});
+        edges.push({"source": triangles[i][0], "target": triangles[i][2], "id": triangles[i][0]+"_"+triangles[i][2]});
+        edges.push({"source": triangles[i][1], "target": triangles[i][2], "id": triangles[i][1]+"_"+triangles[i][2]});
     }
 
     // enrych edges qith distances and ids
     for (var i=0; i<edges.length; i++) {
         // set edge weight as euclidean distance
-        edges[i].distance = this.euclidean(mat2d[edges[i].n1], mat2d[edges[i].n2]);
+        edges[i].distance = this.euclidean(mat2d[edges[i].source], mat2d[edges[i].target]);
         // get node ids
-        edges[i].n1x = prj[edges[i].n1].id_internal;
-        edges[i].n2x = prj[edges[i].n2].id_internal;
-        nodes[edges[i].n1].deg = nodes[edges[i].n1].deg + 1;
-        nodes[edges[i].n2].deg = nodes[edges[i].n2].deg + 1; 
+        edges[i].sourcex = prj[edges[i].source].id_internal;
+        edges[i].targetx = prj[edges[i].target].id_internal;
+        nodes[edges[i].source].deg = nodes[edges[i].source].deg + 1;
+        nodes[edges[i].target].deg = nodes[edges[i].target].deg + 1; 
     }
     return {"nodes": nodes, "edges": edges};
 }

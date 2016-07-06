@@ -26,6 +26,66 @@ app.post('/post_data', function(req, res) {
 	status.push({'time':new Date().toString(), "status":'posted data stored', 'ms': new Date().getTime()});
 	res.send({"status":"done"});
 });
+
+app.post('/send_record', function(req, res) {
+    var data = req.body;
+	console.log({'time':new Date().toString(), "status":'sending new record', 'ms': new Date().getTime()});
+	status.push({'time':new Date().toString(), "status":'sending new record', 'ms': new Date().getTime()});
+	
+	var inputId = data.id_internal;
+		
+	var files = qdata.getAllFilesFromFolder("../output/");
+	var cashed = false;
+	for (var i=0; i<files.length; i++) {
+	    var arr = files[i].split('custom_graph_');
+		if (arr.length > 0) {
+		    if (arr[1] == inputId+".json") {
+			    var graph = JSON.parse(fs.readFileSync('../output/custom_graph_'+arr[1], 'utf8'));
+				console.log({'time':new Date().toString(), "status":'similarity graph for id '+req.params.n + ' computed', 'ms': new Date().getTime()});
+	            status.push({'time':new Date().toString(), "status":'similarity graph for id '+req.params.n + ' computed', 'ms': new Date().getTime()});
+			    cashed = true;
+				res.send(graph);
+			}
+		}
+	}
+	
+	if (!cashed) {
+		var rec = null;
+		var recset = qminer.prj.allRecords;
+		for (var i=0; i<recset.length; i++) {
+			if (recset[i].id_internal == inputId) {
+				rec = recset[i];
+			}
+		}
+		if (rec) {
+			var graph = qminer.customGraph(rec);
+			fs.writeFile("../output/custom_graph_"+inputId+".json", JSON.stringify(graph), function(err) {
+				if (err) {
+					return console.log(err);
+				}
+				console.log("The file was saved!");
+			});
+			console.log({'time':new Date().toString(), "status":'similarity graph for id '+req.params.n + ' computed', 'ms': new Date().getTime()});
+			status.push({'time':new Date().toString(), "status":'similarity graph for id '+req.params.n + ' computed', 'ms': new Date().getTime()});
+			res.send(graph);
+		}
+		else {
+		    // new record
+		    rec = data;
+			console.log("send rec "+rec);
+			var graph = qminer.sendRecord(rec);
+			fs.writeFile("../output/custom_graph_"+inputId+".json", JSON.stringify(graph), function(err) {
+				if (err) {
+					return console.log(err);
+				}
+				console.log("The file was saved!");
+			});
+			console.log({'time':new Date().toString(), "status":'similarity graph for id '+ inputId + ' computed', 'ms': new Date().getTime()});
+			status.push({'time':new Date().toString(), "status":'similarity graph for id '+ inputId + ' computed', 'ms': new Date().getTime()});
+			res.send(graph);
+		}
+	}
+});
  
 app.get('/', function (req, res) {
     res.send('Hello World')
@@ -59,6 +119,13 @@ app.get('/main_graph_async', function (req, res) {
     console.log({'time':new Date().toString(), "status":'computing main similarity graph', 'ms': new Date().getTime()});
 	status.push({'time':new Date().toString(), "status":'computing main similarity graph', 'ms': new Date().getTime()});
     qminer.mainGraphAsync();
+	res.send({"status":'started computing main graph'});
+});
+
+app.get('/main_graph_full', function (req, res) {
+    console.log({'time':new Date().toString(), "status":'computing main similarity graph', 'ms': new Date().getTime()});
+	status.push({'time':new Date().toString(), "status":'computing main similarity graph', 'ms': new Date().getTime()});
+	qminer.mainGraph2();
 	res.send({"status":'started computing main graph'});
 });
 
@@ -120,7 +187,7 @@ app.get('/custom_graph/:n', function (req, res) {
 			res.send(graph);
 		}
 		else {
-			res.send({"status":"no project with id "+inputId});
+			res.status(404).send('Not found');
 		}
 	}
 });

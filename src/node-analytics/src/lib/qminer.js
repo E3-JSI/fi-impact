@@ -43,6 +43,10 @@ exports.fillPrjStore = function(data) {
     this.ftr.updateRecords(prj.allRecords);
 }
 
+exports.processRecord = function(data) {
+    console.log(data);
+}
+
 exports.fillPrjStoreFromFile = function() {
     var prj = this.prj;
     // push data to store
@@ -64,6 +68,14 @@ exports.fillPrjStoreFromFile = function() {
         prj.push({"id_internal": data.projects[i].id_internal, "desc": data.projects[i].full_text+" ", "succ": succ});
     }
     this.ftr.updateRecords(prj.allRecords);
+}
+
+exports.sendRecord = function(dat) {
+    var rec = {"id_internal": dat.id_internal, "desc": dat.full_text, "succ": dat.node_type};
+	var mat = exports.ftr.extractMatrix(exports.prj.allRecords).transpose().toArray();
+	var vec = exports.ftr.extractVector(rec).toArray();
+    var analytics = require('./analytics.js'); 
+    return analytics.buildEgoGraphNewRec(rec, dat, mat, vec, this.data.projects, analytics.graph);
 }
 
 exports.close = function() {
@@ -97,7 +109,6 @@ exports.customGraph = function(rec) {
     return analytics.buildEgoGraph(rec, mat, vec, this.data.projects, analytics.graph);
 }
 
-
 exports.mainGraph = function() {
     // get matrix
     var mat = exports.ftr.extractMatrix(exports.prj.allRecords);
@@ -111,6 +122,29 @@ exports.mainGraph = function() {
     var graph = analytics.buildGraph(mat2d, triangles, this.data.projects);
     this.graph = graph;
     return graph;
+}
+
+exports.mainGraph2 = function() {
+	var analytics = require('./analytics.js');
+    var mat = exports.ftr.extractMatrix(exports.prj.allRecords);
+	var nodes = [];
+	var prj = this.data.projects;
+    console.log(prj.length+" rows "+ mat.rows+" cols "+mat.cols);
+    for( var i=0; i<mat.cols; i++) {
+        //console.log(prj[i].id_internal);
+      	nodes.push({ "x": Math.random(), "y": Math.random(), "id": i, "idx": prj[i].id_internal, "deg": 0, "node_type": prj[i].node_type, "extra_data": exports.data.extra_data[i]});
+    }
+	var edges = [];
+    for (var i=0; i<mat.cols; i++) {
+	    for (var j=i; j<mat.cols; j++) {
+		    var sim = analytics.cosine(mat.getCol(i).toArray(), mat.getCol(j).toArray());
+			if (sim > 0.04) {
+                console.log(i+" - "+j+": "+sim);
+			    edges.push({"source": nodes[i].id, "source": nodes[j].id});
+			}
+		}
+    }
+	this.graph = {"nodes": nodes, "edges": edges};
 }
 
 exports.mainGraphAsync = function() {

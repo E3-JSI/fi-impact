@@ -17,16 +17,35 @@
 					type: 'POST',
 					url: 'post_data',
 					data: data,
-					success: function(msg){
+					success: function(msg) {
 						alert('wow' + msg);
 					}
 				});
 				
 			});
 		}
+		
+		function testRecord() {
+			$.getJSON( "./data/record_data.json", function( data ) {
+			    console.log("data: "+data);
+				
+				$.ajax({
+					type: 'POST',
+					url: 'send_record',
+					data: data,
+					success: function(msg) {
+						$('body').append(JSON.stringify(msg));
+					}
+				});
+				
+			});
+		}
+		
+		
     </script>
 </head>
 <body>
     <div id="button" style="width:20px; height:100px;" onclick="javascript:testPost();">POST</div>
+	<div id="button" style="width:20px; height:100px;" onclick="javascript:testRecord();">ONE RECORD</div>
 </body>
 </html>
