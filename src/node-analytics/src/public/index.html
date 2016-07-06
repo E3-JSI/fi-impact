@@ -31,7 +31,7 @@
 				
 				$.ajax({
 					type: 'POST',
-					url: 'send_record',
+					url: 'custom_graph_full_record',
 					data: data,
 					success: function(msg) {
 						$('body').append(JSON.stringify(msg));

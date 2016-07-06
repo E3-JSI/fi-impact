@@ -27,7 +27,7 @@ app.post('/post_data', function(req, res) {
 	res.send({"status":"done"});
 });
 
-app.post('/send_record', function(req, res) {
+app.post('/custom_graph_full_record', function(req, res) {
     var data = req.body;
 	console.log({'time':new Date().toString(), "status":'sending new record', 'ms': new Date().getTime()});
 	status.push({'time':new Date().toString(), "status":'sending new record', 'ms': new Date().getTime()});
