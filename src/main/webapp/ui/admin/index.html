@@ -32,11 +32,11 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
   </head>
-  
+
   <body role="document" ng-controller="fiProjects as vm" ng-cloak>
-  
+
     <div class="container theme-showcase" role="main">
-		
+
 		<div  style="height: 160px;"><img src="../../css/fi-impact.png"></div>
 		 <!-- background: top left url('css/fi-impact.png') no-repeat; -->
     	<div class="jumbotron">
@@ -45,7 +45,7 @@
 				<i class="fa fa-user" aria-hidden="true"></i> {{profile.user}} <span ng-if="profile.accelerator.length > 0"><i class="fa fa-building-o" aria-hidden="true"></i> {{profile.accelerator}}</span>
 				<div class="btn-group" role="group" style="margin-left: 10px">
 					<button id="btnUpload" type="button" class="btn" ng-class="{'btn-primary': access('upload'), 'btn-secondary': !access('upload')}" ng-disabled="!access('upload')" ng-click="vm.open('upload')">Upload</button>
-					
+
 					<div class="btn-group" uib-dropdown is-open="status.isopen">
 						<a class="btn" ng-class="{'btn-primary': access('export'), 'btn-secondary': !access('export')}" ng-disabled="!access('export')" href="../../manager?action=export&type=short">Export</a>
 						<button id="export-dropdown" type="button" class="btn btn-primary dropdown-toggle" uib-dropdown-toggle on-toggle="toggled(open)" ng-class="{'btn-primary': access('export'), 'btn-secondary': !access('export')}" ng-disabled="!access('export')">
@@ -64,23 +64,24 @@
 				</div>
 				<a id="btnUsers" type="button" class="btn" ng-class="{'btn-primary': access('user-management'), 'btn-secondary': !access('user-management')}" ng-disabled="!access('user-management')" href="users.html">Manage users</a>
 				<div class="btn-group" role="group" style="margin-left: 10px">
-					<button id="btnUpload" data-toggle="modal" data-target="#pwdModal" type="button" class="btn btn-primary" ng-click="vm.open('password')">Change password</button>
+					<button id="btnPwd" data-toggle="modal" data-target="#pwdModal" type="button" class="btn btn-primary" ng-click="vm.open('password')">Change password</button>
+					<a class="btn btn-primary" target="_blank" href="https://github.com/JozefStefanInstitute/fi-impact/wiki/Overview%20list"><i class="fa fa-question" aria-hidden="true"></i></a>
 					<a class="btn btn-primary" href="../../logout.jsp">Logout</a>
 				</div>
 			</div>
 		</div>
-		
+
         <table id="listing" class="table table-striped">
 			<thead><tr><th>Project</th><th>Feasibility</th><th>Innovation</th><th>Market</th><th>Market Needs</th><th>Mattermark Growth</th>
-				<th>Accelerator</th><th>Organisation</th><th>Country</th></tr></thead> 
+				<th>Accelerator</th><th>Organisation</th><th>Country</th></tr></thead>
             <tbody><tr ng-repeat="s in surveys"><td><a href="../../ui/user/report.html?id={{s.id_internal}}">{{s.Q1_4}}</a>
 				<div ng-bind-html="s.lineChart | sanitize"></div></td>
 				<td class="textRight">{{s.feasibility}}%</td><td class="textRight">{{s.innovation}}%</td><td class="textRight">{{s.market}}%</td><td class="textRight">{{s.business}}%</td>
 				<td class="textRight">{{s.mattermark}}%</td>
 				<td>{{s.Q1_1}}</td><td>{{s.Q1_3}}</td><td>{{s.Q1_2}}</td></tr></tbody>
         </table>
-		
-		<!-- pager --> 
+
+		<!-- pager -->
 		<div class="pager">
 			<i class="first fa fa-angle-double-left"></i>	<i class="prev fa fa-angle-left"></i>
 			<span class="pagedisplay"></span> <!-- this can be any element, including an input -->
@@ -94,7 +95,7 @@
 			<a href="http://www.iimg.com" target="_blank"><img style="margin-left: 10px; margin-right: 10px;" src="../../css/iimc.gif" alt="" width="138" height="36" /></a>
 			<img style="margin-left: 10px; margin-right: 10px;" src="../../css/SFC_2.jpg" alt="" width="150" height="50" />
 			<a href="http://ailab.ijs.si/" target="_blank"><img style="margin-left: 10px; margin-right: 0px;" src="../../css/jsi_logo_2.png" alt="" width="150" height="43" /></a></p>
-	  
+
     </div>
 
     <!-- Core JavaScript -->
@@ -104,8 +105,8 @@
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="../../js/ie10-viewport-bug-workaround.js"></script>
 	<!-- Optional includes -->
-	<script type="text/javascript" src="../../js/jquery.min.js"></script> 
-	<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script> 
+	<script type="text/javascript" src="../../js/jquery.min.js"></script>
+	<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="../../js/jquery.tablesorter.pager.min.js"></script>
 	<script type="text/javascript" src="../../js/d3.min.js"></script>
 	<!-- FI-Impact JavaScript -->

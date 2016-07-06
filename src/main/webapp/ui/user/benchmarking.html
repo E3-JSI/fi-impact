@@ -3,14 +3,14 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	
+
 	<meta name="description" content="">
 	<meta name="author" content="JSI">
 	<link rel="shortcut icon" href="../../img/favicon.ico" type="image/x-icon">
 	<link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
 
     <title>FI-Impact Report</title>
-		
+
     <!-- Bootstrap Core CSS -->
     <link href="../../css/bootstrap.min.css" rel="stylesheet" type="text/css">
 	<!-- Optional includes -->
@@ -37,6 +37,13 @@
                 </button>
                 <a class="navbar-brand page-scroll" href="#page-top">FI-IMPACT Benchmarking</a> <a class="navbar-brand page-scroll fi-switch" ng-href="report.html?id={{vm.id}}"><i class="fa fa-arrow-right fa-sm" aria-hidden="true"></i> Report</a>
             </div>
+
+						<!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+									<li><a class="page-scroll" target="_blank" href="https://github.com/JozefStefanInstitute/fi-impact/wiki/Advanced%20Benchmarking%20Report"><i class="fa fa-question" aria-hidden="true"></i></a></li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
     </nav>
 
@@ -46,8 +53,8 @@
 			<div class="col-md-3">
 				<p><strong>Selected project</strong></p>
 				<span class="symbol fi-selected" ng-style="{'color': vm.selected.nodeColor}" ng-bind-html="vm.symbolLegend[vm.selected.nodeShape].code"></span> {{vm.selected.info.Q1_4}}
-					
-			</div>	
+
+			</div>
 			<div class="col-md-3">
 				<p><strong>Performance level</strong></p>
 				<div class="checkbox" ng-repeat="(type, object) in vm.legend.type" ng-hide="type == 'SELECTED'">
@@ -101,7 +108,7 @@
 			</div>
 		</div>
 	</div></section>
-	
+
     <!-- Partners -->
 	<aside class="clients"><div class="container"><hr id="partners"><div class="row">
 		<div class="col-md-2 col-sm-6"><a href="http://idcitalia.com/ita/" target="_blank"><img style="margin-left: 0px; margin-right: 10px;" src="../../css/IDC_logo_4.png" alt="" width="120" height="57" /></a></div>
