@@ -4,7 +4,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.*;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,18 +19,19 @@ import si.ijs.ailab.fiimpact.settings.FIImpactSettings;
  */
 public class FIImpactRequestHandler extends HttpServlet
 {
-  final static Logger logger = LogManager.getLogger(FIImpactRequestHandler.class.getName());
-  PDFManager pdfManager;
+  private final static Logger logger = LogManager.getLogger(FIImpactRequestHandler.class.getName());
+  private PDFManager pdfManager;
 
 
   @Override
   public void init(ServletConfig config) throws ServletException
   {
     FIImpactSettings.createSettings(config.getServletContext());
-    pdfManager = pdfManager.getPDFManager(config.getServletContext().getRealPath("/"));
+    pdfManager = PDFManager.getPDFManager(config.getServletContext().getRealPath("/"));
   }
 
   private static Set<String> ALLOWED_ACTIONS;
+  static
   {
     ALLOWED_ACTIONS = new HashSet<>();
     ALLOWED_ACTIONS.add("add");
@@ -43,6 +43,7 @@ public class FIImpactRequestHandler extends HttpServlet
     ALLOWED_ACTIONS.add("allpdf");
     ALLOWED_ACTIONS.add("plot");
     ALLOWED_ACTIONS.add("plot-legend");
+    ALLOWED_ACTIONS.add("profile");
     ALLOWED_ACTIONS.add(QMinerManager.ACTION_GET_GRAPH);
 
   }
@@ -64,15 +65,7 @@ public class FIImpactRequestHandler extends HttpServlet
       if(arrQuestions[i] != null)
         arrQuestions[i] = new String(arrQuestions[i].getBytes("iso-8859-1"), "UTF-8");
 
-    String[] arrSelections = request.getParameterValues("s");
-    if(arrSelections == null)
-      arrSelections = new String[0];
-    for(int i = 0; i < arrSelections.length; i++)
-      if(arrSelections[i] != null)
-        arrSelections[i] = new String(arrSelections[i].getBytes("iso-8859-1"), "UTF-8");
-
-
-    logger.info("Received request: action={} for {} with {} questions and {} selections", sAction, sId, arrQuestions.length, arrSelections.length);
+    logger.info("Received request: action={} for {} with {} questions", sAction, sId, arrQuestions.length);
     if (sAction == null || sAction.equals(""))
       setBadRequest(response, "Parameter 'action' not defined.");
     else if (!ALLOWED_ACTIONS.contains(sAction))
@@ -135,6 +128,19 @@ public class FIImpactRequestHandler extends HttpServlet
       }
 
     }
+    else if(sAction.equals("profile"))
+    {
+      if (sId == null || sId.equals(""))
+        setBadRequest(response, "Parameter 'id' not defined.");
+      else
+      {
+        //id is internal
+        response.setContentType("application/json");
+        response.setCharacterEncoding("utf-8");
+        FIImpactSettings.getFiImpactSettings().getSurveyManager().getJSONProjectProfile(response.getOutputStream(), sId);
+      }
+
+    }
     else if(sAction.equals("resultsxml"))
     {
       if (sId == null || sId.equals(""))
@@ -166,12 +172,7 @@ public class FIImpactRequestHandler extends HttpServlet
       response.setContentType("application/json");
       response.setCharacterEncoding("utf-8");
 
-      /*if(arrSelections.length == 0)
-      {
-        logger.info("default to standard plot selections");
-        arrSelections = new String[] {"Q1_1", "Q1_2"};
-      }*/
-      FIImpactSettings.getFiImpactSettings().getSurveyManager().listFilter(response.getOutputStream(), arrQuestions, arrSelections, sId);
+      FIImpactSettings.getFiImpactSettings().getSurveyManager().getPlotJSON(response.getOutputStream(), sId);
     }
     else if(sAction.equals(QMinerManager.ACTION_GET_GRAPH))
     {

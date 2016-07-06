@@ -887,6 +887,126 @@ public class SurveyData
     logger.info("Saved survey {}/{} with {} questions and {} results", externalId, id, questions.size(), results.size());
   }
 
+  public void writeProfileUI(OutputStream os) throws IOException
+  {
+
+    JSONObject jsonProfile = new JSONObject();
+    jsonProfile.put("id", id);
+    jsonProfile.put("external_id", externalId);
+    SimpleDateFormat format = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
+
+    Date curDate = new Date();
+    jsonProfile.put("timestamp_report_display", format.format(curDate));
+
+
+    JSONObject answersOut = new JSONObject();
+    jsonProfile.put("answers", answersOut);
+
+    JSONArray questionsDef = FIImpactSettings.getFiImpactSettings().getFiImpactModel().getJSONArray("profile");
+    profileUIQuestions(answersOut, questionsDef);
+
+
+    OutputStreamWriter w = new OutputStreamWriter(os, "utf-8");
+    jsonProfile.write(w);
+    w.flush();
+    w.close();
+    logger.info("Got survey profile {}/{} with {} questions and {} results", externalId, id, questions.size(), results.size());
+  }
+
+  private void profileUIQuestions(JSONObject answersOut, JSONArray questionsDef)
+  {
+    for(int j = 0; j < questionsDef.length(); j++)
+    {
+      JSONObject questionDef = questionsDef.getJSONObject(j);
+      String questionID = questionDef.optString("id");
+      String sLabel = questionDef.optString("label", null);
+      JSONArray tableDef = questionDef.optJSONArray("table");
+      logger.debug("Profile filed {}", questionID);
+      if(tableDef != null)
+      {
+        logger.debug("Profile table begin {}", questionID);
+        JSONObject table = new JSONObject();
+        answersOut.put(questionID, table);
+        if(sLabel != null)
+          table.put("label", sLabel);
+        profileUIQuestions(table, tableDef);
+        logger.debug("Profile table done {}", questionID);
+      }
+      else
+      {
+        String defaultAnswer = questionDef.optString("default", null);
+
+        StringBuilder sbAnswer = new StringBuilder();
+        IOListField ioListField = FIImpactSettings.getFiImpactSettings().getAllFields().get(questionID);
+        String sValue = null;
+        if(!ioListField.getListId().equals(FIImpactSettings.LIST_SURVEYS))
+        {
+          ProjectData pd = getProject();
+          if(pd != null)
+          {
+            if(ioListField.getListId().equals(FIImpactSettings.LIST_PROJECTS))
+              sValue = pd.getValue(questionID);
+            else if(ioListField.getListId().equals(FIImpactSettings.LIST_MATTERMARK))
+              sValue = pd.getMattermarkValue(questionID);
+          }
+        }
+        else
+          sValue = questions.get(questionID);
+
+        if(sValue == null || sValue.equals(""))
+          if(defaultAnswer != null)
+            sValue = defaultAnswer;
+          else
+            sValue = "";
+
+        if(ioListField.getType().equals(FIImpactSettings.FIELD_TYPE_LOOKUP) || ioListField.getType().equals(FIImpactSettings.FIELD_TYPE_MULTI))
+        {
+          logger.debug("Solve lookup {} for with {} values in lookup", sValue, ioListField.getLookup().size());
+          if(!sValue.equals(""))
+          {
+            String[] sArr = sValue.split(",");
+            for(String sSegmentID : sArr)
+            {
+              sSegmentID = sSegmentID.trim();
+              String sSegment = ioListField.getLookup().get(sSegmentID);
+              if(sSegment == null)
+                sSegment = "";
+              if(!sSegment.equals(""))
+              {
+                if(sbAnswer.length() != 0)
+                  sbAnswer.append(", ").append(sSegment);
+                else
+                  sbAnswer.append(sSegment);
+              }
+            }
+          }
+        }
+        else
+        {
+          logger.debug("Solve as text: {}", sValue);
+          if(!sValue.equals(""))
+          {
+            sbAnswer.append(sValue);
+          }
+        }
+
+        if(sbAnswer.length() != 0)
+        {
+          String sAnswer = truncateDecimals(questionID, sbAnswer.toString());
+          if(!sAnswer.equals(""))
+          {
+            JSONObject answer = new JSONObject();
+            answersOut.put(questionID, answer);
+            answer.put("value", sAnswer);
+            if(sLabel != null)
+              answer.put("label", sLabel);
+          }
+        }
+      }
+    }
+
+  }
+
   private String truncateDecimals(String id, String sAnswer)
   {
     if (FIImpactSettings.JSON_TRUNCATE_DECIMALS.contains(id))
@@ -1097,6 +1217,7 @@ public class SurveyData
   {
     results.clear();
     resultDerivatives.clear();
+    int scoringVersion = getScoringVersion();
     //logger.debug("Calculate results for {}", id);
 
     //------------INNOVATION--------------------
@@ -1110,22 +1231,37 @@ public class SurveyData
 
     if(Q2_1 != null && Q2_2 != null && Q2_3 != null && Q2_4 != null && Q2_5 != null)
     {
-      Double A2_1 = FIImpactSettings.SCORES.get("Q2_1").get(Q2_1);
-      Double A2_2 = FIImpactSettings.SCORES.get("Q2_2").get(Q2_2);
-      Double A2_3 = FIImpactSettings.SCORES.get("Q2_3").get(Q2_3);
-      Double A2_4 = FIImpactSettings.SCORES.get("Q2_4").get(Q2_4);
-      Double A2_5 = FIImpactSettings.SCORES.get("Q2_5").get(Q2_5);
+      Double A2_1 = FIImpactSettings.SCORES_V2.get("Q2_1").get(Q2_1);
+      Double A2_2;
+      if(scoringVersion < 3)
+        A2_2 = FIImpactSettings.SCORES_V2.get("Q2_2").get(Q2_2);
+      else
+        A2_2 = FIImpactSettings.SCORES_V3.get("Q2_2").get(Q2_2);
 
-      //logger.debug("A2_X: {}, {}, {}, {}, {}", A2_1, A2_2, A2_3, A2_4, A2_5);
+      Double A2_3 = FIImpactSettings.SCORES_V2.get("Q2_3").get(Q2_3);
+      Double A2_4 = FIImpactSettings.SCORES_V2.get("Q2_4").get(Q2_4);
+      Double A2_5 = FIImpactSettings.SCORES_V2.get("Q2_5").get(Q2_5);
 
-      if(A2_1 != null && A2_2 != null && A2_3 != null && A2_4 != null && A2_5 != null)
+      if(scoringVersion < 3)
       {
-        Double r = A2_1 * A2_3 + A2_2 + A2_4 + A2_5;
-        //normalise
-        r = (r - 3.75) * 5.0 / 1.55;
-        //logger.debug("R2: {}", r);
-        results.put("INNOVATION", r);
+        if(A2_1 != null && A2_2 != null && A2_3 != null && A2_4 != null && A2_5 != null)
+        {
+          Double r = A2_1 * A2_3 + A2_2 + A2_4 + A2_5;
+          //normalise
+          r = (r - 3.75) * 5.0 / 1.55;
+          results.put("INNOVATION", r);
+        }
       }
+      else
+      {
+        if(A2_2 != null && A2_3 != null)
+        {
+          Double r = A2_2 * A2_3;
+          //normalise r=r
+          results.put("INNOVATION", r);
+        }
+      }
+
 
     }
 
@@ -1133,9 +1269,14 @@ public class SurveyData
     //------------MARKET--------------------
 
 
-    String Q3_5 = questions.get("Q3_7");
+    String Q3_5 = questions.get("Q3_5");
     String Q3_7 = questions.get("Q3_7");
-    String Q3_8 = questions.get("Q3_8");
+    String Q3_8;
+    if(scoringVersion < 3)
+      Q3_8 = questions.get("Q3_8");
+    else
+      Q3_8 = questions.get("Q3_8a");
+
     String Q3_9 = questions.get("Q3_9");
     String Q3_10 = questions.get("Q3_10");
     String Q3_11 = questions.get("Q3_11");
@@ -1145,22 +1286,20 @@ public class SurveyData
 
     if(Q3_5 != null && Q3_7 != null && Q3_8 != null && Q3_9 != null && Q3_10 != null && Q3_11 != null && Q2_2 != null)
     {
-
-
       //Market weights from Q2_2 and Q3_7
       //"Q2_2_A_3_7_W1"
       Double W1 = null;
       Double W2 = null;
 
       String keyQ2_2 = "Q2_2_" + Q2_2 + "_3_7_";
-      Map<String, Double> m = FIImpactSettings.SCORES.get(keyQ2_2 + "W1");
+      Map<String, Double> m = FIImpactSettings.SCORES_V2.get(keyQ2_2 + "W1");
 
       if(m != null)
       {
         W1 = m.get(Q3_7);
       }
 
-      m = FIImpactSettings.SCORES.get(keyQ2_2 + "W2");
+      m = FIImpactSettings.SCORES_V2.get(keyQ2_2 + "W2");
 
       if(m != null)
       {
@@ -1168,33 +1307,52 @@ public class SurveyData
       }
 
       String[] arr = Q3_5.split(",");
-      Double A3_5 = FIImpactSettings.SCORES.get("Q3_5").get("E");
+      Double A3_5 = FIImpactSettings.SCORES_V2.get("Q3_5").get("E");
       for(String s : arr)
       {
-        Double dTmp = FIImpactSettings.SCORES.get("Q3_5").get(s);
+        Double dTmp = FIImpactSettings.SCORES_V2.get("Q3_5").get(s);
         if(dTmp != null && dTmp > A3_5)
           A3_5 = dTmp;
       }
 
-      Double A3_8 = FIImpactSettings.SCORES.get("Q3_8").get(Q3_8);
-      Double A3_9 = FIImpactSettings.SCORES.get("Q3_9").get(Q3_9);
-      Double A3_10 = FIImpactSettings.SCORES.get("Q3_10").get(Q3_10);
-      Double A3_11 = FIImpactSettings.SCORES.get("Q3_11").get(Q3_11);
+      Double A3_8;
+      if(scoringVersion < 3)
+        A3_8 = FIImpactSettings.SCORES_V2.get("Q3_8").get(Q3_8);
+      else
+        A3_8 = FIImpactSettings.SCORES_V3.get("Q3_8a").get(Q3_8);
+
+      Double A3_9 = FIImpactSettings.SCORES_V2.get("Q3_9").get(Q3_9);
+      Double A3_10 = FIImpactSettings.SCORES_V2.get("Q3_10").get(Q3_10);
+      Double A3_11 = FIImpactSettings.SCORES_V2.get("Q3_11").get(Q3_11);
 
       if(A3_5 != null && A3_8 != null && A3_9 != null && A3_10 != null && A3_11 != null && W1 != null && W2 != null)
       {
-        //logger.debug("A3_X: 5: {}, 8: {}, 9: {}, 10: {}, 11: {}, W1: {}, W2: {}", A3_5, A3_8, A3_9, A3_10, A3_11, W1, W2);
+        if(scoringVersion < 3)
+        {
+          /*
+            --calc result --
+          @R3 = @W1*(@Q3_8+@Q3_9)/2 + @W2*(@Q3_10 +@Q3_11+Q3_5)/2.5
+          Range: 2 - 10
+          Normalisation to range 0 - 5: @R3N=(@R3-2)*5/8
+          */
+          Double r = W1 * (A3_8 + A3_9) / 2.0 + W2 * (A3_10 + A3_11 + A3_5) / 2.5;
+          r = (r - 2.0) * 5.0 / 8.0;
+          //logger.debug("R3: {}", r);
+          results.put("MARKET", r);
+        }
+        else
+        {
+          /*
+            v3: SCORE_MARKET = 0.7*S3_8+0.3*(W1*S3_9 + W2*(S3_10 +S3_11+S3_5)/3)
+            Range: 0,94...8,00
+            Normalisation to range 0 - 5: SCORE_MARKET_NORM=(SCORE_MARKET-0,94)*5/7,06
+          */
+          Double r = 0.7 * A3_8 + 0.3*(W1 * A3_9 + W2 * (A3_10 + A3_11 + A3_5)/ 3.0);
+          r = (r - 0.94) * 5.0 / 7.06;
+          //logger.debug("R3: {}", r);
+          results.put("MARKET", r);
+        }
 
-        /*
-          --calc result --
-        @R3 = @W1*(@Q3_8+@Q3_9)/2 + @W2*(@Q3_10 +@Q3_11+Q3_5)/2.5
-        Range: 2 - 10
-        Normalisation to range 0 - 5: @R3N=(@R3-2)*5/8
-        */
-        Double r = W1 * (A3_8 + A3_9) / 2.0 + W2 * (A3_10 + A3_11 + A3_5) / 2.5;
-        r = (r - 2.0) * 5.0 / 8.0;
-        //logger.debug("R3: {}", r);
-        results.put("MARKET", r);
       }
 
     }
@@ -1220,24 +1378,24 @@ public class SurveyData
       Double W4 = null;
 
       String keyQ2_2 = "Q2_2_" + Q2_2 + "_3_7_";
-      Map<String, Double> m = FIImpactSettings.SCORES.get(keyQ2_2 + "W3");
+      Map<String, Double> m = FIImpactSettings.SCORES_V2.get(keyQ2_2 + "W3");
 
       if(m != null)
       {
         W3 = m.get(Q3_7);
       }
 
-      m = FIImpactSettings.SCORES.get(keyQ2_2 + "W4");
+      m = FIImpactSettings.SCORES_V2.get(keyQ2_2 + "W4");
 
       if(m != null)
       {
         W4 = m.get(Q3_7);
       }
 
-      Double A4_1 = FIImpactSettings.SCORES.get("Q4_1").get(Q4_1);
-      Double A4_2 = FIImpactSettings.SCORES.get("Q4_2").get(Q4_2);
-      Double A4_4 = FIImpactSettings.SCORES.get("Q4_4").get(Q4_4);
-      Double A4_5 = FIImpactSettings.SCORES.get("Q4_5").get(Q4_5);
+      Double A4_1 = FIImpactSettings.SCORES_V2.get("Q4_1").get(Q4_1);
+      Double A4_2 = FIImpactSettings.SCORES_V2.get("Q4_2").get(Q4_2);
+      Double A4_4 = FIImpactSettings.SCORES_V2.get("Q4_4").get(Q4_4);
+      Double A4_5 = FIImpactSettings.SCORES_V2.get("Q4_5").get(Q4_5);
       Double A4_6 = AIUtils.parseDecimal(Q4_6, 0.0);
 
       if(A4_1 != null && A4_2 != null && A4_4 != null && A4_5 != null && W3 != null && W4 != null)
@@ -1251,19 +1409,37 @@ public class SurveyData
           A4_6 = 100.0;
         }
 
-        /*
-          --calc result --
-        @R4 = W3*(@Q4_1 + ( 'answer4_6' / 100)*5)/2  + @W4*(@Q4_2 +@Q4_4 +@Q4_5)/3
-        Range: 1 - 10
-        Normalisation to range 0 - 5: @R4N=(@R4-1)*5/9
-        */
-        //logger.debug("A4_X: 1: {}, 2: {}, 4: {}, 5: {}, 6: {}, W3: {}, W4: {}", A4_1, A4_2, A4_4, A4_5, A4_6, W3, W4);
+        if(scoringVersion < 3)
+        {
+          /*
+            --calc result --
+          @R4 = W3*(@Q4_1 + ( 'answer4_6' / 100)*5)/2  + @W4*(@Q4_2 +@Q4_4 +@Q4_5)/3
+          Range: 1 - 10
+          Normalisation to range 0 - 5: @R4N=(@R4-1)*5/9
+          */
+          //logger.debug("A4_X: 1: {}, 2: {}, 4: {}, 5: {}, 6: {}, W3: {}, W4: {}", A4_1, A4_2, A4_4, A4_5, A4_6, W3, W4);
 
-        Double r = W3 * (A4_1 + A4_6 / 100.0 * 5.0) / 2.0 + W4 * (A4_2 + A4_4 + A4_5) / 3;
-        r = (r - 1.0) * 5.0 / 9.0;
+          Double r = W3 * (A4_1 + A4_6 / 100.0 * 5.0) / 2.0 + W4 * (A4_2 + A4_4 + A4_5) / 3;
+          r = (r - 1.0) * 5.0 / 9.0;
 
-        //logger.debug("R4: {}", r);
-        results.put("FEASIBILITY", r);
+          //logger.debug("R4: {}", r);
+          results.put("FEASIBILITY", r);
+        }
+        else
+        {
+          /*
+            v3: SCORE_FEASIBILITY = S4_1 + ( Q4_6 / 100)*5 + S4_2 +S4_4 +W4*S4_5
+            Range: 3 - 25
+            Normalisation to range 0 - 5: SCORE_FEASIBILITY_NORM=(SCORE_FEASIBILITY-3)*5/22
+          */
+
+          Double r = A4_1 + A4_6 / 100.0 * 5.0 + A4_2 + A4_4 + W4 * A4_5;
+          r = (r - 3.0) * 5.0 / 22.0;
+
+          //logger.debug("R4: {}", r);
+          results.put("FEASIBILITY", r);
+
+        }
       }
 
     }
@@ -1273,17 +1449,17 @@ public class SurveyData
 
     HashMap<String, Integer> Q5A1_list = new HashMap<>();
 
-    Map<String, Double> m5A1_Benefits = FIImpactSettings.SCORES.get("Q5A_1_BENEFITS");
-    Map<String, Double> m5A1_Verticals = FIImpactSettings.SCORES.get("Q5A_1_VERTICALS");
+    Map<String, Double> m5A1_Benefits = FIImpactSettings.SCORES_V2.get("Q5A_1_BENEFITS");
+    Map<String, Double> m5A1_Verticals = FIImpactSettings.SCORES_V2.get("Q5A_1_VERTICALS");
 
-    Map<String, Double> m5A1_weights = FIImpactSettings.SCORES.get("Q5A_1");
+    Map<String, Double> m5A1_weights = FIImpactSettings.SCORES_V2.get("Q5A_1");
 
     HashMap<String, Integer> Q5B1_list = new HashMap<>();
 
-    Map<String, Double> m5B1_Benefits = FIImpactSettings.SCORES.get("Q5B_1_BENEFITS");
-    Map<String, Double> m5B1_Verticals = FIImpactSettings.SCORES.get("Q5B_1_VERTICALS");
+    Map<String, Double> m5B1_Benefits = FIImpactSettings.SCORES_V2.get("Q5B_1_BENEFITS");
+    Map<String, Double> m5B1_Verticals = FIImpactSettings.SCORES_V2.get("Q5B_1_VERTICALS");
 
-    Map<String, Double> m5B1_weights = FIImpactSettings.SCORES.get("Q5B_1");
+    Map<String, Double> m5B1_weights = FIImpactSettings.SCORES_V2.get("Q5B_1");
 
     //questionnaire v1 has all market sectors in 3_3.
     //questionnaire v2 has main market sector in 3_3a and "other" sectors in 3_3a.
@@ -1464,6 +1640,11 @@ public class SurveyData
     //logger.debug("Calc results: {}", results.toString());
   }
 
+  private int getScoringVersion()
+  {
+    return AIUtils.parseInteger(questions.get("Q0_2"), 1);
+  }
+
   public void clear()
   {
     questions.clear();
@@ -1511,6 +1692,14 @@ public class SurveyData
         questions.put(arr[0], answer);
       } else
         questions.put(arr[0], arr[1]);
+    }
+    //!!FF hotfix - if Q3_8a exists then questionaire verion = 3 (Q0_2=3).
+    if(questions.containsKey("Q3_8a"))
+    {
+
+      int version = AIUtils.parseInteger(questions.get("Q0_2"), 1);
+      if(version < 3)
+        questions.put("Q0_2", "3");
     }
   }
 

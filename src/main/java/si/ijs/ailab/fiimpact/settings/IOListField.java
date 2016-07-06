@@ -21,6 +21,7 @@ public class IOListField
   String graph;
   private SortedMap<String, String> lookup = Collections.synchronizedSortedMap(new TreeMap<String, String>());
   private List<String> calculatedFrom = Collections.synchronizedList(new ArrayList<String>());
+  private String defaultAnswer;
 
   IOListField(String listId, String column, String label, String fieldid, String usage, String missing,
               String include_record_when, String transform, String type, String plot, String graph)
@@ -127,5 +128,15 @@ public class IOListField
   public String getListId()
   {
     return listId;
+  }
+
+  public void setDefaultAnswer(String defaultAnswer)
+  {
+    this.defaultAnswer = defaultAnswer;
+  }
+
+  public String getDefaultAnswer()
+  {
+    return defaultAnswer;
   }
 }

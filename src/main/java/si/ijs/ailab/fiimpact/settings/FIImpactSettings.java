@@ -68,7 +68,8 @@ public class FIImpactSettings
 
   public enum OutputFormat {XML, JSON}
 
-  public static final Map<String, Map<String, Double>> SCORES = new TreeMap<>();
+  public static final Map<String, Map<String, Double>> SCORES_V2 = new TreeMap<>();
+  public static final Map<String, Map<String, Double>> SCORES_V3 = new TreeMap<>();
 
   private static String SCORES_5A1 =
 
@@ -136,52 +137,62 @@ public class FIImpactSettings
     m.put("TRL7", 1.7);
     m.put("TRL8", 1.7);
     m.put("TRL9", 1.7);
-    SCORES.put("Q2_1", m);
+    SCORES_V2.put("Q2_1", m);
 
     m = new HashMap<>();
     m.put("A", 1.0);
     m.put("B", 1.2);
-    SCORES.put("Q2_2", m);
+    SCORES_V2.put("Q2_2", m);
+
+    m = new HashMap<>();
+    m.put("A", 0.0);
+    m.put("B", 2.5);
+    SCORES_V3.put("Q2_2", m);
 
     m = new HashMap<>();
     m.put("A", 0.75);
     m.put("B", 1.00);
-    SCORES.put("Q2_3", m);
+    SCORES_V2.put("Q2_3", m);
+
+    m = new HashMap<>();
+    m.put("A", 2.5);
+    m.put("B", 0.0);
+    SCORES_V3.put("Q2_3", m);
 
     m = new HashMap<>();
     m.put("A", 1.0);
     m.put("B", 1.2);
-    SCORES.put("Q2_4", m);
+    SCORES_V2.put("Q2_4", m);
 
     m = new HashMap<>();
     m.put("A", 1.0);
     m.put("B", 1.2);
-    SCORES.put("Q2_5", m);
+    SCORES_V2.put("Q2_5", m);
 
     //SECTION 3 - MARKET
     m = new HashMap<>();
     m.put("A", 2.0);
     m.put("B", 1.0);
     m.put("C", 0.8);
-    SCORES.put("Q2_2_A_3_7_W1", m);
+    SCORES_V2.put("Q2_2_A_3_7_W1", m);
 
     m = new HashMap<>();
     m.put("A", 0.0);
     m.put("B", 1.0);
     m.put("C", 1.2);
-    SCORES.put("Q2_2_A_3_7_W2", m);
+    SCORES_V2.put("Q2_2_A_3_7_W2", m);
 
     m = new HashMap<>();
     m.put("A", 2.0);
     m.put("B", 1.5);
     m.put("C", 1.0);
-    SCORES.put("Q2_2_B_3_7_W1", m);
+    SCORES_V2.put("Q2_2_B_3_7_W1", m);
 
     m = new HashMap<>();
     m.put("A", 0.0);
     m.put("B", 0.5);
     m.put("C", 1.0);
-    SCORES.put("Q2_2_B_3_7_W2", m);
+    SCORES_V2.put("Q2_2_B_3_7_W2", m);
 
 
     m = new HashMap<>();
@@ -190,80 +201,87 @@ public class FIImpactSettings
     m.put("C", 2.0);
     m.put("D", 2.5);
     m.put("E", 1.0);
-    SCORES.put("Q3_5", m);
+    SCORES_V2.put("Q3_5", m);
 
     m = new HashMap<>();
     m.put("A", 1.0);
     m.put("B", 3.0);
     m.put("C", 5.0);
-    SCORES.put("Q3_8", m);
+    SCORES_V2.put("Q3_8", m);
+
+    m = new HashMap<>();
+    m.put("A", 1.0);
+    m.put("B", 3.0);
+    m.put("C", 4.0);
+    m.put("D", 5.0);
+    SCORES_V3.put("Q3_8a", m);
 
     m = new HashMap<>();
     m.put("A", 1.0);
     m.put("B", 3.0);
     m.put("C", 5.0);
-    SCORES.put("Q3_9", m);
+    SCORES_V2.put("Q3_9", m);
 
     m = new HashMap<>();
     m.put("A", 1.0);
     m.put("B", 3.0);
     m.put("C", 5.0);
-    SCORES.put("Q3_10", m);
+    SCORES_V2.put("Q3_10", m);
 
     m = new HashMap<>();
     m.put("A", 1.0);
     m.put("B", 3.0);
     m.put("C", 5.0);
-    SCORES.put("Q3_11", m);
+    SCORES_V2.put("Q3_11", m);
 
     //SECTION 4 - FEASIBILITY
     m = new HashMap<>();
     m.put("A", 1.0);
     m.put("B", 3.0);
     m.put("C", 5.0);
-    SCORES.put("Q4_1", m);
+    SCORES_V2.put("Q4_1", m);
 
     m = new HashMap<>();
     m.put("A", 1.0);
     m.put("B", 3.0);
     m.put("C", 5.0);
-    SCORES.put("Q4_2", m);
+    SCORES_V2.put("Q4_2", m);
 
     m = new HashMap<>();
     m.put("A", 1.0);
     m.put("B", 3.0);
     m.put("C", 5.0);
-    SCORES.put("Q4_4", m);
+    SCORES_V2.put("Q4_4", m);
 
     m = new HashMap<>();
     m.put("A", 1.0);
     m.put("B", 3.0);
     m.put("C", 5.0);
-    SCORES.put("Q4_5", m);
+    SCORES_V2.put("Q4_5", m);
 
     m = new HashMap<>();
     m.put("A", 2.0);
     m.put("B", 1.2);
     m.put("C", 1.0);
-    SCORES.put("Q2_2_A_3_7_W3", m);
+    SCORES_V2.put("Q2_2_A_3_7_W3", m);
 
     m = new HashMap<>();
     m.put("A", 0.0);
     m.put("B", 0.8);
     m.put("C", 1.0);
-    SCORES.put("Q2_2_A_3_7_W4", m);
+    SCORES_V2.put("Q2_2_A_3_7_W4", m);
 
     m = new HashMap<>();
     m.put("A", 2.0);
     m.put("B", 1.8);
     m.put("C", 1.1);
-    SCORES.put("Q2_2_B_3_7_W3", m);
+    SCORES_V2.put("Q2_2_B_3_7_W3", m);
 
     m = new HashMap<>();
     m.put("A", 0.0);
     m.put("B", 0.2);
     m.put("C", 0.8);
-    SCORES.put("Q2_2_B_3_7_W4", m);
+    SCORES_V2.put("Q2_2_B_3_7_W4", m);
 
 
     //5A_1
@@ -290,9 +308,9 @@ public class FIImpactSettings
         m.put(row_column, d);
       }
     }
-    SCORES.put("Q5A_1", m);
-    SCORES.put("Q5A_1_BENEFITS", m5A1_Benefits);
-    SCORES.put("Q5A_1_VERTICALS", m5A1_Verticals);
+    SCORES_V2.put("Q5A_1", m);
+    SCORES_V2.put("Q5A_1_BENEFITS", m5A1_Benefits);
+    SCORES_V2.put("Q5A_1_VERTICALS", m5A1_Verticals);
 
     //5B_1
     String[] arr5b1Rows = SCORES_5B1.split("\n");
@@ -318,9 +336,9 @@ public class FIImpactSettings
         m.put(row_column, d);
       }
     }
-    SCORES.put("Q5B_1", m);
-    SCORES.put("Q5B_1_BENEFITS", m5B1_Benefits);
-    SCORES.put("Q5B_1_VERTICALS", m5B1_Verticals);
+    SCORES_V2.put("Q5B_1", m);
+    SCORES_V2.put("Q5B_1_BENEFITS", m5B1_Benefits);
+    SCORES_V2.put("Q5B_1_VERTICALS", m5B1_Verticals);
 
 
 
@@ -351,7 +369,7 @@ public class FIImpactSettings
 
     }
 
-    m5A1_Verticals = SCORES.get("Q5A_1_VERTICALS");
+    m5A1_Verticals = SCORES_V2.get("Q5A_1_VERTICALS");
     OverallResult.ScoreBoundaries marketNeedsBusiness = SPEEDOMETER_SLOTS.get("MARKET_NEEDS");
     for(String s : m5A1_Verticals.keySet())
     {
@@ -686,6 +704,9 @@ public class FIImpactSettings
       JSONArray jsonQuestions = jsonSection.getJSONArray("questions");
       parseQuestions(sectionID, jsonQuestions, null);
     }
+    JSONArray jsonAdditionalLookups = FIImpactSettings.getFiImpactSettings().getFiImpactModel().optJSONArray("additional_lookups");
+    parseQuestions(jsonAdditionalLookups);
+
     logger.info("Parse lookups done");
   }
 
@@ -698,6 +719,7 @@ public class FIImpactSettings
       JSONObject jsonQuestion = jsonQuestions.getJSONObject(iQuestion);
       String questionID = jsonQuestion.getString("id");
       String fullQuestionID = "Q" + sectionID + "_" + questionID;
+      String sDefaultAnswer = jsonQuestion.optString("default", null);
       //logger.debug("Parse question: {}", fullQuestionID);
       boolean bLookupFound = false;
       IOListDefinition ioListDefinition = getListDefinition(LIST_SURVEYS);
@@ -709,6 +731,8 @@ public class FIImpactSettings
 
       if(ioListField != null)
       {
+        if(sDefaultAnswer != null)
+          ioListField.setDefaultAnswer(sDefaultAnswer);
         //logger.info("Found : {}", ioListField.getFieldid());
         JSONArray jsonLookups = jsonQuestion.optJSONArray("lookup");
         if(parentQuestion != null)
@@ -760,6 +784,39 @@ public class FIImpactSettings
 
   }
 
+  private void parseQuestions(JSONArray jsonLookups)
+  {
+    if(jsonLookups == null)
+    {
+      logger.warn("No additional lookups");
+      return;
+    }
+    for(int iQuestion = 0; iQuestion < jsonLookups.length(); iQuestion++)
+    {
+      JSONObject jsonQuestion = jsonLookups.getJSONObject(iQuestion);
+      String questionID = jsonQuestion.getString("id");
+      String sDefaultAnswer = jsonQuestion.optString("default", null);
+      IOListField ioListField = getAllFields().get(questionID);
+      if(ioListField != null)
+      {
+        if(sDefaultAnswer != null)
+          ioListField.setDefaultAnswer(sDefaultAnswer);
+        //logger.info("Found : {}", ioListField.getFieldid());
+        JSONArray jsonLookup = jsonQuestion.optJSONArray("lookup");
+        if(jsonLookup != null)
+        {
+          for(int iLookup = 0; iLookup < jsonLookup.length(); iLookup++)
+          {
+            JSONObject jsonLookupEntry = jsonLookup.getJSONObject(iLookup);
+            String key = jsonLookupEntry.keys().next();
+            String value = jsonLookupEntry.getString(key);
+            ioListField.addLookup(key, value);
+          }
+        }
+
+      }
+    }
+  }
 
   public void exportLegendTxt(ServletOutputStream outputStream) throws IOException
   {
@@ -796,7 +853,12 @@ public class FIImpactSettings
         {
           json.key("lookup").array();
           for(Map.Entry<String, String> lookupEntry: ioListField.getLookup().entrySet())
-            json.object().key(lookupEntry.getKey()).value(lookupEntry.getValue()).endObject();
+          {
+            String val = lookupEntry.getValue();
+            if(val == null || val.equals(""))
+              val = "Other";
+            json.object().key(lookupEntry.getKey()).value(val).endObject();
+          }
           json.endArray();
         }
         json.endObject();
@@ -814,7 +876,13 @@ public class FIImpactSettings
         {
           json.key("lookup").array();
           for(Map.Entry<String, String> lookupEntry: ioListField.getLookup().entrySet())
-            json.object().key(lookupEntry.getKey()).value(lookupEntry.getValue()).endObject();
+          {
+            String val = lookupEntry.getValue();
+            if(val == null || val.equals(""))
+              val = "Other";
+
+            json.object().key(lookupEntry.getKey()).value(val).endObject();
+          }
           json.endArray();
         }
         json.endObject();
