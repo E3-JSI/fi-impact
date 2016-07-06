@@ -3,14 +3,14 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	
+
 	<meta name="description" content="">
 	<meta name="author" content="JSI">
 	<link rel="shortcut icon" href="../../img/favicon.ico" type="image/x-icon">
 	<link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
 
     <title>FI-Impact Report</title>
-		
+
     <!-- Bootstrap Core CSS -->
     <link href="../../css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS -->
@@ -92,13 +92,13 @@
     <section id="innovation" class="bg-light-gray"><div class="container onBg">
 		<div class="row"><div class="col-lg-12 text-center">
 			<h2 class="section-heading">Innovation</h2><div id="innovationGauge" class="pull-right"></div>
-			<p class="text-muted">The Innovation indicator expresses the level of originality, maturity and sustainability of innovation to a 
-			product or service in an organization’s go to market strategy. The single measures are used to create the innovation indicator 
-			but are also used in the calculation of Market Attractiveness and Feasibility Indicators. Several conditions affect the innovation 
-			Indicator. An innovative product or service can make a significant Impact in the market if you are ready to implement it, but can 
-			conceal substantial engineering, business planning, development, testing and marketing effort if the product or service is still 
-			in the planning phases. If the innovation is being developed and validated among colleagues and potential clients the innovation’s 
-			real market potential is increased. Innovation is quite healthy in organizations if it is part of a strategy but can be quite resource 
+			<p class="text-muted">The Innovation indicator expresses the level of originality, maturity and sustainability of innovation to a
+			product or service in an organization’s go to market strategy. The single measures are used to create the innovation indicator
+			but are also used in the calculation of Market Attractiveness and Feasibility Indicators. Several conditions affect the innovation
+			Indicator. An innovative product or service can make a significant Impact in the market if you are ready to implement it, but can
+			conceal substantial engineering, business planning, development, testing and marketing effort if the product or service is still
+			in the planning phases. If the innovation is being developed and validated among colleagues and potential clients the innovation’s
+			real market potential is increased. Innovation is quite healthy in organizations if it is part of a strategy but can be quite resource
 			consuming where stand-alone.</p>
 			<h3 class="section-subheading">{{d.innovation.interpretation}}</h3>
 			<h3 class="section-subheading" ng-repeat="x in d.innovation.bottomHalf">
@@ -110,7 +110,11 @@
 		</tbody></table></div>
 		<div class="col-md-6"><table class="table table-striped"><tbody>
 			<tr><td width="25%"><strong>Business idea</strong></td>
-				<td><strong>Innovation Type:</strong> {{d.Q2_2}}<br><strong>Existence of similar solution:</strong> {{d.Q2_3}}<br><strong>Strategy:</strong> {{d.Q2_5}}</td></tr>
+				<td><strong>Innovation Type:</strong> {{d.Q2_2}}<br>
+					<strong ng-if="d.Q0_2 < 2">Existence of similar solution:</strong>
+					<strong ng-if="d.Q0_2 >= 2">Is your solution based on a proprietary technology, potentially patentable, making it unique in the marketplace?</strong>
+						{{d.Q2_3}}<br>
+					<strong>Strategy:</strong> {{d.Q2_5}}</td></tr>
 		</tbody></table></div></div>
 	</div></section>
 
@@ -123,10 +127,10 @@
 			target market, and if your initiative has a strategy and plan to reach the target market. This indicator
 			measures the level of your “customer development” activities: whether you have already approached customers
 			to collect feedback on your product, and to what extent you have developed a strategy to acquire them.</p> -->
-			<p class="text-muted">The Market Focus indicator reflects the quality and relevance of your knowledge of customer needs 
-			in your target market(s), the extent to which you have gathered knowledge about customers in the target market, and if your 
-			initiative has a strategy and plan to reach the target market. This indicator measures the level of your “customer development” 
-			activities: whether you have already approached customers to collect feedback on your product, and to what extent you have 
+			<p class="text-muted">The Market Focus indicator reflects the quality and relevance of your knowledge of customer needs
+			in your target market(s), the extent to which you have gathered knowledge about customers in the target market, and if your
+			initiative has a strategy and plan to reach the target market. This indicator measures the level of your “customer development”
+			activities: whether you have already approached customers to collect feedback on your product, and to what extent you have
 			developed a strategy to acquire them.</p>
 			<h3 class="section-subheading">{{d.market.interpretation}}</h3>
 			<h3 class="section-subheading" ng-repeat="x in d.market.bottomHalf">
@@ -136,7 +140,9 @@
 			<tr><td width="25%"><strong>Business model</strong></td>
 				<td><strong>Model:</strong> {{d.Q3_1}}<br><strong>Revenue Division:</strong> <span ng-repeat="R in d.revenue">{{R.value}}% {{R.label}}{{$last ? '' : ', '}}</span></td></tr>
 			<tr><td><strong>Customers</strong></td>
-				<td><strong>Value Proposition Verification:</strong> {{d.Q3_8}}<br><strong>Commercial Strategy Status: </strong>{{d.Q3_9}}</td></tr>
+				<td><span ng-if="d.Q0_2 < 2"><strong>Value Proposition Verification:</strong> {{d.Q3_8}}<br></span>
+					<span ng-if="d.Q0_2 >= 2"><strong>Have you verified your value proposition with the target customers?</strong> {{d.Q3_8a}}<br></span>
+					<strong>Commercial Strategy Status: </strong>{{d.Q3_9}}</td></tr>
 			</tbody></table></div>
 			<div class="col-md-6"><table class="table table-striped"><tbody>
 			<tr ng-if="d.primaryMarketSector"><td width="25%"><strong>Primary Market Sector</strong></td>
@@ -155,7 +161,7 @@
 		<div class="row"><div class="col-lg-12 text-center">
 			<h2 class="section-heading">Feasibility</h2>
 			<div id="feasibilityGauge" class="pull-right"></div>
-			<p class="text-muted">The Feasibility indicator assesses to what extent you have assessed the 
+			<p class="text-muted">The Feasibility indicator assesses to what extent you have assessed the
 			economic viability of your business, and if you have already provided for the necessary funds for the startup phase.
 			This indicator assesses whether you are aware of the funds required to start and grow your business, and whether you
 			have secured sources for these funds.</p>
@@ -166,7 +172,10 @@
 		<div class="row tableMargin">
 			<div class="col-md-6"><table class="table table-striped"><tbody>
 				<tr><td width="25%"><strong>Capital</strong></td>
-					<td><strong>Required investments until sustainable:</strong> {{d.Q4_1}}<br><strong>Secured funding:</strong> {{d.Q4_6}}%</td></tr>
+					<td><strong ng-if="d.Q0_2 < 2">Required investments until sustainable:</strong>
+						<strong ng-if="d.Q0_2 >= 2">Have you produced a detailed business plan, with clear break-even expectations and proper estimation of the market size, and have you provided for the capital investments needed until reaching break-even point?</strong>
+						{{d.Q4_1}}<br>
+						<strong>Secured funding:</strong> {{d.Q4_6}}%</td></tr>
 				<tr><td><strong>Growth rate</strong></td>
 					<td><strong>Sales:</strong> {{d.Q4_2}}<br><strong>Revenue (4 years):</strong> {{d.Q4_3}}</td></tr>
 				</tbody></table></div>
@@ -176,14 +185,14 @@
 			</tbody></table></div>
 		</div>
     </div></section>
-	
+
 	<!-- Market Needs Section -->
     <section id="business"><div class="container onBg">
 		<div class="row"><div class="col-lg-12 text-center">
 			<h2 class="section-heading">Market Needs</h2>
-			<p class="text-muted">The Market Needs Indicator reflects the extent to which perceived user benefits associated with a product 
-			or service are aligned with real-market needs, based on an analysis of IDC Vertical Market Survey results. One set of indicators 
-			are outlined for business and government sectors (B2B and B2G) and a second set of indicators are outlined for consumer markets (B2C), 
+			<p class="text-muted">The Market Needs Indicator reflects the extent to which perceived user benefits associated with a product
+			or service are aligned with real-market needs, based on an analysis of IDC Vertical Market Survey results. One set of indicators
+			are outlined for business and government sectors (B2B and B2G) and a second set of indicators are outlined for consumer markets (B2C),
 			based on different market needs.
 		</div></div>
 		<div class="row mnSector" ng-repeat="MN in d.marketNeeds">
@@ -207,9 +216,9 @@
     <section id="socialImpact" class="bg-light-gray"><div class="container onBg">
 		<div class="row"><div class="col-lg-12 text-center">
 			<h2 class="section-heading">Social Impact</h2>
-			<p class="text-muted">The Social Impact Indicator reflects the extent to which the project has social impact in 11 key areas. 
-			It focuses on identifying specific social benefits that your project will support and the contribution to quality of life for 
-			specific social groups. It also contextualises the impact of your project against the average social impact of all surveyed 
+			<p class="text-muted">The Social Impact Indicator reflects the extent to which the project has social impact in 11 key areas.
+			It focuses on identifying specific social benefits that your project will support and the contribution to quality of life for
+			specific social groups. It also contextualises the impact of your project against the average social impact of all surveyed
 			projects in these areas.</p>
 		</div></div>
 		<h3>Social Benefits</h3>
@@ -279,23 +288,23 @@
 				<div id="linkedinGauge" class="pull-right"></div>
 				<p class="text-muted">{{d.linkedin.interpretation}}</p>
 			</div>
-			
+
 		</div>
     </div></section>
-	
+
 	<section id="overview" class="bg-light-gray"><div class="container onBg">
 		<div class="row"><div class="col-lg-12 text-center">
 			<h2 class="section-heading">Overview</h2>
-			<p class="text-muted">In this section you can evaluate your Impact Assessment scores against the average score calculated from all 
-			completed surveys to date. Scores are represented in a spider diagram so that you can easily identify your strengths or weaknessess 
-			compared to the average score. Details about a specific section of the report can be accessed by clicking on the node on the axis 
+			<p class="text-muted">In this section you can evaluate your Impact Assessment scores against the average score calculated from all
+			completed surveys to date. Scores are represented in a spider diagram so that you can easily identify your strengths or weaknessess
+			compared to the average score. Details about a specific section of the report can be accessed by clicking on the node on the axis
 			representing the respective section.</p>
 		</div></div>
 		<div id="bodyOverview" class="radarBody"><div class="radarLegend">
 			<p><i class="fa fa-square color0"></i> Your Score<br><i class="fa fa-square color1"></i> Average</p>
 		</div><div id="radarOverview"></div></div>
 	</div></section>
-	
+
     <!-- Partners -->
 	<aside class="clients"><div class="container"><hr id="partners"><div class="row">
 		<div class="col-md-2 col-sm-6"><a href="http://idcitalia.com/ita/" target="_blank"><img style="margin-left: 0px; margin-right: 10px;" src="../../css/IDC_logo_4.png" alt="" width="120" height="57" /></a></div>
