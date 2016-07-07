@@ -184,6 +184,7 @@
 		<filed column="Q3_6" label="When will (did) your Product/Service enter the open market?" fieldid="Q3_6" transform="" plot="selection" graph="feature" type="category"/>
 		<filed column="Q3_7" label="What is the level of competition in your target market?" fieldid="Q3_7" transform="" plot="selection" graph="feature-selection" type="lookup"/>
 		<filed column="Q3_8" label="Have you verified your value proposition with the target customers?" fieldid="Q3_8" transform="" plot="selection" graph="feature-selection" type="lookup"/>
+		<filed column="Q3_8a" label="Have you verified your value proposition with the target customers?" fieldid="Q3_8a" transform="" plot="ignore" graph="ignore" type="lookup"/>
 		<filed column="Q3_9" label="What is the status of your commercial strategy to acquire customers?" fieldid="Q3_9" transform="" plot="selection" graph="feature-selection" type="lookup"/>
 		<filed column="Q3_10" label="If this is a new market what is the status of your market strategy?" fieldid="Q3_10" transform="" plot="selection" graph="feature-selection" type="lookup"/>
 		<filed column="Q3_11" label="If this is market with many compettitors what is the status of your market strategy?" fieldid="Q3_11" transform="" plot="selection" graph="feature-selection" type="lookup"/>
