@@ -12,28 +12,19 @@ In addition to the self-assessment, we have developed a possibility to integrate
  Sub grantees, or their mentors, can thus perform a gap analysis comparing "my" performance against other initiatives.
 
 
-**[Project homepage](http://www.fi-impact.eu/)**
-**[Developers homepage](http://ailab.ijs.si)**
+**Project information:** [FI-IMPACT](http://www.fi-impact.eu/)
 
+**Developers:** [AILAB](http://ailab.ijs.si)  of the Josef Stefan Institute
 
-### Prerequisites
+**Prerequisites:**
 
-**[QMiner] (https://github.com/qminer/qminer), Java 7+, [Apache Tomcat 7+] (http://tomcat.apache.org/), other dependencies are defined in the Maven project**
+[QMiner](https://github.com/qminer/qminer), Java 7+, [Apache Tomcat 7+](http://tomcat.apache.org/), [Maven (for compilation)](https://maven.apache.org/), other dependencies defined in the Maven project.
 
 This webapp has been tested on Windows 7 with Java 1.7.0.13 and Tomcat 7.x. 
 
-### Install 
+Dependencies, compilation and installation [Wiki](https://github.com/JozefStefanInstitute/fi-impact/wiki/Compile-and-Install)  
 
-	
-
-**Test**
-
-
----
-
-### Compile from source
-
-### Documentation
+**Documentation:** [see project Wiki](https://github.com/JozefStefanInstitute/fi-impact/wiki)
 
 ## Acknowledgments
 
