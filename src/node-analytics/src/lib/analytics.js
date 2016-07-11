@@ -155,7 +155,7 @@ exports.buildGraph = function(mat2d, triangles, prj) {
     return {"nodes": nodes, "edges": edges};
 }
 // MDS async	
-exports.mdsAsync = function(mat) {
+exports.mdsAsync = function(mat, type) {
     var mds = new analytics.MDS({ maxStep: config.MDS_max_steps, maxSecs: parseInt(config.MDS_time_sec), distType: config.MDS_similarity_measure });
 	//var mds = new analytics.MDS({ distType: config.MDS_similarity_measure });
 	mds.fitTransformAsync(mat, function (err, res) {
@@ -167,13 +167,31 @@ exports.mdsAsync = function(mat) {
         var triangles = exports.triangulate(mat2d);
         // generate graph
         var graph = exports.buildGraph(mat2d, triangles, data.projects);
-		fs.writeFile("../output/"+config.main_graph_fn, JSON.stringify(graph), function(err) {
-		    if(err) {
-                return console.log(err);
-            }
-            console.log("The file was saved!");
-		});
-		exports.graph = graph;
+		
+        if (type == "text") {
+            fs.writeFile("../output/"+config.main_graph_fn, JSON.stringify(graph), function(err) {
+                if(err) {
+                    return console.log(err);
+                }
+                console.log("The file was saved!");
+            });
+            exports.graph = graph;
+        }
+        else if (type == "all") {
+            fs.writeFile("../output/"+config.main_graph_all_fn, JSON.stringify(graph), function(err) {
+                if(err) {
+                    return console.log(err);
+                }
+                console.log("The file was saved!");
+            });
+            exports.graph_allftr = graph;
+        }
+        else {
+            exports.graph = graph;
+        }
+        
+        console.log('done');
+        
         return graph;		
 	});
 }

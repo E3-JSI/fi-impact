@@ -3,44 +3,135 @@ var qm = require('qminer');
 // load schemas
 var schemas = require('../../schema/schema.json');
 // load data
-var data = require('./data.js');
-
-var base = new qm.Base({
-    mode: 'createClean',
-    schema: [{
-            name: 'prj',
-            fields: schemas.prj
-        }]
-    });
+var qdata = require('./data.js');
 
 // EXPORT PROPERTIES
 //
-
 exports = module.exports = {};
-exports.base = base;
-exports.data = data;
+exports.data = qdata;
+exports.base;
+exports.prj;
 exports.graph;
-exports.prj = base.store("prj");
-exports.ftr = new qm.FeatureSpace(base, {type: "text", source: "prj", field: "desc", normalize: true, weight: "tfidf", tokenizer: { type: "simple", stopwords: "en"}});
+exports.graph_allftr;
+exports.ftr;
+exports.ftrAll;
+
+/*
+ * Create base 
+ */
+exports.createBase = function(schema) {
+    exports.base = new qm.Base({
+        mode: 'createClean',
+        schema: [{
+                name: 'prj',
+                fields: schema
+            }]
+    });
+    exports.prj = exports.base.store("prj");    
+}
+ 
+/*
+ * Set project shema
+ */
+ exports.setPrjShema = function(data) {
+    var prj = [];	
+    for (var j=0; j<data.settings.length; j++) {
+        var seed_object = {};
+        var type = "string";
+        if (data.settings[j].type == "text") {
+            type = "string";
+        }
+        else if (data.settings[j].type == "int" || data.settings[j].type == "numeric" || data.settings[j].type == "float") {
+            type = "int";
+        } 
+        else if (data.settings[j].type == "numeric" || data.settings[j].type == "float" || data.settings[j].type == "num") {
+            type = "float";
+        }
+        else {
+            type = "string";
+        }
+        
+        if (data.settings[j].usage == "id") {
+            seed_object = {"name": data.settings[j].field, "type": type, "primary": true};
+            prj.push(seed_object);
+        }     
+        else if (data.settings[j].usage == "feature" || data.settings[j].usage == "node_type") {
+            seed_object = {"name": data.settings[j].field, "type": type, "primary": false};
+            prj.push(seed_object);
+        }
+        else {}       
+    }
+    return prj;
+}
+
+/*
+ * Set feature spaces
+ */
+exports.setTextFts = function() {
+    exports.ftr = new qm.FeatureSpace(exports.base, {type: "text", source: "prj", field: "full_text", normalize: true, weight: "tfidf", tokenizer: { type: "simple", stopwords: "en"}});
+}
+exports.setAllFts = function() {
+    exports.ftrAll = new qm.FeatureSpace(exports.base,{type: "text", source: "prj", field: "full_text", normalize: true, weight: "tfidf", tokenizer: { type: "simple", stopwords: "en"}});
+    for (var i=0; i<qdata.data_settings.length; i++) {
+        if (qdata.data_settings[i].usage == "feature") {
+            if (qdata.data_settings[i].type == "numeric" || qdata.data_settings[i].type == "int" || qdata.data_settings[i].type == "num") {
+                exports.ftrAll.addFeatureExtractor({type: "numeric", source: "prj", field: qdata.data_settings[i].field});
+            }
+            if (qdata.data_settings[i].type == "text" && qdata.data_settings[i].field == "full_text") {
+                exports.ftrAll.addFeatureExtractor({type: "text", source: "prj", field: qdata.data_settings[i].field, normalize: true, weight: "tfidf", tokenizer: { type: "simple", stopwords: "en"}});
+            }
+        }
+    }
+}
 
 // EXPORT METHODS
 //
 
 exports.fillPrjStore = function(data) {
-    var prj = this.prj;
-    // push data to store
-	
+    var prj = this.prj;	
     for (var i=0; i<data.surveys.length; i++) {
 	    var extra_data = {};
+		var seed_object = {};
+        
+        for (var j=0; j<data.settings.length; j++) {
+		    if (data.settings[j].usage == "feature" || data.settings[j].usage == "id" || data.settings[j].usage == "node_type") {
+                if (data.settings[j].type == "int") {
+                    seed_object[data.settings[j].field] = 0;
+                }
+                else if (data.settings[j].type == "numeric" || data.settings[j].type == "num") {
+                    seed_object[data.settings[j].field] = 0.0;
+                }
+                else {
+                    seed_object[data.settings[j].field] = "";
+                }
+            }
+        }
+        
 	    for (var j=0; j<data.settings.length; j++) {
-		    if (data.settings[j].usage == "display" || data.settings[j].usage == "selection" || true) {
-	            extra_data[data.settings[j].field] = data.surveys[i][data.settings[j].field];
-			}
+            if (data.surveys[i].hasOwnProperty(data.settings[j].field)) {
+                if (data.settings[j].usage == "feature" || data.settings[j].usage == "id" || data.settings[j].usage == "node_type") {
+                    if (data.settings[j].type == "int") {
+                        seed_object[data.settings[j].field] = parseInt(data.surveys[i][data.settings[j].field]);
+                    }
+                    else if (data.settings[j].type == "numeric" || data.settings[j].type == "num") {
+                        seed_object[data.settings[j].field] = parseFloat(data.surveys[i][data.settings[j].field]);
+                    }
+                    else {
+                        if (seed_object[data.settings[j].field] !== undefined) {
+                            seed_object[data.settings[j].field] = data.surveys[i][data.settings[j].field];
+                        }
+                    }
+                }
+                if (data.settings[j].usage == "display" || data.settings[j].usage == "selection" || true) {
+                    extra_data[data.settings[j].field] = data.surveys[i][data.settings[j].field];
+                }
+            }
 	    }
+        
+        prj.push(seed_object);
 		exports.data.extra_data.push(extra_data);
-        prj.push({"id_internal": data.surveys[i].id_internal, "desc": data.surveys[i].full_text+" ", "node_type":data.surveys[i].node_type });
+        //prj.push({"id_internal": data.surveys[i].id_internal, "desc": data.surveys[i].full_text+" ", "node_type":data.surveys[i].node_type });
     }
-    this.ftr.updateRecords(prj.allRecords);
 }
 
 exports.processRecord = function(data) {
@@ -102,11 +193,24 @@ exports.init = function() {
     });
 }
 
-exports.customGraph = function(rec) {
-    var mat = exports.ftr.extractMatrix(exports.prj.allRecords).transpose().toArray();
-    var vec = exports.ftr.extractVector(rec).toArray();
-    var analytics = require('./analytics.js'); 
-    return analytics.buildEgoGraph(rec, mat, vec, this.data.projects, analytics.graph);
+exports.customGraph = function(ftr, recs, rec, graph, type) {
+    var analytics = require('./analytics.js');
+    var mat = ftr.extractMatrix(recs).transpose().toArray();
+    var vec = ftr.extractVector(rec).toArray();
+    // 1 - refresh graph from analytics
+    exports.graph = analytics.graph;
+    exports.graph_allftr = analytics.graph_allftr;
+    // 2 - compute
+    if (type == "text") {
+        return analytics.buildEgoGraph(rec, mat, vec, this.data.projects, exports.graph);
+    }
+    else if (type == "all") {
+        return analytics.buildEgoGraph(rec, mat, vec, this.data.projects, exports.graph_allftr);
+    }
+    else {
+        return analytics.buildEgoGraph(rec, mat, vec, this.data.projects, exports.graph);
+    }
+    
 }
 
 exports.mainGraph = function() {
@@ -147,11 +251,11 @@ exports.mainGraph2 = function() {
 	this.graph = {"nodes": nodes, "edges": edges};
 }
 
-exports.mainGraphAsync = function() {
-    // get matrix
-    var mat = exports.ftr.extractMatrix(exports.prj.allRecords);
+exports.mainGraphAsync = function(ftr, recs, type) {
     // import analytics module
-    var analytics = require('./analytics.js');
+    var analytics = require('./analytics.js');  
+    // get matrix
+    var mat = ftr.extractMatrix(recs);
     // construct a MDS instance
-	this.graph = analytics.mdsAsync(mat);
+	analytics.mdsAsync(mat, type); 
 }
