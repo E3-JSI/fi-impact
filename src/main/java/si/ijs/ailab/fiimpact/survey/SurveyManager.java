@@ -756,18 +756,11 @@ public class SurveyManager
       {
         if(!ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_IGNORE))
         {
-          String answer = surveyData.questions.get(ioListField.getFieldid());
-          if(answer != null)
-          {
-            answer = FIImpactSettings.normaliseCSVString(answer);
-            if(ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_FEATURE_TEXT))
-              fullText.append(answer).append(" ");
-            else
-              json.key(ioListField.getFieldid()).value(answer);
-          }
+          if(ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_FEATURE_TEXT))
+            addFullText(fullText, ioListField, surveyData.questions);
+          else
+            addQuestionKey(json, ioListField, surveyData.questions);
         }
-
-
       }
 
       ProjectData projectData = surveyData.getProject();
@@ -777,14 +770,12 @@ public class SurveyManager
         {
           if(!ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_IGNORE))
           {
-            String answer = projectData.getMattermarkValue(ioListField.getFieldid());
-            if(answer != null)
+            if(!ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_IGNORE))
             {
-              answer = FIImpactSettings.normaliseCSVString(answer);
               if(ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_FEATURE_TEXT))
-                fullText.append(answer).append(" ");
+                addFullText(fullText, ioListField, projectData.getMattermarkFields());
               else
-                json.key(ioListField.getFieldid()).value(answer);
+                addQuestionKey(json, ioListField, projectData.getMattermarkFields());
             }
           }
         }
@@ -797,18 +788,13 @@ public class SurveyManager
         {
           if(!ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_IGNORE))
           {
-            String answer = projectData.getValue(ioListField.getFieldid());
-            if(answer != null)
-            {
-              answer = FIImpactSettings.normaliseCSVString(answer);
-              if(ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_FEATURE_TEXT))
-                fullText.append(answer).append(" ");
-              else
-                json.key(ioListField.getFieldid()).value(answer);
-            }
+
+            if(ioListField.getGraph().equals(FIImpactSettings.FIELD_GRAPH_FEATURE_TEXT))
+              addFullText(fullText, ioListField, projectData.getFields());
+            else
+              addQuestionKey(json, ioListField, projectData.getFields());
           }
         }
-
       }
       json.key("full_text").value(fullText.toString());
     }
@@ -1066,8 +1052,35 @@ public class SurveyManager
       json.key(qID).value(FIImpactSettings.getDecimalFormatter4().format(val));
   }
 
-   private void addQuestionKey(JSONObject json, IOListField ioListField, Map<String, String> questions)
+
+private void addFullText(StringBuilder fullText, IOListField ioListField, Map<String, String> questions)
+{
+  String answer = questions.get(ioListField.getFieldid());
+  if(answer != null)
   {
+    answer = FIImpactSettings.normaliseCSVString(answer);
+    fullText.append(answer).append(" ");
+  }
+}
+
+
+  private void addQuestionKey(JSONObject json, IOListField ioListField, Map<String, String> questions)
+  {
+    String val = getQuestionValue(ioListField, questions);
+    if(val != null)
+      json.put(ioListField.getFieldid(), val);
+  }
+
+  private void addQuestionKey(JSONWriter json, IOListField ioListField, Map<String, String> questions)
+  {
+    String val = getQuestionValue(ioListField, questions);
+    if(val != null)
+      json.key(ioListField.getFieldid()).value(val);
+  }
+
+  private String getQuestionValue(IOListField ioListField, Map<String, String> questions)
+  {
+    String ret = null;
     if(ioListField.getCalculatedFrom().size() > 0)
     {
       StringBuilder sb = new StringBuilder();
@@ -1088,9 +1101,9 @@ public class SurveyManager
         }
       }
       if(sb.length() > 0) //!!FF Hack!!!
-        json.put(ioListField.getFieldid(), sb.toString());
+        ret = sb.toString();
       else
-        json.put(ioListField.getFieldid(), "B");
+        ret = "B";
     }
     else
     {
@@ -1102,8 +1115,9 @@ public class SurveyManager
       }
 
       if(val != null)
-        json.put(ioListField.getFieldid(), val);
+        ret = val;
     }
+    return ret;
   }
 
 

@@ -271,7 +271,7 @@ public class QMinerManager extends TimerTask
     HttpClient httpClient = null;
     try
     {
-      logger.info("Prepare qMiner get status call");
+      logger.info("Prepare qMiner get graph call");
 
       httpClient = createHttpClient();
 
@@ -282,7 +282,7 @@ public class QMinerManager extends TimerTask
       logger.debug("Service returned {}", response.getStatusLine().getStatusCode());
       if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
       {
-        logger.info("QMiner post status OK: {}", response.getStatusLine());
+        logger.info("QMiner get graph status OK: {}", response.getStatusLine());
         HttpEntity entity = response.getEntity();
         if(entity != null)
         {
@@ -414,9 +414,8 @@ public class QMinerManager extends TimerTask
 
     if(status != null)
     {
-      logger.warn("Project with id {} does not exist in qMiner. About to post the full record.");
-      //TODO  Wait for Mario
-      //status = getGraphForFullRecord(outputStream, internalSurveyId);
+      logger.warn("Project with id {} does not exist in qMiner. About to post the full record.", internalSurveyId);
+      status = getGraphForFullRecord(outputStream, internalSurveyId);
       if(status != null)
       {
         logger.error("Error calling get graph for {}: {}", internalSurveyId, status);
