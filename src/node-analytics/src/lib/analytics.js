@@ -168,6 +168,7 @@ exports.mdsAsync = function(mat, type) {
         // generate graph
         var graph = exports.buildGraph(mat2d, triangles, data.projects);
 		
+        console.log(type);
         if (type == "text") {
             fs.writeFile("../output/"+config.main_graph_fn, JSON.stringify(graph), function(err) {
                 if(err) {
@@ -186,13 +187,8 @@ exports.mdsAsync = function(mat, type) {
             });
             exports.graph_allftr = graph;
         }
-        else {
-            exports.graph = graph;
-        }
-        
-        console.log('done');
-        
-        return graph;		
+        else {}
+       		
 	});
 }
 	

@@ -166,14 +166,17 @@ app.get('/custom_graph_all/:n', function (req, res) {
         var graph = null;
         // 2.1 - if its cashed, load it from file
         if (cashed) {
+            console.log('custom graph is cashed');
             // 2.1.1 - load it
             var graph = qdata.loadFile('custom_graph_all_', inputId);
         }
         // 2.2 - if its not, find the record and computed
         else {
+            console.log('custom graph is not cashed');
             var rec = qdata.findPrj(inputId);
             // 2.2.1 - find the record
             if (rec) {
+                console.log('record is found');
                 // 2.2.1.1 - compute it
                 var graph = qminer.customGraph(qminer.ftrAll, qminer.prj.allRecords, rec, "all");
             }
@@ -182,7 +185,7 @@ app.get('/custom_graph_all/:n', function (req, res) {
     
     // 3 - return result
     if (graph) {
-        qdata.saveFile('custom_graph_all_', inputId, inputId, JSON.stringify(graph));
+        qdata.saveFile('custom_graph_all_', inputId, JSON.stringify(graph));
         console.log({'time':new Date().toString(), "status":'similarity graph (all feature) for id '+req.params.n + ' computed', 'ms': new Date().getTime()});
         status.push({'time':new Date().toString(), "status":'similarity graph (all feature) for id '+req.params.n + ' computed', 'ms': new Date().getTime()});
         res.send(graph);

@@ -62,7 +62,7 @@ exports.findPrj = function(id) {
 }
 
 exports.loadFile = function(prefix, name) {
-    return JSON.parse(fs.readFileSync('../output/'+prefix+name, 'utf8'));
+    return JSON.parse(fs.readFileSync('../output/'+prefix+name+'.json', 'utf8'));
 }
 
 exports.saveFile = function(prefix, name, graph) {

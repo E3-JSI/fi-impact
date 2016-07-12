@@ -4,5 +4,5 @@
 	"MDS_max_steps": 100,
 	"prj_data_fn": "fi-impact-export.json",
 	"main_graph_fn": "main_graph.json",
-    "main_graph_all_fn": "main_graph.json"
+    "main_graph_all_fn": "main_graph_all.json"
 }

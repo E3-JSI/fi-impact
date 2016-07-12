@@ -193,7 +193,7 @@ exports.init = function() {
     });
 }
 
-exports.customGraph = function(ftr, recs, rec, graph, type) {
+exports.customGraph = function(ftr, recs, rec, type) {
     var analytics = require('./analytics.js');
     var mat = ftr.extractMatrix(recs).transpose().toArray();
     var vec = ftr.extractVector(rec).toArray();
@@ -205,10 +205,10 @@ exports.customGraph = function(ftr, recs, rec, graph, type) {
         return analytics.buildEgoGraph(rec, mat, vec, this.data.projects, exports.graph);
     }
     else if (type == "all") {
-        return analytics.buildEgoGraph(rec, mat, vec, this.data.projects, exports.graph_allftr);
+        return analytics.buildEgoGraph(rec, mat, vec, this.data.projects, analytics.graph_allftr);
     }
     else {
-        return analytics.buildEgoGraph(rec, mat, vec, this.data.projects, exports.graph);
+        return analytics.buildEgoGraph(rec, mat, vec, this.data.projects, analytics.graph);
     }
     
 }
@@ -233,7 +233,6 @@ exports.mainGraph2 = function() {
     var mat = exports.ftr.extractMatrix(exports.prj.allRecords);
 	var nodes = [];
 	var prj = this.data.projects;
-    console.log(prj.length+" rows "+ mat.rows+" cols "+mat.cols);
     for( var i=0; i<mat.cols; i++) {
         //console.log(prj[i].id_internal);
       	nodes.push({ "x": Math.random(), "y": Math.random(), "id": i, "idx": prj[i].id_internal, "deg": 0, "node_type": prj[i].node_type, "extra_data": exports.data.extra_data[i]});
