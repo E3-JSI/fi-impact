@@ -45,27 +45,9 @@ app.post('/post_data', function(req, res) {
 	status.push({'time':new Date().toString(), "status":'posted data stored', 'ms': new Date().getTime()});
 	res.send({"status":"done"});
 });
-
-/*
- * Computing similarity graph for a custum input record that doesent have to be a part of the model and db. 
- */
-app.post('/custom_graph_full_record', function(req, res) {
-    var data = req.body;
-	console.log({'time':new Date().toString(), "status":'sending new record', 'ms': new Date().getTime()});
-	status.push({'time':new Date().toString(), "status":'sending new record', 'ms': new Date().getTime()});
-	var inputId = data.id_internal;
-    var files = qdata.getAllFilesFromFolder("../output/");
-	// new record
-	var	rec = data;
-	console.log("send rec "+rec);
-	var graph = qminer.sendRecord(rec);
-	console.log({'time':new Date().toString(), "status":'similarity graph for a new record with id '+ inputId + ' computed', 'ms': new Date().getTime()});
-	status.push({'time':new Date().toString(), "status":'similarity graph for a new record with id '+ inputId + ' computed', 'ms': new Date().getTime()});
-	res.send(graph);
-});
  
 app.get('/', function (req, res) {
-    res.send('Hello World')
+    res.send('Hello World');
 });
 
 app.get('/fill_from_file', function (req, res) {
@@ -110,6 +92,20 @@ app.get('/main_graph_all_async', function (req, res) {
     qminer.mainGraphAsync(qminer.ftrAll, qminer.prj.allRecords, "all");
 	
     res.send({"status":'started computing main graph based on all features'});
+});
+/*
+ * Computing similarity graph for a custum input record that doesent have to be a part of the model and db. 
+ */
+app.post('/custom_graph_full_record', function(req, res) {
+	console.log({'time':new Date().toString(), "status":'sending new record', 'ms': new Date().getTime()});
+	status.push({'time':new Date().toString(), "status":'sending new record', 'ms': new Date().getTime()});
+
+    // 1 - compute it
+	var graph = qminer.sendRecord(qminer.ftr, qminer.prj.allRecords, req.body);
+    
+	console.log({'time':new Date().toString(), "status":'similarity graph for a new record computed', 'ms': new Date().getTime()});
+	status.push({'time':new Date().toString(), "status":'similarity graph for a new record computed', 'ms': new Date().getTime()});
+	res.send(graph);
 });
 
 app.get('/custom_graph/:n', function (req, res) {

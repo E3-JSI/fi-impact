@@ -86,6 +86,46 @@ exports.setAllFts = function() {
 
 // EXPORT METHODS
 //
+exports.createRecord = function (data) {
+    var seed_object = {};
+    for (var j=0; j<qdata.data_settings.length; j++) {
+        if (qdata.data_settings[j].usage == "feature" || qdata.data_settings[j].usage == "id" || qdata.data_settings[j].usage == "node_type") {
+            if (qdata.data_settings[j].type == "int") {
+                seed_object[qdata.data_settings[j].field] = 0;
+            }
+            else if (qdata.data_settings[j].type == "numeric" || qdata.data_settings[j].type == "num") {
+                seed_object[qdata.data_settings[j].field] = 0.0;
+            }
+            else {
+                seed_object[qdata.data_settings[j].field] = "";
+            }
+        }
+    }
+    
+    var extra_data = {};
+    for (var j=0; j<qdata.data_settings.length; j++) {
+        if (data.hasOwnProperty(qdata.data_settings[j].field)) {
+            if (qdata.data_settings[j].usage == "feature" || qdata.data_settings[j].usage == "id" || qdata.data_settings[j].usage == "node_type") {
+                if (qdata.data_settings[j].type == "int") {
+                    seed_object[qdata.data_settings[j].field] = parseInt(data[qdata.data_settings[j].field]);
+                }
+                else if (qdata.data_settings[j].type == "numeric" || qdata.data_settings[j].type == "num") {
+                    seed_object[qdata.data_settings[j].field] = parseFloat(data[qdata.data_settings[j].field]);
+                }
+                else {
+                    if (seed_object[qdata.data_settings[j].field] !== undefined) {
+                        seed_object[qdata.data_settings[j].field] = data[qdata.data_settings[j].field];
+                    }
+                }
+            }
+            if (qdata.data_settings[j].usage == "display" || qdata.data_settings[j].usage == "selection" || true) {
+                extra_data[qdata.data_settings[j].field] = data[qdata.data_settings[j].field];
+            }
+        }
+    }
+    seed_object.extra_data = extra_data;
+    return seed_object;
+}
 
 exports.fillPrjStore = function(data) {
     var prj = this.prj;	
@@ -161,11 +201,12 @@ exports.fillPrjStoreFromFile = function() {
     this.ftr.updateRecords(prj.allRecords);
 }
 
-exports.sendRecord = function(dat) {
-    var rec = {"id_internal": dat.id_internal, "desc": dat.full_text, "succ": dat.node_type};
-	var mat = exports.ftr.extractMatrix(exports.prj.allRecords).transpose().toArray();
-	var vec = exports.ftr.extractVector(rec).toArray();
+exports.sendRecord = function(ftr, recs, dat) {
     var analytics = require('./analytics.js'); 
+    //var rec = {"id_internal": dat.id_internal, "desc": dat.full_text, "succ": dat.node_type};
+	var rec = exports.createRecord(dat);
+    var mat = ftr.extractMatrix(exports.prj.allRecords).transpose().toArray();
+	var vec = ftr.extractVector(rec).toArray();
     return analytics.buildEgoGraphNewRec(rec, dat, mat, vec, this.data.projects, analytics.graph);
 }
 
