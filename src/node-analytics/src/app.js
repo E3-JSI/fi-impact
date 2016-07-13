@@ -23,7 +23,7 @@ app.post('/post_data', function(req, res) {
     var data = req.body;
 	console.log({'time':new Date().toString(), "status":'recieved post data', 'ms': new Date().getTime()});
 	status.push({'time':new Date().toString(), "status":'recieved post data', 'ms': new Date().getTime()});
-    
+        
     // 1 = define schema based on data
     var schema = qminer.setPrjShema(data);
     // 2 - create qminer base based on schema
@@ -78,6 +78,21 @@ app.get('/main_graph_async', function (req, res) {
     console.log({'time':new Date().toString(), "status":'computing main similarity graph', 'ms': new Date().getTime()});
 	status.push({'time':new Date().toString(), "status":'computing main similarity graph', 'ms': new Date().getTime()});
     
+    console.log(qminer.prj.allRecords);
+    
+    // 1 - compute main graph based on full_text features
+    qminer.mainGraphAsync(qminer.ftr, qminer.prj.allRecords, "text");
+    // 2 - compute main graph based on all features
+    qminer.mainGraphAsync(qminer.ftrAll, qminer.prj.allRecords, "all");
+    
+	res.send({"status":'started computing main graph'});
+});
+
+/*
+app.get('/main_graph_async', function (req, res) {
+    console.log({'time':new Date().toString(), "status":'computing main similarity graph', 'ms': new Date().getTime()});
+	status.push({'time':new Date().toString(), "status":'computing main similarity graph', 'ms': new Date().getTime()});
+    
     // 1 - compute main graph based on full_text feature
     qminer.mainGraphAsync(qminer.ftr, qminer.prj.allRecords, "text");
     
@@ -93,6 +108,8 @@ app.get('/main_graph_all_async', function (req, res) {
 	
     res.send({"status":'started computing main graph based on all features'});
 });
+*/
+
 /*
  * Computing similarity graph for a custum input record that doesent have to be a part of the model and db. 
  */
@@ -101,7 +118,19 @@ app.post('/custom_graph_full_record', function(req, res) {
 	status.push({'time':new Date().toString(), "status":'sending new record', 'ms': new Date().getTime()});
 
     // 1 - compute it
-	var graph = qminer.sendRecord(qminer.ftr, qminer.prj.allRecords, req.body);
+	var graph = qminer.sendRecord(qminer.ftr, qminer.prj.allRecords, req.body, "text");
+    
+	console.log({'time':new Date().toString(), "status":'similarity graph for a new record computed', 'ms': new Date().getTime()});
+	status.push({'time':new Date().toString(), "status":'similarity graph for a new record computed', 'ms': new Date().getTime()});
+	res.send(graph);
+});
+
+app.post('/custom_graph_full_record_all', function(req, res) {
+	console.log({'time':new Date().toString(), "status":'sending new record', 'ms': new Date().getTime()});
+	status.push({'time':new Date().toString(), "status":'sending new record', 'ms': new Date().getTime()});
+
+    // 1 - compute it
+	var graph = qminer.sendRecord(qminer.ftrAll, qminer.prj.allRecords, req.body, "all");
     
 	console.log({'time':new Date().toString(), "status":'similarity graph for a new record computed', 'ms': new Date().getTime()});
 	status.push({'time':new Date().toString(), "status":'similarity graph for a new record computed', 'ms': new Date().getTime()});

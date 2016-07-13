@@ -155,20 +155,19 @@ exports.buildGraph = function(mat2d, triangles, prj) {
     return {"nodes": nodes, "edges": edges};
 }
 // MDS async	
-exports.mdsAsync = function(mat, type) {
+exports.mdsAsync = function(mat, type, data) {
     var mds = new analytics.MDS({ maxStep: config.MDS_max_steps, maxSecs: parseInt(config.MDS_time_sec), distType: config.MDS_similarity_measure });
 	//var mds = new analytics.MDS({ distType: config.MDS_similarity_measure });
 	mds.fitTransformAsync(mat, function (err, res) {
         if (err) {
-            console.log(err); return 
+            console.log("MDS ERROR: "+err); return 
         }
 		var mat2d = res.toArray();
 		// delaunay triangulation
         var triangles = exports.triangulate(mat2d);
         // generate graph
-        var graph = exports.buildGraph(mat2d, triangles, data.projects);
+        var graph = exports.buildGraph(mat2d, triangles, data);
 		
-        console.log(type);
         if (type == "text") {
             fs.writeFile("../output/"+config.main_graph_fn, JSON.stringify(graph), function(err) {
                 if(err) {

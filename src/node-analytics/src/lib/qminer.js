@@ -20,6 +20,11 @@ exports.ftrAll;
  * Create base 
  */
 exports.createBase = function(schema) {
+    if (exports.base!==undefined) {
+        console.log('closing base');
+        exports.base.close();
+    }
+    
     exports.base = new qm.Base({
         mode: 'createClean',
         schema: [{
@@ -170,7 +175,8 @@ exports.fillPrjStore = function(data) {
         
         prj.push(seed_object);
 		exports.data.extra_data.push(extra_data);
-        //prj.push({"id_internal": data.surveys[i].id_internal, "desc": data.surveys[i].full_text+" ", "node_type":data.surveys[i].node_type });
+        qdata.projects = data.surveys;
+        this.prj = prj;
     }
 }
 
@@ -178,36 +184,22 @@ exports.processRecord = function(data) {
     console.log(data);
 }
 
-exports.fillPrjStoreFromFile = function() {
-    var prj = this.prj;
-    // push data to store
-    for (var i=0; i<data.projects.length; i++) {
-	    var succ = "none";
-	    /*
-	    if (data.projects[i]["SUCCESS IDG"] == "X") {
-	        succ = "idg";
-	    }
-	    if (data.projects[i]["SUCCESS VIP"] == "X") {
-            succ = "vip";
-        }
-	    if (data.projects[i]["SUCCESS HPI"] == "X") {
-            succ = "hpi";
-	    }
-	    data.projects[i].succ = succ;
-		*/
-		succ = data.projects[i].node_type;
-        prj.push({"id_internal": data.projects[i].id_internal, "desc": data.projects[i].full_text+" ", "succ": succ});
-    }
-    this.ftr.updateRecords(prj.allRecords);
-}
-
-exports.sendRecord = function(ftr, recs, dat) {
+exports.sendRecord = function(ftr, recs, dat, type) {
     var analytics = require('./analytics.js'); 
     //var rec = {"id_internal": dat.id_internal, "desc": dat.full_text, "succ": dat.node_type};
 	var rec = exports.createRecord(dat);
     var mat = ftr.extractMatrix(exports.prj.allRecords).transpose().toArray();
 	var vec = ftr.extractVector(rec).toArray();
-    return analytics.buildEgoGraphNewRec(rec, dat, mat, vec, this.data.projects, analytics.graph);
+    
+    if (type == "text") {
+        return analytics.buildEgoGraphNewRec(rec, dat, mat, vec, this.data.projects, analytics.graph);
+    }
+    else if (type == "all") {
+        return analytics.buildEgoGraphNewRec(rec, dat, mat, vec, this.data.projects, analytics.graph_allftr);
+    }
+    else {
+        return analytics.buildEgoGraphNewRec(rec, dat, mat, vec, this.data.projects, analytics.graph);
+    }
 }
 
 exports.close = function() {
@@ -254,48 +246,11 @@ exports.customGraph = function(ftr, recs, rec, type) {
     
 }
 
-exports.mainGraph = function() {
-    // get matrix
-    var mat = exports.ftr.extractMatrix(exports.prj.allRecords);
-    // import analytics module
-    var analytics = require('./analytics.js');
-    // construct a MDS instance
-    var mat2d = analytics.mds(mat);
-    // delaunay triangulation
-    var triangles = analytics.triangulate(mat2d);
-    // generate graph
-    var graph = analytics.buildGraph(mat2d, triangles, this.data.projects);
-    this.graph = graph;
-    return graph;
-}
-
-exports.mainGraph2 = function() {
-	var analytics = require('./analytics.js');
-    var mat = exports.ftr.extractMatrix(exports.prj.allRecords);
-	var nodes = [];
-	var prj = this.data.projects;
-    for( var i=0; i<mat.cols; i++) {
-        //console.log(prj[i].id_internal);
-      	nodes.push({ "x": Math.random(), "y": Math.random(), "id": i, "idx": prj[i].id_internal, "deg": 0, "node_type": prj[i].node_type, "extra_data": exports.data.extra_data[i]});
-    }
-	var edges = [];
-    for (var i=0; i<mat.cols; i++) {
-	    for (var j=i; j<mat.cols; j++) {
-		    var sim = analytics.cosine(mat.getCol(i).toArray(), mat.getCol(j).toArray());
-			if (sim > 0.04) {
-                console.log(i+" - "+j+": "+sim);
-			    edges.push({"source": nodes[i].id, "source": nodes[j].id});
-			}
-		}
-    }
-	this.graph = {"nodes": nodes, "edges": edges};
-}
-
 exports.mainGraphAsync = function(ftr, recs, type) {
     // import analytics module
     var analytics = require('./analytics.js');  
     // get matrix
     var mat = ftr.extractMatrix(recs);
     // construct a MDS instance
-	analytics.mdsAsync(mat, type); 
+	analytics.mdsAsync(mat, type, qdata.projects); 
 }

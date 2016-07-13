@@ -1,0 +1,1 @@
+In this folder files for caching are stored.

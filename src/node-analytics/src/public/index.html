@@ -7,7 +7,8 @@
     <script>
 		
 		function testPost() {
-			$.getJSON( "./data/post_data.json", function( data ) {
+			//$.getJSON( "./data/post_data.json", function( data ) {
+            $.getJSON( "./data/fi-impact-export1.json", function( data ) {
 			    console.log("data: "+data);
 				
 				$.ajax({
@@ -37,6 +38,22 @@
 				
 			});
 		}
+        
+        function testRecordAll() {
+			$.getJSON( "./data/record_data.json", function( data ) {
+			    console.log("data: "+data);
+				
+				$.ajax({
+					type: 'POST',
+					url: 'custom_graph_full_record_all',
+					data: data,
+					success: function(msg) {
+						$('body').append(JSON.stringify(msg));
+					}
+				});
+				
+			});
+		}
 		
 		
     </script>
@@ -44,5 +61,6 @@
 <body>
     <div id="button" style="width:20px; height:100px;" onclick="javascript:testPost();">POST</div>
 	<div id="button" style="width:20px; height:100px;" onclick="javascript:testRecord();">ONE RECORD</div>
+    <div id="button" style="width:20px; height:100px;" onclick="javascript:testRecordAll();">ONE RECORD ALL</div>
 </body>
 </html>
