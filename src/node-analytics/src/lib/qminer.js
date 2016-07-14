@@ -192,13 +192,13 @@ exports.sendRecord = function(ftr, recs, dat, type) {
 	var vec = ftr.extractVector(rec).toArray();
     
     if (type == "text") {
-        return analytics.buildEgoGraphNewRec(rec, dat, mat, vec, this.data.projects, analytics.graph);
+        return analytics.buildEgoGraph(rec, dat, mat, vec, this.data.projects, analytics.graph, "new");
     }
     else if (type == "all") {
-        return analytics.buildEgoGraphNewRec(rec, dat, mat, vec, this.data.projects, analytics.graph_allftr);
+        return analytics.buildEgoGraph(rec, dat, mat, vec, this.data.projects, analytics.graph_allftr, "new");
     }
     else {
-        return analytics.buildEgoGraphNewRec(rec, dat, mat, vec, this.data.projects, analytics.graph);
+        return analytics.buildEgoGraph(rec, dat, mat, vec, this.data.projects, analytics.graph, "new");
     }
 }
 
@@ -235,13 +235,13 @@ exports.customGraph = function(ftr, recs, rec, type) {
     exports.graph_allftr = analytics.graph_allftr;
     // 2 - compute
     if (type == "text") {
-        return analytics.buildEgoGraph(rec, mat, vec, this.data.projects, exports.graph);
+        return analytics.buildEgoGraph(rec, {}, mat, vec, this.data.projects, exports.graph, "existing");
     }
     else if (type == "all") {
-        return analytics.buildEgoGraph(rec, mat, vec, this.data.projects, analytics.graph_allftr);
+        return analytics.buildEgoGraph(rec, {}, mat, vec, this.data.projects, analytics.graph_allftr, "existing");
     }
     else {
-        return analytics.buildEgoGraph(rec, mat, vec, this.data.projects, analytics.graph);
+        return analytics.buildEgoGraph(rec, {}, mat, vec, this.data.projects, analytics.graph, "existing");
     }
     
 }

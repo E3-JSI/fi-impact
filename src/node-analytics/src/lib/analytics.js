@@ -34,7 +34,7 @@ exports.triangulate = function(mat2d) {
 
 // build graph
 
-exports.buildEgoGraph = function(rec, mat, mat1, prj, graph) {
+exports.buildEgoGraph = function(rec, dat, mat, mat1, prj, graph, type) {
     
     dict = {};
     for (var i=0; i<mat.length; i++) {
@@ -55,72 +55,30 @@ exports.buildEgoGraph = function(rec, mat, mat1, prj, graph) {
             egoNode = graph.nodes[i];
         }
     }
-
+    
     if (newNode) {
         egoNode = {"id": graph.nodes.length, "idx": rec.id_internal, "x":0, "y":0};
-        graph1.nodes.push(egoNode);
     }
-
-    for (var i=0; i<graph.nodes.length; i++) {
-        if (dict[graph.nodes[i].idx] > 0.01) {
-            var node = graph.nodes[i];
-            graph1.nodes.push(node);
-	    if (dict[graph.nodes[i].idx] > 0.1) {
-                graph1.edges.push({"source":egoNode.id,"target":graph.nodes[i].id, "id":egoNode.id+"_"+graph.nodes[i].id, "id1x": egoNode.idx, "id2x":graph.nodes[i].idx, "distance": dict[graph.nodes[i].idx]});
-	    }
-	}
-    }
-
-    for (var i=0; i<graph.edges.length; i++) {
-        if (dict[graph.edges[i].sourcex] > 0.01 && dict[graph.edges[i].targetx] > 0.01){
-            graph1.edges.push(graph.edges[i]);
-        }
-    }
-
-    return graph1;
-}
-
-exports.buildEgoGraphNewRec = function(rec, dat, mat, mat1, prj, graph) {
     
-    dict = {};
-	
-    for (var i=0; i<mat.length; i++) {
-        dict[prj[i].id_internal] = this.cosine(mat[i], mat1);
-    }
-
-    var graph1 = {};
-    graph1.nodes = [];
-    graph1.edges = [];
-
-    var newNode = true;
-    var egoNode;
-
     for (var i=0; i<graph.nodes.length; i++) {
-        if (rec.id_internal == graph.nodes[i].idx) {
-            newNode = false;
-			graph.nodes[i].ego = 1;
-            egoNode = graph.nodes[i];
-        }
-    }
-
-    if (newNode) {
-        egoNode = {"id": graph.nodes.length, "idx": rec.id_internal, "x":0, "y":0, "deg": 0, "extra_data": dat};
-        graph1.nodes.push(egoNode);
-    }
-
-    for (var i=0; i<graph.nodes.length; i++) {
-        if (dict[graph.nodes[i].idx] > 0.01) {
+        if (dict[graph.nodes[i].idx] > config.node_threshold) {
             var node = graph.nodes[i];
             graph1.nodes.push(node);
-			if (dict[graph.nodes[i].idx] > 0.1) {
+            if (dict[graph.nodes[i].idx] > config.edge_threshold) {
                 graph1.edges.push({"source":egoNode.id,"target":graph.nodes[i].id, "id":egoNode.id+"_"+graph.nodes[i].id, "id1x": egoNode.idx, "id2x":graph.nodes[i].idx, "distance": dict[graph.nodes[i].idx]});
-	            egoNode.deg += 1;
-			}
-		}
+            }
+            egoNode.deg += 1;
+        }
+    }
+	
+    graph1.nodes.push(egoNode);
+    
+    if (type == "new") {
+        egoNode.extra_data = dat;
     }
 
     for (var i=0; i<graph.edges.length; i++) {
-        if (dict[graph.edges[i].sourcex] > 0.01 && dict[graph.edges[i].targetx] > 0.01){
+        if (dict[graph.edges[i].sourcex] > config.node_threshold && dict[graph.edges[i].targetx] > config.node_threshold){
             graph1.edges.push(graph.edges[i]);
         }
     }
@@ -131,7 +89,7 @@ exports.buildEgoGraphNewRec = function(rec, dat, mat, mat1, prj, graph) {
 exports.buildGraph = function(mat2d, triangles, prj) {
     var nodes = [];
     for( var i=0; i<mat2d.length; i++) {
-        nodes.push({ "x": mat2d[i][0], "y": mat2d[i][1], "id": i, "idx": prj[i].id_internal, "deg": 0, "node_type": prj[i].node_type, "extra_data": data.extra_data[i]});
+        nodes.push({ "x": Number(parseFloat(mat2d[i][0].toString().substr(0,5)).toFixed(4)), "y": Number(parseFloat(mat2d[i][1].toString().substr(0,5))).toFixed(4), "id": i, "idx": prj[i].id_internal, "deg": 0, "node_type": prj[i].node_type, "extra_data": data.extra_data[i]});
     }
 
     // build edges json array

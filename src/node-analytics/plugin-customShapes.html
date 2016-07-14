@@ -68,11 +68,8 @@
  * IMPORTANT: This only works with the canvas renderer. TBD in the future
  * will also support the WebGL renderer.
  */
- 
- //$.getJSON( "output/custom_graph.json", function( data ) {
- //$.getJSON( "output/custom_graph_bfcc4bc1-1a0c-41c9-9d48-1b73641a05bf.json", function( data ) {
- $.getJSON( "output/custom_graph_test1.json", function( data ) {
-        console.log(data);
+   $.getJSON( "output/custom_graph_bfcc4bc1-1a0c-41c9-9d48-1b73641a05bf.json", function( data ) {
+    console.log('data:' + data);
 		var dict = {};
 		var uniqEdges = [];
 		for (var i=0; i<data.edges.length; i++) {
