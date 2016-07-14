@@ -95,9 +95,12 @@ app.post('/custom_graph_full_record', function(req, res) {
 	console.log({'time':new Date().toString(), "status":'sending new record', 'ms': new Date().getTime()});
 	status.push({'time':new Date().toString(), "status":'sending new record', 'ms': new Date().getTime()});
 
-    // 1 - compute it
-	var graph = qminer.sendRecord(qminer.ftr, qminer.prj.allRecords, req.body, "text");
-    qdata.saveFile('test_new_rec', inputId, graph);
+    // 1 - generate record from input
+    var rec = qminer.createRecord(req.body);
+    // 2 - compute it
+	var graph = qminer.customGraph(qminer.ftr, qminer.prj.allRecords, rec, req.body, "text");
+    // 3 - save it to file - testing
+    qdata.saveFile('test_', "txt", graph);
     
 	console.log({'time':new Date().toString(), "status":'similarity graph for a new record computed', 'ms': new Date().getTime()});
 	status.push({'time':new Date().toString(), "status":'similarity graph for a new record computed', 'ms': new Date().getTime()});
@@ -108,9 +111,12 @@ app.post('/custom_graph_full_record_all', function(req, res) {
 	console.log({'time':new Date().toString(), "status":'sending new record', 'ms': new Date().getTime()});
 	status.push({'time':new Date().toString(), "status":'sending new record', 'ms': new Date().getTime()});
 
-    // 1 - compute it
-	var graph = qminer.sendRecord(qminer.ftrAll, qminer.prj.allRecords, req.body, "all");
-    qdata.saveFile('test_new_rec', inputId, graph);
+    // 1 - generate record from input
+    var rec = qminer.createRecord(req.body);
+    // 2 - compute it
+	var graph = qminer.customGraph(qminer.ftrAll, qminer.prj.allRecords, rec, req.body, "all");
+    // 3 - save it to file - testing
+    qdata.saveFile('test_', "all", graph);
     
 	console.log({'time':new Date().toString(), "status":'similarity graph for a new record computed', 'ms': new Date().getTime()});
 	status.push({'time':new Date().toString(), "status":'similarity graph for a new record computed', 'ms': new Date().getTime()});
@@ -140,7 +146,7 @@ app.get('/custom_graph/:n', function (req, res) {
             if (rec) {
                 // 2.2.1.1 - compute it
                 var qminer = require('./lib/qminer.js');
-                var graph = qminer.customGraph(qminer.ftr, qminer.prj.allRecords, rec, "text");
+                var graph = qminer.customGraph(qminer.ftr, qminer.prj.allRecords, rec, {}, "text");
             }
         }               
     }
@@ -171,19 +177,16 @@ app.get('/custom_graph_all/:n', function (req, res) {
         var graph = null;
         // 2.1 - if its cashed, load it from file
         if (cashed) {
-            console.log('custom graph is cashed');
             // 2.1.1 - load it
             var graph = qdata.loadFile('custom_graph_all_', inputId);
         }
         // 2.2 - if its not, find the record and computed
         else {
-            console.log('custom graph is not cashed');
             var rec = qdata.findPrj(inputId);
             // 2.2.1 - find the record
             if (rec) {
-                console.log('record is found');
                 // 2.2.1.1 - compute it
-                var graph = qminer.customGraph(qminer.ftrAll, qminer.prj.allRecords, rec, "all");
+                var graph = qminer.customGraph(qminer.ftrAll, qminer.prj.allRecords, rec, {}, "all");
             }
         }               
     }
@@ -235,4 +238,4 @@ app.get('/close', function (req, res) {
     res.send({"success":"done"});
 });
  
-app.listen(3000)
+app.listen(config.port);

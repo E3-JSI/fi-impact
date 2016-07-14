@@ -48,34 +48,38 @@ exports.buildEgoGraph = function(rec, dat, mat, mat1, prj, graph, type) {
     var newNode = true;
     var egoNode;
 
-    for (var i=0; i<graph.nodes.length; i++) {
-        if (rec.id_internal == graph.nodes[i].idx) {
-            newNode = false;
-			graph.nodes[i].ego = 1;
-            egoNode = graph.nodes[i];
+    if (type != "new") {
+        for (var i=0; i<graph.nodes.length; i++) {
+            if (rec.id_internal == graph.nodes[i].idx) {
+                newNode = false;
+                graph.nodes[i].ego = 1;
+                egoNode = graph.nodes[i];
+            }
         }
     }
     
     if (newNode) {
-        egoNode = {"id": graph.nodes.length, "idx": rec.id_internal, "x":0, "y":0};
+        egoNode = {"id": graph.nodes.length, "idx": rec.id_internal, "x":0, "y":0, "deg":0, "node_type": rec.node_type};
+        if (type == "new") {
+            egoNode.extra_data = dat;
+        }
     }
     
     for (var i=0; i<graph.nodes.length; i++) {
         if (dict[graph.nodes[i].idx] > config.node_threshold) {
             var node = graph.nodes[i];
-            graph1.nodes.push(node);
+            if (node.id != egoNode.id) { // ego node is added last
+                graph1.nodes.push(node);
+            }
             if (dict[graph.nodes[i].idx] > config.edge_threshold) {
                 graph1.edges.push({"source":egoNode.id,"target":graph.nodes[i].id, "id":egoNode.id+"_"+graph.nodes[i].id, "id1x": egoNode.idx, "id2x":graph.nodes[i].idx, "distance": dict[graph.nodes[i].idx]});
+                egoNode.deg += 1;
             }
-            egoNode.deg += 1;
         }
     }
-	
-    graph1.nodes.push(egoNode);
     
-    if (type == "new") {
-        egoNode.extra_data = dat;
-    }
+    // ego node is added last
+    graph1.nodes.push(egoNode);
 
     for (var i=0; i<graph.edges.length; i++) {
         if (dict[graph.edges[i].sourcex] > config.node_threshold && dict[graph.edges[i].targetx] > config.node_threshold){

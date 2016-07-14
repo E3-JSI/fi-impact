@@ -128,7 +128,7 @@ exports.createRecord = function (data) {
             }
         }
     }
-    seed_object.extra_data = extra_data;
+    //seed_object.extra_data = extra_data;
     return seed_object;
 }
 
@@ -184,24 +184,6 @@ exports.processRecord = function(data) {
     console.log(data);
 }
 
-exports.sendRecord = function(ftr, recs, dat, type) {
-    var analytics = require('./analytics.js'); 
-    //var rec = {"id_internal": dat.id_internal, "desc": dat.full_text, "succ": dat.node_type};
-	var rec = exports.createRecord(dat);
-    var mat = ftr.extractMatrix(exports.prj.allRecords).transpose().toArray();
-	var vec = ftr.extractVector(rec).toArray();
-    
-    if (type == "text") {
-        return analytics.buildEgoGraph(rec, dat, mat, vec, this.data.projects, analytics.graph, "new");
-    }
-    else if (type == "all") {
-        return analytics.buildEgoGraph(rec, dat, mat, vec, this.data.projects, analytics.graph_allftr, "new");
-    }
-    else {
-        return analytics.buildEgoGraph(rec, dat, mat, vec, this.data.projects, analytics.graph, "new");
-    }
-}
-
 exports.close = function() {
     base.close();
 }
@@ -226,7 +208,7 @@ exports.init = function() {
     });
 }
 
-exports.customGraph = function(ftr, recs, rec, type) {
+exports.customGraph = function(ftr, recs, rec, dat, type) {
     var analytics = require('./analytics.js');
     var mat = ftr.extractMatrix(recs).transpose().toArray();
     var vec = ftr.extractVector(rec).toArray();
@@ -235,13 +217,13 @@ exports.customGraph = function(ftr, recs, rec, type) {
     exports.graph_allftr = analytics.graph_allftr;
     // 2 - compute
     if (type == "text") {
-        return analytics.buildEgoGraph(rec, {}, mat, vec, this.data.projects, exports.graph, "existing");
+        return analytics.buildEgoGraph(rec, dat, mat, vec, this.data.projects, exports.graph, "existing");
     }
     else if (type == "all") {
-        return analytics.buildEgoGraph(rec, {}, mat, vec, this.data.projects, analytics.graph_allftr, "existing");
+        return analytics.buildEgoGraph(rec, dat, mat, vec, this.data.projects, analytics.graph_allftr, "existing");
     }
     else {
-        return analytics.buildEgoGraph(rec, {}, mat, vec, this.data.projects, analytics.graph, "existing");
+        return analytics.buildEgoGraph(rec, dat, mat, vec, this.data.projects, analytics.graph, "existing");
     }
     
 }
