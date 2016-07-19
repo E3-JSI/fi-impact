@@ -44,7 +44,8 @@ public class FIImpactRequestHandler extends HttpServlet
     ALLOWED_ACTIONS.add("plot");
     ALLOWED_ACTIONS.add("plot-legend");
     ALLOWED_ACTIONS.add("profile");
-    ALLOWED_ACTIONS.add(QMinerManager.ACTION_GET_GRAPH);
+    ALLOWED_ACTIONS.add(QMinerManager.ACTION_GET_GRAPH_TEXT_FEATURE);
+    ALLOWED_ACTIONS.add(QMinerManager.ACTION_GET_GRAPH_TEXT_FEATURE);
 
   }
   @Override
@@ -174,11 +175,11 @@ public class FIImpactRequestHandler extends HttpServlet
 
       FIImpactSettings.getFiImpactSettings().getSurveyManager().getPlotJSON(response.getOutputStream(), sId);
     }
-    else if(sAction.equals(QMinerManager.ACTION_GET_GRAPH))
+    else if(sAction.equals(QMinerManager.ACTION_GET_GRAPH_TEXT_FEATURE) || ALLOWED_ACTIONS.add(QMinerManager.ACTION_GET_GRAPH_ALL_FEATURES))
     {
       response.setContentType("application/json");
       response.setCharacterEncoding("utf-8");
-      FIImpactSettings.getFiImpactSettings().getQMinerManager().actionGetGraph(response.getOutputStream(), sId);
+      FIImpactSettings.getFiImpactSettings().getQMinerManager().actionGetGraph(response.getOutputStream(), sId, sAction);
     }
     else if (sAction.equals("plot-legend"))
     {
