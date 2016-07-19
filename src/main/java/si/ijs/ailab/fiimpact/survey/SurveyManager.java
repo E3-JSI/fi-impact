@@ -139,6 +139,22 @@ public class SurveyManager
     logger.info("Recalc Surveys Results done");
   }
 
+  public void surveysPostedToQMiner()
+  {
+    logger.info("Set all surveys QMiner status");
+    synchronized(surveys)
+    {
+      for(SurveyData surveyData : surveys.values())
+      {
+        if(!surveyData.isPostedToQMiner())
+        {
+          surveyData.setPostedToQMiner(true);
+          surveyData.saveSurvey(FIImpactSettings.getFiImpactSettings().getSurveyRoot());
+        }
+      }
+    }
+    logger.info("Set all surveys QMiner status - done");
+  }
 
   public void recalcResults()
   {
@@ -198,20 +214,7 @@ public class SurveyManager
 
         for(IOListField ioListField: categoryFields)
         {
-          String answer = null;
-          if(!ioListField.getListId().equals(FIImpactSettings.LIST_SURVEYS))
-          {
-            ProjectData pd = sd.getProject();
-            if(pd != null)
-            {
-              if(ioListField.getListId().equals(FIImpactSettings.LIST_PROJECTS))
-                answer = pd.getValue(ioListField.getFieldid());
-              else if(ioListField.getListId().equals(FIImpactSettings.LIST_MATTERMARK))
-                answer = pd.getMattermarkValue(ioListField.getFieldid());
-            }
-          }
-          else
-            answer = sd.questions.get(ioListField.getFieldid());
+          String answer = sd.getAnyFieldValue(ioListField);
 
           if(answer != null && !answer.equals(""))
             ioListField.addLookup(answer, answer);
@@ -299,6 +302,7 @@ public class SurveyManager
       surveyData = surveys.get(id);
     }
 
+    surveyData.setPostedToQMiner(false);
     surveyData.addQuestions(arrQuestions);
     surveyData.calculateResults();
     surveyData.saveSurvey(FIImpactSettings.getFiImpactSettings().getSurveyRoot());

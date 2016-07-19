@@ -491,6 +491,24 @@ public class FIImpactSettings
     String url = servletContext.getInitParameter("qMinerUrl");
     logger.info("qMinerUrl: {}", url);
     qMinerManager = new QMinerManager(url);
+    String sScheduleQminer = servletContext.getInitParameter("qMinerSchedule");
+    if(sScheduleQminer != null)
+    {
+      logger.info("qMinerSchedule: {}", sScheduleQminer);
+      if(sScheduleQminer.equals("true"))
+      {
+        try
+        {
+          String status = qMinerManager.actionStartJob(null);
+          if(status != null)
+            logger.error("Error scheduling qMiner updates: {}", status);
+        }
+        catch (IOException e)
+        {
+          logger.error("Error scheduling qMiner updates", e);
+        }
+      }
+    }
   }
 
   public static synchronized void createSettings(ServletContext servletContext)
@@ -717,8 +735,16 @@ public class FIImpactSettings
     for(int iQuestion = 0; iQuestion < jsonQuestions.length(); iQuestion++)
     {
       JSONObject jsonQuestion = jsonQuestions.getJSONObject(iQuestion);
-      String questionID = jsonQuestion.getString("id");
-      String fullQuestionID = "Q" + sectionID + "_" + questionID;
+      String questionID = jsonQuestion.optString("id", null);
+      String fullQuestionID;
+      if(questionID == null)
+      {
+        questionID = jsonQuestion.getString("full_id");
+        fullQuestionID = questionID;
+      }
+      else
+        fullQuestionID = "Q" + sectionID + "_" + questionID;
+
       String sDefaultAnswer = jsonQuestion.optString("default", null);
       //logger.debug("Parse question: {}", fullQuestionID);
       boolean bLookupFound = false;

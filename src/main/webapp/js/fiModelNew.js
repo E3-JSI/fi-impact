@@ -860,7 +860,7 @@
 			"name" : "MATTERMARK_GROWTH",
 			"label" : "Growth Score",
 			"label_graph" : "Growth Score",
-			"questions" : []
+			"questions" : [{"full_id": "M05"}]
 		},
         {
 			"id" : "7b",

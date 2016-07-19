@@ -82,6 +82,7 @@ public class FIImpactSecureRequestHandler extends HttpServlet
     logger.info("digest={}", sDigest);
 
     usersManager=UsersManager.getUsersManager(webappRoot, sDigest);
+
   }
 
 

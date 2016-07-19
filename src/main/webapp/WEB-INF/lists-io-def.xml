@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lists>
-	<list name="project-list" header_row="3">
+	<list name="project-list" header_row="4">
 		<filed column="PROGRESSIVE NUMBER" label="PROGRESSIVE NUMBER" fieldid="PROGRESSIVE_NUMBER" plot="ignore" graph="ignore" type="text"/>
 		<filed column="FI-IMPACT IDENTIFIER" label="FI-IMPACT IDENTIFIER" fieldid="FI-IMPACT_ID" plot="ignore" graph="ignore" usage="id" type="text"/>
 		<filed column="Help" label="Help" fieldid="P_IGNORE_01" plot="ignore" graph="ignore" usage="ignore" type="text"/>
@@ -32,7 +32,7 @@
 		<filed column="SOFTWARE INDIVIDUAL MARKET (ONLY SOFTWARE) IDC" label="SOFTWARE INDIVIDUAL MARKET" fieldid="SW_INDIVIDUAL_MARKET" plot="selection" graph="feature-selection" missing="0;#N/A;?" type="category"/>
 		<filed column="SOFTWARE PRIMARY MARKET" label="SOFTWARE PRIMARY MARKET" fieldid="SW_PRIMARY_MARKET" plot="selection" graph="feature-selection" missing="0;#N/A;?" type="category"/>
 		<filed column="SOFTWARE SECONDARY MARKET" label="SOFTWARE SECONDARY MARKET" fieldid="SW_SECONDARY_MARKET" plot="selection" graph="feature-selection" missing="0;#N/A;?" type="category"/>
-		<filed column="CALL" label="CALL" fieldid="P29" plot="ignore" graph="ignore" type="int"/>
+		<filed column="CALL" label="CALL" fieldid="P29" plot="ignore" graph="ignore" type="category"/>
 		<filed column="RESPONDENT TO FIMPACT ASSESSMENT?" label="RESPONDED TO FIMPACT ASSESSMENT" fieldid="P_IGNORE_02" plot="ignore" graph="ignore" usage="ignore" type="lookup"/>
 		<filed column="WEBSITE URL" label="WEBSITE URL" fieldid="WEBSITE_URL" plot="ignore" graph="ignore" missing="0;#N/A;?" type="text"/>
 		<filed column="SME/STARTUP" label="SME/STARTUP" fieldid="SME_STARTUP" plot="selection" graph="feature-selection" missing="0;#N/A;?" type="category"/>
