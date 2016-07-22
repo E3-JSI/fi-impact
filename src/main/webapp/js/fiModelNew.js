@@ -530,7 +530,22 @@
 						}
 					]
 
-				}, {
+				},
+				 {
+					"id" : "8a",
+					"lookup" : [{
+							"A" : "Our value proposition is based on vision and internal discussion."
+						}, {
+							"B" : "Our value proposition is validated through surveys and market studies."
+						}, {
+							"C" : "Our value proposition is validated through interviews and meetings with customers."
+						}, {
+                            "D" : "Value proposition tested through usage in a real life setting."
+                         	}
+					]
+
+				},
+				{
 					"id" : "9",
 					"lookup" : [{
 							"A" : "Preparing sales materials and channels."
@@ -845,7 +860,7 @@
 			"name" : "MATTERMARK_GROWTH",
 			"label" : "Growth Score",
 			"label_graph" : "Growth Score",
-			"questions" : []
+			"questions" : [{"full_id": "M05"}]
 		},
         {
 			"id" : "7b",

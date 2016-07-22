@@ -34,11 +34,11 @@
 		  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 		<![endif]-->
   </head>
-
+  
   <body role="document" ng-controller="fiUsers as vm" ng-cloak>
-
+  
     <div class="container theme-showcase" role="main">
-
+		
 		<div  style="height: 160px;"><img src="../../css/fi-impact.png"></div>
 		 <!-- background: top left url('css/fi-impact.png') no-repeat; -->
     	<div class="jumbotron">
@@ -53,7 +53,7 @@
 				</div>
 			</div>
 		</div>
-
+		
 		<table id="listing" class="table table-striped">
 			<thead><tr><th>User</a></th><th>Description</th><th>Accelerator</th><th ng-repeat="(role, description) in roles">{{role}}</th><th>Edit</th><th>Delete</th></tr></tbody>
             <tbody><tr ng-repeat="u in users">
@@ -63,10 +63,10 @@
 				<td class="text-center"><a ng-if="profile.user != u.user" type="button" ng-click="vm.open('delete', u.user)" href=""><i class="fa fa-lg fa-trash-o" aria-hidden="true"></i></a></td>
 			</tr></tbody>
         </table>
-
+		
     </div>
 
-
+	
     <!-- Core JavaScript -->
     <script type="text/javascript" src="../../js/jquery.min.js"></script>
     <script type="text/javascript" src="../../js/angular.min.js"></script>
@@ -74,8 +74,8 @@
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="../../js/ie10-viewport-bug-workaround.js"></script>
 	<!-- Optional includes -->
-	<script type="text/javascript" src="../../js/jquery.min.js"></script>
-	<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../js/jquery.min.js"></script> 
+	<script type="text/javascript" src="../../js/jquery.tablesorter.min.js"></script> 
 	<script type="text/javascript" src="../../js/jquery.tablesorter.pager.min.js"></script>
 	<script type="text/javascript" src="../../js/d3.min.js"></script>
 	<!-- FI-Impact JavaScript -->
@@ -86,7 +86,7 @@
 	<script type="text/javascript" src="../../js/fiCreate.js"></script>
 	<script type="text/javascript" src="../../js/fiDelete.js"></script>
 	<script type="text/javascript" src="../../js/fiEdit.js"></script>
-
+	
 	<script>
 		$(document).ready( function() {
 			$("#listing").tablesorter(fiTableSorter).tablesorterPager(fiTableSorterPager);

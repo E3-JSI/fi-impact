@@ -98,6 +98,10 @@
 				$.each(json.sections.S_6A.answers.Q6A_1.answers, function(i, v) {
 					result.socialBenefits[v.id] = { id: v.id, value: v.result_percent, average: v.average_percent, label: v.label };
 				});
+				
+				result.growth.show = 'M05' in json.sections.S_7a.answers
+				if (result.growth.show) result.growth.M05 = json.sections.S_7a.answers.M05.value
+				
 				return result;
 			}
 			
@@ -128,6 +132,7 @@
 		};
 		
 		$.each($scope.d.speedometers, function(i, v) { d3Speedometer('#' + v + 'Gauge', $scope.d[v].speedometer); });
+		
 		window.radar = {
 			Overview: new fiRadar("bodyOverview", $scope.d.radarOverview),
 			SocialA: new fiRadar("bodySocialA", $scope.d.radarSocialA, {w: 400, h: 400, levels: 5}, $scope.fi.model.radarLevelsSocial),

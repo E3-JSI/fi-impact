@@ -1,20 +1,20 @@
 <div class="modal-header">
 	<button type="button" class="close" ng-click="vm.cancel()">&times;</button>
-	<h3 class="modal-title">{{vm.data.Q1_4.value}} <a target="_blank" ng-href="{{vm.data.MAP_WEBSITE.value}}"><i class="fa fa-external-link" aria-hidden="true"></i></a></h3>
+	<h3 class="modal-title">{{vm.popupData.Q1_4.value}} <a target="_blank" ng-href="{{vm.popupData.MAP_WEBSITE.value}}"><i class="fa fa-external-link" aria-hidden="true"></i></a></h3>
 </div>
 <div class="modal-body fiModal">
 	<table class="projectInfo"><tbody>
 		<tr ng-repeat="info in ['Q1_3', 'Q1_2', 'Q1_1', 'Q3_3a', 'Q3_12', 'B2B_B2C']">
-			<td><strong>{{vm.data[info].label}}</strong></td><td>{{vm.data[info].value}}</td>
+			<td><strong>{{vm.popupData[info].label}}</strong></td><td>{{vm.popupData[info].value}}</td>
 		</tr>
 	</tbody></table>
 	
 	<h3>Abstract</h3>
-	<div>{{vm.data.ABSTRACT.value}}</div>
+	<div>{{vm.popupData.ABSTRACT.value}}</div>
 	
 	<h3>Solution types</h3>
 	<table class="projectInfo"><tbody>
-		<tr ng-repeat="(key, info) in vm.data.solution_types" ng-if="key != 'label'">
+		<tr ng-repeat="(key, info) in vm.popupData.solution_types" ng-if="key != 'label'">
 			<td><strong>{{info.label}}</strong></td><td>{{info.value}}</td>
 		</tr>
 	</tbody></table>
