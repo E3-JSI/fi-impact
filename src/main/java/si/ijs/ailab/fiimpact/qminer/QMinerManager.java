@@ -16,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONWriter;
 import si.ijs.ailab.fiimpact.settings.FIImpactSettings;
+import si.ijs.ailab.fiimpact.survey.SurveyData;
 import si.ijs.ailab.util.AIUtils;
 
 import java.io.*;
@@ -31,14 +32,20 @@ public class QMinerManager extends TimerTask
   public static final String ACTION_STOP_UPDATE_JOB = "q-stop-job";
   public static final String ACTION_POST_DATASET = "q-post-dataset";
   public static final String ACTION_GET_STATUS = "q-get-status";
-  public static final String ACTION_GET_GRAPH = "q-get-graph";
 
+  public static final String ACTION_GET_GRAPH_TEXT_FEATURE = "q-get-graph";
+  public static final String ACTION_GET_GRAPH_ALL_FEATURES = "q-get-graph-all-features";
 
   private final String QMINER_ENDPOINT_POST_DATASET = "post_data";
   private final String QMINER_ENDPOINT_CALC_DATASET = "main_graph_async";
+
   private final String QMINER_ENDPOINT_STATUS = "status";
-  private final String QMINER_ENDPOINT_GRAPH = "custom_graph";
-  private final String QMINER_ENDPOINT_POST_GET_GRAPH = "custom_graph_full_record";
+
+  private final String QMINER_ENDPOINT_EXISTING_GRAPH_TEXT_FEATURE = "custom_graph";
+  private final String QMINER_ENDPOINT_EXISTING_GRAPH_ALL_FEATURES = "custom_graph_all";
+
+  private final String QMINER_ENDPOINT_NEW_GRAPH_TEXT_FEATURE = "custom_graph_full_record";
+  private final String QMINER_ENDPOINT_NEW_GRAPH_ALL_FEATURES = "custom_graph_full_record_all";
 
   private final static Logger logger = LogManager.getLogger(QMinerManager.class.getName());
   private final int HTTP_TIMEOUT = 60 * 1000; // one minute timeout
@@ -116,7 +123,7 @@ public class QMinerManager extends TimerTask
         EntityUtils.consumeQuietly(response.getEntity());
         logger.debug("cleared response entity.");
       }
-      //no errors, start calculating graph
+      //no errors, start calculating graph for the text feature
       if(status == null)
       {
 
@@ -125,7 +132,7 @@ public class QMinerManager extends TimerTask
         HttpGet get = new HttpGet(sUrl);
         logger.debug("About to call qMiner: {}", sUrl);
         response = httpClient.execute(get);
-        logger.debug("Service returned {}", response.getStatusLine().getStatusCode());
+        logger.debug("Service returned: {}", response.getStatusLine().getStatusCode());
         if(response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
         {
           logger.info("QMiner post status OK: {}", response.getStatusLine());
@@ -152,12 +159,14 @@ public class QMinerManager extends TimerTask
       if(httpClient != null)
         httpClient.getConnectionManager().shutdown();
     }
+    logger.debug("Set surveys posted");
+    FIImpactSettings.getFiImpactSettings().getSurveyManager().surveysPostedToQMiner();
     logger.debug("Done.");
     return status;
 
   }
 
-  private String getGraphForFullRecord(OutputStream os, String id)
+  private String getNewGraph(OutputStream os, String id, String action)
   {
     String status = null;
     HttpClient httpClient = null;
@@ -172,7 +181,12 @@ public class QMinerManager extends TimerTask
       logger.debug("Prepare post entity");
       ByteArrayEntity ent = new ByteArrayEntity(out.toByteArray());
       ent.setContentEncoding(new BasicHeader("Content-Type", "application/json"));
-      String sUrl = qMinerRootURL + QMINER_ENDPOINT_POST_GET_GRAPH;
+      String sUrl = qMinerRootURL;
+      if(action.equals(ACTION_GET_GRAPH_TEXT_FEATURE))
+       sUrl+= QMINER_ENDPOINT_NEW_GRAPH_TEXT_FEATURE;
+      else
+        sUrl+= QMINER_ENDPOINT_NEW_GRAPH_ALL_FEATURES;
+
       HttpPost post = new HttpPost(sUrl);
       post.setEntity(ent);
       logger.debug("About to call qMiner: {}", sUrl);
@@ -265,7 +279,7 @@ public class QMinerManager extends TimerTask
 
   }
 
-  private String getGraph(OutputStream os, String id)
+  private String getExistingGraph(OutputStream os, String id, String action)
   {
     String status = null;
     HttpClient httpClient = null;
@@ -275,7 +289,13 @@ public class QMinerManager extends TimerTask
 
       httpClient = createHttpClient();
 
-      String sUrl = qMinerRootURL + QMINER_ENDPOINT_GRAPH + "/"+ id;
+      String sUrl = qMinerRootURL;
+      if(action.equals(ACTION_GET_GRAPH_TEXT_FEATURE))
+        sUrl+= QMINER_ENDPOINT_EXISTING_GRAPH_TEXT_FEATURE;
+      else
+        sUrl+= QMINER_ENDPOINT_EXISTING_GRAPH_ALL_FEATURES;
+
+      sUrl+= "/"+ id;
       HttpGet get = new HttpGet(sUrl);
       logger.debug("About to call qMiner: {}", sUrl);
       HttpResponse response = httpClient.execute(get);
@@ -324,26 +344,29 @@ public class QMinerManager extends TimerTask
     }
   }
 
-  public void actionStartJob(OutputStream outputStream) throws IOException
+  public String actionStartJob(OutputStream outputStream) throws IOException
   {
-    OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
-    JSONWriter json = new JSONWriter(w);
-    json.object();
-    json.key("action").value(ACTION_START_UPDATE_JOB);
     String status = startJob();
-    if(status == null)
+    if(outputStream != null)
     {
-      json.key("success").value("true");
+      OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
+      JSONWriter json = new JSONWriter(w);
+      json.object();
+      json.key("action").value(ACTION_START_UPDATE_JOB);
+      if(status == null)
+      {
+        json.key("success").value("true");
+      }
+      else
+      {
+        json.key("success").value("false");
+        json.key("error").value(status);
+      }
+      json.endObject();
+      w.flush();
+      w.close();
     }
-    else
-    {
-      json.key("success").value("false");
-      json.key("error").value(status);
-    }
-    json.endObject();
-    w.flush();
-    w.close();
-
+    return status;
   }
 
   public void actionStopJob(OutputStream outputStream) throws IOException
@@ -408,27 +431,34 @@ public class QMinerManager extends TimerTask
     }
   }
 
-  public void actionGetGraph(OutputStream outputStream, String internalSurveyId) throws IOException
+  public void actionGetGraph(OutputStream outputStream, String internalSurveyId, String action) throws IOException
   {
-    String status = getGraph(outputStream, internalSurveyId);
+    SurveyData surveyData = FIImpactSettings.getFiImpactSettings().getSurveyManager().getSurveys().get(internalSurveyId);
+    String status = null;
+    if(surveyData == null)
+    {
+      status = "Survey "+internalSurveyId+" does not exist";
+    }
+    else
+    {
+      if(surveyData.isPostedToQMiner())
+        status = getExistingGraph(outputStream, internalSurveyId, action);
+      else
+        status = getNewGraph(outputStream, internalSurveyId, action);
+    }
 
     if(status != null)
     {
-      logger.warn("Project with id {} does not exist in qMiner. About to post the full record.", internalSurveyId);
-      status = getGraphForFullRecord(outputStream, internalSurveyId);
-      if(status != null)
-      {
-        logger.error("Error calling get graph for {}: {}", internalSurveyId, status);
-        OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
-        JSONWriter json = new JSONWriter(w);
-        json.object();
-        json.key("action").value(ACTION_GET_GRAPH);
-        json.key("success").value("false");
-        json.key("error").value(status);
-        json.endObject();
-        w.flush();
-        w.close();
-      }
+      logger.error("Error calling get graph for {}: {}", internalSurveyId, status);
+      OutputStreamWriter w = new OutputStreamWriter(outputStream, "utf-8");
+      JSONWriter json = new JSONWriter(w);
+      json.object();
+      json.key("action").value(action);
+      json.key("success").value("false");
+      json.key("error").value(status);
+      json.endObject();
+      w.flush();
+      w.close();
     }
   }
 

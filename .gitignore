@@ -6,3 +6,5 @@ qminer/monitor.js
 /target/
 /.idea/libraries
 src/main/webapp/css/Thumbs.db
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/inspectionProfiles/profiles_settings.xml

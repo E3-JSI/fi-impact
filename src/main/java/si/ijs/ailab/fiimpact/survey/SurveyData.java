@@ -38,7 +38,17 @@ public class SurveyData
   Map<String, String> questions = new TreeMap<>();
   public Map<String, Double> results = new TreeMap<>();
   public Map<String, Double> resultDerivatives = new TreeMap<>();
+  private boolean isPostedToQMiner = false;
 
+  public boolean isPostedToQMiner()
+  {
+    return isPostedToQMiner;
+  }
+
+  public void setPostedToQMiner(boolean postedToQMiner)
+  {
+    isPostedToQMiner = postedToQMiner;
+  }
 
   private String getSVGArc(double dR, double dr, double boundaryLo, double boundaryHi)
   {
@@ -311,6 +321,10 @@ public class SurveyData
     doc.appendChild(root);
     root.setAttribute("external", externalId);
     root.setAttribute("id", id);
+    if(isPostedToQMiner())
+      root.setAttribute("q", "true");
+    else
+      root.setAttribute("q", "false");
 
     for (Map.Entry<String, String> qe : questions.entrySet())
     {
@@ -528,12 +542,14 @@ public class SurveyData
             String defaultAnswer = questionDef.optString("default", null);
             String postfixChar = questionDef.optString("postfix", null);
 
-            String questionID = questionDef.optString("id");
+            String questionID = questionDef.optString("id", null);
             if (questionID != null)
             {
               questionID = sQuestionIDRoot + questionID;
-            } else
+            }
+            else
               questionID = questionDef.getString("full_id");
+
 
             StringBuilder sbAnswer = new StringBuilder();
             if (customDef != null)
@@ -612,7 +628,8 @@ public class SurveyData
                   }
                 }
               }
-            } else if (mergeDef != null)
+            }
+            else if (mergeDef != null)
             {
               for (int k = 0; k < mergeDef.length(); k++)
               {
@@ -638,7 +655,8 @@ public class SurveyData
                   }
                 }
               }
-            } else if (answersListDef != null)
+            }
+            else if (answersListDef != null)
             {
 
               JSONArray answer = new JSONArray();
@@ -694,7 +712,8 @@ public class SurveyData
                   }
                 }
               }
-            } else if (lookupDef != null)
+            }
+            else if (lookupDef != null)
             {
               String s = questions.get(questionID);
               boolean bLinks = questionDef.optBoolean("links", false);
@@ -740,7 +759,8 @@ public class SurveyData
                   }
                 }
               }
-            } else if (sList.equals("true"))
+            }
+            else if (sList.equals("true"))
             {
               String s = questions.get(questionID);
               if (s == null || s.equals(""))
@@ -765,7 +785,8 @@ public class SurveyData
                 }
               }
 
-            } else if (multipleDef != null)
+            }
+            else if (multipleDef != null)
             {
               JSONObject segmentAnswer = new JSONObject();
               JSONArray subSegmentAnswers = new JSONArray();
@@ -824,9 +845,10 @@ public class SurveyData
               segmentAnswer.put("line_average", lineAverage);
               segmentAnswer.put("line_result", lineResult);
 
-            } else
+            }
+            else
             {
-              String sValue = questions.get(questionID);
+              String sValue = getAnyFieldValue(questionID);
               if (sValue == null || sValue.equals(""))
                 if (defaultAnswer != null)
                   sValue = defaultAnswer;
@@ -913,6 +935,34 @@ public class SurveyData
     logger.info("Got survey profile {}/{} with {} questions and {} results", externalId, id, questions.size(), results.size());
   }
 
+  public String getAnyFieldValue(String fieldID)
+  {
+    logger.debug("Get value of {}", fieldID);
+    IOListField ioListField = FIImpactSettings.getFiImpactSettings().getAllFields().get(fieldID);
+    return getAnyFieldValue(ioListField);
+  }
+
+  public String getAnyFieldValue(IOListField ioListField)
+  {
+    String sValue = null;
+    if(!ioListField.getListId().equals(FIImpactSettings.LIST_SURVEYS))
+    {
+      ProjectData pd = getProject();
+      if(pd != null)
+      {
+        if(ioListField.getListId().equals(FIImpactSettings.LIST_PROJECTS))
+          sValue = pd.getValue(ioListField.getFieldid());
+        else if(ioListField.getListId().equals(FIImpactSettings.LIST_MATTERMARK))
+          sValue = pd.getMattermarkValue(ioListField.getFieldid());
+      }
+    }
+    else
+      sValue = questions.get(ioListField.getFieldid());
+
+    return sValue;
+  }
+
+
   private void profileUIQuestions(JSONObject answersOut, JSONArray questionsDef)
   {
     for(int j = 0; j < questionsDef.length(); j++)
@@ -938,20 +988,7 @@ public class SurveyData
 
         StringBuilder sbAnswer = new StringBuilder();
         IOListField ioListField = FIImpactSettings.getFiImpactSettings().getAllFields().get(questionID);
-        String sValue = null;
-        if(!ioListField.getListId().equals(FIImpactSettings.LIST_SURVEYS))
-        {
-          ProjectData pd = getProject();
-          if(pd != null)
-          {
-            if(ioListField.getListId().equals(FIImpactSettings.LIST_PROJECTS))
-              sValue = pd.getValue(questionID);
-            else if(ioListField.getListId().equals(FIImpactSettings.LIST_MATTERMARK))
-              sValue = pd.getMattermarkValue(questionID);
-          }
-        }
-        else
-          sValue = questions.get(questionID);
+        String sValue = getAnyFieldValue(ioListField);
 
         if(sValue == null || sValue.equals(""))
           if(defaultAnswer != null)
@@ -1148,7 +1185,7 @@ public class SurveyData
     }
   }
 
-  public void saveSurvey(Path root)
+  public synchronized void saveSurvey(Path root)
   {
     Path p = root.resolve("survey-" + id + ".xml");
     try
@@ -1183,6 +1220,14 @@ public class SurveyData
     Document doc = db.parse(is);
     externalId = doc.getDocumentElement().getAttribute("external");
     id = doc.getDocumentElement().getAttribute("id");
+
+    setPostedToQMiner(false);
+    if(doc.getDocumentElement().hasAttribute("q"))
+    {
+      String q = doc.getDocumentElement().getAttribute("q");
+      if(q!=null)
+        setPostedToQMiner(q.equals("true"));
+    }
 
     NodeList nl = doc.getElementsByTagName("q");
 
