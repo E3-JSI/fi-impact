@@ -1,9 +1,12 @@
+var fs = require('fs');
 // require main qminer object
 var qm = require('qminer');
 // load schemas
 var schemas = require('../../schema/schema.json');
 // load data
 var qdata = require('./data.js');
+//config
+var config = JSON.parse(fs.readFileSync('./config/main_config.json', 'utf8'));
 
 // EXPORT PROPERTIES
 //
@@ -212,18 +215,22 @@ exports.customGraph = function(ftr, recs, rec, dat, type) {
     var analytics = require('./analytics.js');
     var mat = ftr.extractMatrix(recs).transpose().toArray();
     var vec = ftr.extractVector(rec).toArray();
+    var config = JSON.parse(fs.readFileSync('./config/main_config.json', 'utf8'));
     // 1 - refresh graph from analytics
     exports.graph = analytics.graph;
     exports.graph_allftr = analytics.graph_allftr;
     // 2 - compute
     if (type == "text") {
-        return analytics.buildEgoGraph(rec, dat, mat, vec, this.data.projects, exports.graph, "existing");
+        console.log(config.node_threshold, config.edge_threshold);
+        return analytics.buildEgoGraph(rec, dat, mat, vec, this.data.projects, exports.graph, "existing", config.node_threshold, config.edge_threshold);
     }
     else if (type == "all") {
-        return analytics.buildEgoGraph(rec, dat, mat, vec, this.data.projects, analytics.graph_allftr, "existing");
+        console.log(config.node_threshold_all, config.edge_threshold_all);
+        return analytics.buildEgoGraph(rec, dat, mat, vec, this.data.projects, analytics.graph_allftr, "existing", config.node_threshold_all, config.edge_threshold_all);
     }
     else {
-        return analytics.buildEgoGraph(rec, dat, mat, vec, this.data.projects, analytics.graph, "existing");
+        console.log(config.node_threshold, config.edge_threshold);
+        return analytics.buildEgoGraph(rec, dat, mat, vec, this.data.projects, analytics.graph, "existing", config.node_threshold, config.edge_threshold);
     }
     
 }

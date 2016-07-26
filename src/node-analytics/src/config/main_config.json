@@ -7,5 +7,7 @@
     "main_graph_all_fn": "main_graph_all.json",
     "node_threshold": 0.01,
     "edge_threshold": 0.1,
+    "node_threshold_all": 0.75,
+    "edge_threshold_all": 0.85,
     "port": 3000
 }
