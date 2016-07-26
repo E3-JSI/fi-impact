@@ -11,6 +11,7 @@
 		var vm = this
 		var tabSetup = {
 			scatter: {
+				type: 'scatter',
 				abscissa: '',
 				ordinate: '',
 				call: 'plot',
@@ -29,11 +30,13 @@
 				update: function() { return updateScatter() }
 			},
 			similarity: {
+				type: 'network',
 				call: 'q-get-graph',
 				preprocess: function (response) { vm.tabs.similarity.raw = response.data },
 				update: function() { return updateNetwork(vm.tabs.similarity.raw) }
 			},
 			questionnaire: {
+				type: 'network',
 				call: 'q-get-graph-all-features',
 				preprocess: function(response) { vm.tabs.questionnaire.raw = response.data },
 				update: function() { return updateNetwork(vm.tabs.questionnaire.raw) }
@@ -73,10 +76,11 @@
 			vm.active = tab
 			$('.fi-plot').hide()
 			$('#' + tab + 'plot').show()
-			if (vm.tabs[tab].loaded) drawGraph()
+			if (vm.selected) vm.selected.nodeColorLegend = ( vm.tabs[tab].type=='network' ? '#000000' : vm.selected.nodeColor)
+			if (vm.tabs[tab].loaded) vm.plotChart()
 		}
 		vm.plotChart = function() {
-			vm.tabs.scatter.data = vm.tabs.scatter.update()
+			vm.tabs.scatter.data = vm.tabs.scatter.update() // needed to recompile the groups
 			if (vm.active != 'scatter') vm.tabs[vm.active].data = vm.tabs[vm.active].update()
 			drawGraph()
 		}	
@@ -146,31 +150,11 @@
 			else return vm.filter.dictionary[option].index
 		}
 		
-		var dataLengths = function() {
-			var sum = 0
-			$.each(vm.tabs.scatter.raw, function(key, list) {
-				// console.log(key + ': ' + list.length)
-				sum += list.length
-			})
-			console.log('raw: ' + sum)
-			sum = 0
-			$.each(vm.tabs.scatter.data, function(i, object) {
-				console.log(object.key + ': ' + object.values.length)
-				// console.log(object.key)
-				sum += object.values.length
-			})
-			console.log('data: ' + sum)
-		}
-		
 		var plotScatter = function() {
 			$('#scatterplot svg').empty()
 			var chart;
 			nv.addGraph(function() {
-				chart = nv.models.scatterChart()
-					.useVoronoi(true)
-					.color(vm.colors)
-					.duration(300)
-					.showLegend(false)
+				chart = nv.models.scatterChart().useVoronoi(true).color(vm.colors).duration(300).showLegend(false)
 				chart.xAxis.tickFormat(d3.format('.02f')).axisLabel(vm.tabs.scatter.slice.abscissa.label)
 				chart.yAxis.tickFormat(d3.format('.02f')).axisLabel(vm.tabs.scatter.slice.ordinate.label)
 				chart.tooltip.contentGenerator(fiContentGenerator)
@@ -219,7 +203,10 @@
 				var thisType = vm.legend.type[type]
 				var typeIndex = thisType.index
 				var typeShape = ( (type == 'SELECTED') ? vm.selected.nodeShape : vm.symbols[typeIndex] )
-				if (type == 'SELECTED') vm.selected.nodeColor = vm.colors[1+typeIndex]
+				if (type == 'SELECTED') {
+					vm.selected.nodeColor = vm.colors[1+typeIndex]
+					vm.selected.nodeColorLegend = vm.colors[1+typeIndex]
+				}
 				if (!filtering) {
 					data.push({ key: type, values: [] })
 					if (type != 'SELECTED') vm.symbolLegend[typeShape].color = vm.colors[1+typeIndex]
@@ -228,7 +215,7 @@
 				if (thisType.checked) $.each(list, function(i, value) {
 					var ind = ( filtering ? getOptionIndex(value) : 1+typeIndex )
 					data[( data[ind] ? ind : 0 )].values.push({
-						label: value.info.Q1_3,
+						label: value.info.Q1_4,
 						size: typeSize(type),
 						shape: typeShape,
 						indicatorX: Math.round(value.KPI[vm.tabs.scatter.slice.abscissa.field]*100)/100,
@@ -249,7 +236,7 @@
 				renderer: { container: document.getElementById(vm.active+'plot'), type: 'canvas' },
 				settings: { minNodeSize: 4, maxNodeSize: 16, labelThreshold: 12 }
 			})
-			network.bind('clickNode doubleClickNode', function(e) { vm.open(e.data.node.idx) });
+			network.bind('clickNode doubleClickNode', function(e) { if (e.data.node.node_type != 'normal') vm.open(e.data.node.idx); });
 			CustomShapes.init(network)
 			network.startForceAtlas2({worker: true, barnesHutOptimize: false, gravity: 5, strongGravityMode: false});
 			setTimeout(function(){ network.stopForceAtlas2(); }, 3000); 
@@ -268,17 +255,20 @@
 			for (var i = 0; i < data.nodes.length; i++) {
 				var thisSymbol = typeSymbol(data.nodes[i].node_type)
 				var d = data.nodes[i].deg
+				var isSelected = ('ego' in data.nodes[i] && data.nodes[i].ego == 1)
 				data.nodes[i].type = thisSymbol
-				data.nodes[i].color = ( (data.nodes[i].node_type == 'SELECTED') ? '#000000' : vm.symbolLegend[thisSymbol].light)
-				data.nodes[i].borderColor = ( (data.nodes[i].node_type == 'SELECTED') ? '#000000' : vm.symbolLegend[thisSymbol].color)
+				data.nodes[i].color = ( isSelected ? '#000000' : vm.symbolLegend[thisSymbol].light)
+				data.nodes[i].borderColor = ( isSelected ? '#000000' : vm.symbolLegend[thisSymbol].color)
 				data.nodes[i].label = data.nodes[i].extra_data.Q1_4
-				data.nodes[i].size = ( (data.nodes[i].node_type == 'SELECTED') ? 1 : d*d*d)
-				data.nodes[i].hidden = !vm.legend.type[data.nodes[i].node_type].checked
+				data.nodes[i].size = ( isSelected ? 1 : d*d*d)
+				data.nodes[i].hidden = !vm.legend.type[data.nodes[i].node_type].checked && !isSelected
 				if (vm.filter.field != 'none') {
 					var ind = getOptionIndex(data.nodes[i].extra_data)
 					if (ind == false) ind = 0
-					data.nodes[i].color = vm.lights[ind]
-					data.nodes[i].borderColor = vm.colors[ind]
+					if (!isSelected) {
+						data.nodes[i].color = vm.lights[ind]
+						data.nodes[i].borderColor = vm.colors[ind]
+					}
 				}
 			}
 			return {nodes: data.nodes, edges: uniqEdges}
@@ -291,48 +281,27 @@
 		
 		var fiContentGenerator = function(d) {
 			if (d === null) return '';
-
 			var table = d3.select(document.createElement("table"));
 			var tbodyEnter = table.selectAll("tbody").data([d]).enter().append("tbody");
-
 			var trowEnter = tbodyEnter.append("tr").classed("highlight", function(p) { return p.highlight});
-
-			trowEnter.append("td")
-				.classed("key",true)
-				.classed("total",function(p) { return !!p.total})
+			trowEnter.append("td").classed("key",true).classed("total",function(p) { return !!p.total})
 				.html(function(p, i) { return vm.tabs.scatter.slice.abscissa.label});
-
-			trowEnter.append("td")
-				.classed("value",true)
-				.html(function(p, i) { return d.point.indicatorX });
-
-			trowEnter = tbodyEnter.append("tr").classed("highlight", function(p) { return p.highlight});
-			
-			trowEnter.append("td")
-				.classed("key",true)
-				.classed("total",function(p) { return !!p.total})
+			trowEnter.append("td").classed("value",true).html(function(p, i) { return d.point.indicatorX });
+			trowEnter = tbodyEnter.append("tr").classed("highlight", function(p) { return p.highlight});	
+			trowEnter.append("td").classed("key",true).classed("total",function(p) { return !!p.total})
 				.html(function(p, i) { return vm.tabs.scatter.slice.ordinate.label});
-
-			trowEnter.append("td")
-				.classed("value",true)
-				.html(function(p, i) { return d.point.indicatorY });
-
+			trowEnter.append("td").classed("value",true).html(function(p, i) { return d.point.indicatorY });
 			trowEnter.selectAll("td").each(function(p) {
 				if (p.highlight) {
 					var opacityScale = d3.scale.linear().domain([0,1]).range(["#fff",p.color]);
 					var opacity = 0.6;
-					d3.select(this)
-						.style("border-bottom-color", opacityScale(opacity))
-						.style("border-top-color", opacityScale(opacity))
-					;
+					d3.select(this).style("border-bottom-color", opacityScale(opacity)).style("border-top-color", opacityScale(opacity));
 				}
 			});
-
 			var html = ( (d.point.label) ? '<p style="text-align: left; font-weight: bold;">' + d.point.label + "</p>" : '' );
 				html += table.node().outerHTML;
 			return html;
-
-		};
+		}
 
 		
 	}]);
