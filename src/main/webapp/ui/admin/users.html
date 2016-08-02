@@ -47,7 +47,10 @@
 				<i class="fa fa-user" aria-hidden="true"></i> {{profile.user}} <span ng-if="profile.accelerator.length > 0"><i class="fa fa-building-o" aria-hidden="true"></i> {{profile.accelerator}}</span>
 				<a class="btn btn-primary" id="btnCreate" data-toggle="modal" data-target="#createModal" ng-click="vm.open('create', '')" type="button" href="">Create user</a>
 				<a class="btn btn-primary" id="btnProjects" type="button" href="index.html">Projects overview</a>
-				<a class="btn btn-primary" href="../../logout.jsp">Logout</a>
+				<div class="btn-group" role="group" style="margin-left: 10px">
+					<a class="btn btn-primary" target="_blank" href="https://github.com/JozefStefanInstitute/fi-impact/wiki/User%20Management%20Module"><i class="fa fa-question" aria-hidden="true"></i></a>
+					<a class="btn btn-primary" href="../../logout.jsp">Logout</a>
+				</div>
 			</div>
 		</div>
 		

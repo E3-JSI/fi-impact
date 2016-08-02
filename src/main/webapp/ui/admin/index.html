@@ -64,7 +64,8 @@
 				</div>
 				<a id="btnUsers" type="button" class="btn" ng-class="{'btn-primary': access('user-management'), 'btn-secondary': !access('user-management')}" ng-disabled="!access('user-management')" href="users.html">Manage users</a>
 				<div class="btn-group" role="group" style="margin-left: 10px">
-					<button id="btnUpload" data-toggle="modal" data-target="#pwdModal" type="button" class="btn btn-primary" ng-click="vm.open('password')">Change password</button>
+					<button id="btnPwd" data-toggle="modal" data-target="#pwdModal" type="button" class="btn btn-primary" ng-click="vm.open('password')">Change password</button>
+					<a class="btn btn-primary" target="_blank" href="https://github.com/JozefStefanInstitute/fi-impact/wiki/Overview%20list"><i class="fa fa-question" aria-hidden="true"></i></a>
 					<a class="btn btn-primary" href="../../logout.jsp">Logout</a>
 				</div>
 			</div>
